@@ -1,4 +1,6 @@
 # twitter_analysis_db
+
+```
 The point:
 
 Quickly select and view tweets ( typically for a single person based on a number of criteria ).
@@ -22,6 +24,8 @@ Multiple tables, preloaded with sample data.
 Database Interface ( sqlite, could be modified for other relational databases )
 Parameter file for wide range of modifications of program behavior.
 Uses standard Python logging class.
+
+```
 
 Guide to directories and files:
 ```
