@@ -24,7 +24,7 @@ Parameter file for wide range of modifications of program behavior.
 Uses standard Python logging class.
 
 Guide to directories and files:
-
+```
   .... whatever --|
                     |
                     |-- twitter_analysis_db ----| -> all code required to run the application  
@@ -35,7 +35,7 @@ Guide to directories and files:
                                                 | -- output -> output files, if present from my runs, ok to delete
                                                 | -- help -> help files used by the application 
                                                 | -- wiki_etc -> various files documenting program, including at least some of the material from the open circuits wiki, image files
-
+```
 Some individual files:
          comming soon 
 
