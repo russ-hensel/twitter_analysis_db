@@ -1,0 +1,274 @@
+D:\for_github\twitter_analysis_db\some_querries.txt
+
+These are some example queries for reference or experimentation.
+
+
+# ------ ================= scratch may not work ===============
+
+
+
+============================== queries that work, I think ===========
+
+>>Concordance > (build_for_word_count.txt)
+
+
+
+----------------concordance group by -----------------------------------
+
+
+SELECT concord.word, words.word_rank , COUNT( * ) as my_count
+    FROM concord
+    LEFT JOIN words  ON concord.word = words.word
+ WHERE  words.word_rank is NULL
+    GROUP BY concord.word
+ HAVING ( my_count > 5 )
+ ORDER BY words.word_rank
+ 
+....>>sql_data is:  []
+....>>Select Done, rows selected: 326
+....
+if word rank is null no point in the join
+
+
+SELECT concord.word, words.word_rank , COUNT( * ) as my_count
+    FROM concord
+    LEFT JOIN words  ON concord.word = words.word
+ WHERE  words.word_rank is NULL
+    GROUP BY concord.word
+ HAVING ( my_count > 5 )
+ ORDER BY words.word_rank
+
+# ---------------- just look at the concordance no joins -- here all columns, no where but having
+
+SELECT concord.word, concord.word_type, concord.is_ascii, COUNT( * ) as my_count
+    FROM concord
+    GROUP BY concord.word
+ HAVING ( my_count > 5 )
+ ORDER BY concord.word_type, concord.word
+
+# ---------------- look at the concordance join to tweet  -- here some columns from tweet ,
+
+SELECT concord.word, concord.word_type, concord.is_ascii, COUNT( * ) as my_count
+    FROM concord
+    JOIN tweets  ON concord.tweet_id = tweets.tweet_id
+    GROUP BY concord.word
+    HAVING ( my_count > 5 )
+    ORDER BY concord.word_type, concord.word
+
+# ---------------- look at the concordance join to tweet  add where on tweet_datetime  ,
+
+SELECT concord.word, concord.word_type, concord.is_ascii, COUNT( * ) as my_count
+    FROM concord
+    JOIN tweets  ON concord.tweet_id = tweets.tweet_id
+    WHERE tweets.tweet_datetime  > "2020-01-01 12:01:05.123"
+    GROUP BY concord.word
+    HAVING ( my_count > 5 )
+    ORDER BY concord.word_type, concord.word
+
+SELECT concord.word, concord.word_type, concord.is_ascii, COUNT( * ) as my_count
+    FROM concord
+    JOIN tweets  ON concord.tweet_id = tweets.tweet_id
+    WHERE tweets.tweet_datetime  > "2020-01-01 12:01:05.123"
+    GROUP BY concord.word
+    HAVING ( my_count > 5 )
+    ORDER BY my_count, concord.word
+
+--------------- works but results odd because of null which means join failed
+
+
+SELECT concord.word, words.word_rank , COUNT( * ) as my_count
+    FROM concord
+    LEFT JOIN words  ON concord.word = words.word
+ WHERE  words.word_rank is NULL
+    GROUP BY concord.word
+
+ ORDER BY words.word_rank
+
+
+
+====================  like AND distinct
+
+SELECT concord.word,   concord.is_ascii
+    FROM concord
+ WHERE concord.word LIKE 'wo%'
+
+--------------------------
+
+SELECT DISTINCT concord.word,   concord.is_ascii
+    FROM concord
+ WHERE concord.word LIKE 'wo%'
+
+
+------------- what if now wildcard --- acts like equal, but as fast ??
+
+SELECT DISTINCT concord.word,   concord.is_ascii
+    FROM concord
+ WHERE concord.word LIKE 'who'
+
+================= is_ascii and boolean ===================
+
+SELECT concord.word,   concord.is_ascii
+    FROM concord
+
+ WHERE  concord.is_ascii
+ ORDER BY  concord.word
+
+---------------
+ SELECT concord.word,   concord.is_ascii, concord.word_type
+    FROM concord
+
+ WHERE  concord.is_ascii
+ ORDER BY  concord.word
+
+ ==================================
+
+
+     FROM concord
+    JOIN tweets  ON concord.tweet_id = tweets.tweet_id
+    LEFT OUTER JOIN words  ON concord.word = words.word
+ WHERE
+    concord.word  =     "democrat" AND
+    tweets.tweet_datetime  >= ?  AND
+    tweets.tweet_datetime <= ?
+    ORDER BY tweets.tweet_datetime
+
+
+
+  SELECT concord.word, words.word_rank , COUNT( * ) as my_count
+    FROM concord
+    LEFT JOIN words  ON concord.word = words.word
+ WHERE  words.word_rank is not NULL
+    GROUP BY concord.word
+
+ ORDER BY words.word_rank
+
+left has all records
+    --------------
+================== old sql ===================
+
+  
+------
+
+SELECT
+  concord.word,
+  words.word
+FROM concord
+LEFT JOIN words  ON concord.word = words.word;
+
+
+-------------
+SELECT
+  concord.word,
+  words.word,
+  words.word_rank
+FROM concord
+LEFT JOIN words  ON concord.word = words.word;
+
+
+
+---------------------
+
+SELECT
+  concord.word,
+  words.word,
+  words.word_rank,
+  COUNT( concord.word )
+FROM concord
+LEFT JOIN words  ON concord.word = words.word
+GROUP BY concord.word
+order by words.word_rank asc
+
+ 
+
+
+ 
+=================
+
+SELECT
+  concord.word,
+  words.word,
+  words.word_rank,
+  COUNT( concord.word ) as my_count
+FROM concord
+LEFT JOIN words ON concord.word = words.word  and  ( word.word_rank > 5  )
+GROUP BY concord.word
+where ( word.word_rank > 5  )
+order by words.word_rank asc
+
+==================
+
+SELECT
+  concord.word,
+  words.word,
+  words.word_rank,
+  COUNT( concord.word ) as my_count
+FROM concord
+LEFT JOIN words ON concord.word = words.word  and  ( words.word_rank > 5  )
+GROUP BY concord.word
+
+order by words.word_rank asc
+
+=========================
+
+ 
+
+====================== works
+
+SELECT
+  concord.word,
+  words.word,
+  words.word_rank,
+  COUNT( concord.word ) as my_count
+FROM concord
+LEFT JOIN words ON concord.word = words.word
+GROUP BY concord.word
+having  ( my_count > 5  )
+order by words.word_rank asc
+
+-----------------------
+Select concord.word,   words.word,   COUNT( * ) as my_count
+FROM concord LEFT JOIN words ON concord.word = words.word
+GROUP BY concord.word
+HAVING  ( my_count > 5  )
+ORDER BY my_count
+
+
+
+---------- next has error
+Select concord.word, words.word  COUNT( * ) as my_count
+ FROM concord  LEFT JOIN words  ON concord.word = words.word
+ GROUP BY concord.word
+ HAVING ( my_count > 5 )
+ ORDER BY my_count
+======================
+
+Select concord.word, words.word,  COUNT( * ) as my_count
+
+FROM concord  LEFT JOIN words  ON concord.word = words.word
+
+
+GROUP BY concord.word   HAVING ( my_count > 5 )  ORDER BY my_count
+
+ 
+
+SELECT tweets.tweet, tweets.tweet_type, tweets.tweet_datetime
+FROM tweets
+
+
+ORDER BY tweets.tweet_datetime
+
+
+ SELECT DISTINCT concord.word, tweets.tweet, tweets.tweet_id, tweets.tweet_datetime
+    FROM concord
+    JOIN tweets  ON concord.tweet_id = tweets.tweet_id
+ WHERE  tweets.tweet_datetime  >= ?  AND   tweets.tweet_datetime <= ?
+ ORDER BY tweets.tweet_datetime
+ 
+>>sql_data is:  [datetime.datetime(2006, 3, 1, 0, 0), datetime.datetime(2020, 5, 12, 0, 0)]
+
+
+
+
+
+
+

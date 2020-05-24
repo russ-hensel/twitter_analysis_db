@@ -1,0 +1,29 @@
+select_03   Select Tweets Joined -> (select_03.txt)
+
+General:
+    A 3 way join of all tables, potentially can report on any column.  No grouping.
+    
+SQL:
+    The concord table is joined to the tweets table, and to the words table.  The join to 
+    the words table gives us word count and word rank.
+   
+Select Criteria:
+    date range   user input  whole bunch of different widgets, drop downs, and slider
+    tweet_type   user input  dropdown
+    word_type    user input  dropdown 
+    word         user input  dropdown and text entry ( use % as wild card for multiple char )
+    .... check and update         
+    Min Rank: words.word_rank ) words.see drop down
+    Max Count: (words.word_count) see drop down
+   
+Output Format:
+    the usual    user input  drop down        
+        
+Sort Order:
+    by number of occurrences of each word 
+        
+Note: 
+    to better understand the select you may want to go to <Help> and
+    read the section on the database.   
+
+>-----------------------------------------------------------<                    

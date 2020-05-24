@@ -1,0 +1,23 @@
+Basic Tweet Select > ( tweet_select_1.txt  )
+
+General:        
+    Find desired tweets
+    Check tweet loading 
+    Does not join to concord ( concordance ) or word tables, just tweets 
+ 
+SQL:
+    Straight select from tweets table only no concord or word table info
+ 
+Select Criteria:         
+    is Covid   - user input   see dropdown.
+    date range - user input   whole bunch of different widgets, dropdowns and slider
+    ( other gui widgets ignored )
+                   
+Output Format:
+    the usual - user input see dropdown
+
+        
+Sort:           
+    user input see dropdown   !! not implementd 
+                
+>-----------------------------------------------------------<                       
