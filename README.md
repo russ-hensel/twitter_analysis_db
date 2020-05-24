@@ -1,8 +1,7 @@
 # twitter_analysis_db
 
-No code yet, need to get more stable for alpha release.
-probably about a week from this revision
-
+First code this is an alpha release.
+Works for me, run from a development environment, I use Spyder 
 
 ```
 The point:
