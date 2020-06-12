@@ -1,0 +1,18 @@
+Experimental 04  -> (select_04.txt)
+
+    documentation will follow as select is developed
+    for now experimental and all notes that follow here
+    are scratch, and who know how accurate.
+    
+    Run about it to see sql ... probably not useful, may become a real select or not 
+    
+    ---------------- Probably ------------------------
+General:
+    A 3 way join of all tables, potentially can report on any column.  No grouping.
+    Includes the full tweet text.
+    Join to words table exposes info on how common/uncommon words are.
+    
+    may drop output of much of the tweet data to allow interestind grouping
+    may also look into psedo columns of various types.
+
+>-----------------------------------------------------------<                    

@@ -1,0 +1,39 @@
+New Basic Concordance Selection -> ( select_X1.txt )
+
+General:
+    A concordance listing with associated tweet.  Concordance is over a specified
+    time period ( can be "forever" )
+
+SQL:
+    The concord table is joined to the tweets table.  ( concord/tweets )
+    No group by.  <About It> shows SQL without running query 
+
+Select Criteria:
+    Date Range -  user input  whole bunch widgets widgets to assist choice: drop downs, and slider
+                                       ( from tweets.tweet_datetime )
+    Is Covid   -  user input  dropdown ( from tweets.is_covid )
+    Word Like  -  user input, dropdown & typed text ( note % is the wildcard character for "like" )
+                                       ( from tweets.tweet, shifter to lower case )
+    Tweet Type -  user input  dropdown ( from tweets.tweet_type )
+    Word Type  -  user input  dropdown ( from concord.word_type )
+    Word Search - user input  dropdown & typed text ( note % is the wildcard character for "like" )
+                                       ( from concord.word_word )
+    Is Ascii   -  user input  dropdown ( from concord.is_ascii )
+
+Sort Order:
+         Large selection - user input; see dropdown
+            may include:
+                concord.word
+                concord.word_type, concord.word
+                concord.is_ascii, concord.word
+                concord.word_type, count
+
+ Output Format:
+    The usual - user input see dropdown
+
+Note:
+    To better understand the select you may want to go to <Help> and
+    read the section on the database.
+
+>-----------------------------------------------------------<
+

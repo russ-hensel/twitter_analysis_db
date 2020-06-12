@@ -30,9 +30,9 @@ import sys
 import os
 import time
 import datetime
-import traceback
+#import traceback
 import psutil
-import queue
+#import queue
 import threading
 import importlib
 from   tkinter import messagebox
@@ -45,6 +45,7 @@ import app_global
 import sql_builder
 import load_tweet_data
 import load_word_data
+import select_manager
 
 
 # ----- ========================== Begin Application Class ================================
@@ -66,7 +67,9 @@ class TweetApp( object ):
         AppGlobal.controller        = self
         AppGlobal.main_thread_id    = threading.get_ident()
         self.app_name               = "TweetApp"
-        self.version                = "Ver: Alpha 11 - 2020 05 24.1"   # code cleanup by delete -- use sql_builder as super
+        self.version                = "Ver: Alpha 15 - 2020 06 12.1"   # most of structure for traditional
+                                                                       # select in place, more cleanup
+                                                                       # build multi year db, and perhaps for others
 
         self.gui                    =  None  # the gui created later
         self.no_restarts            =  -1    # counter for the number of times the application is restarted
@@ -81,7 +84,7 @@ class TweetApp( object ):
         args: zip
         ret: zip ... all sided effects
         """
-#        print( "===================restart===========================" )
+        #rint( "===================restart===========================" )
         self.no_restarts    += 1
         if self.gui is not None:
 
@@ -92,28 +95,21 @@ class TweetApp( object ):
 
             self.gui.close()
 
-            importlib.reload( parameters )    # should work on python 3 but sometimes if not
-
+            importlib.reload( parameters )    #
+        self.polling_mode = "off"
         #self._polling_fail        = False   # flag set if _polling in gui thread fails
 
 #        self.is_first_gui_loop    = True
         #self.ext_processing       = None    # built later from parameters if specified
-        self.logger               = None    # set later none value protects against call against nothing
+        self.logger             = None    # set later none value protects against call against nothing
 
         # ----- parameters
-        self.parmeters_x          = "none"        # name without .py for parameters
-                                                  #extension may ?? be replaced by command line args
-        #self.__get_args__( )
-        # command line might look like this
-        # python smart_plug.py    parameters=gh_paramaters
+        self.parmeters_x        = "none"        # name without .py for parameters
+                                                #extension may ?? be replaced by command line args
 
+        self.select_manager     = None          # populate in cb_change_select_type
         self.parameters         = parameters.Parameters( )
         self.starting_dir       = os.getcwd()
-
-        # # get parm extensions  ?? for now drop -- will this work on a reload ??
-        # if self.parmeters_x != "none":
-        #     self.parmeters_xx   =  self.create_class_from_strings( self.parmeters_x, "ParmetersXx" )
-        #     self.parmeters_xx.modify( self.parameters )
 
         self.logger_id          = self.parameters.logger_id       # std name
         self.logger             = self.config_logger()            # std name
@@ -124,19 +120,54 @@ class TweetApp( object ):
         self.prog_info()
 
         self.gui                = gui.GUI(  )
+        self.last_begin_dt,  self.last_end_dt  = self.gui.get_dt_begin_end() # after gui is built
 
-        # now most of setup memory has been allocated -- may want to chekc in again later, save this value ??
+        # now most of setup memory has been allocated -- may want to check in again later, save this value ??
         process      = psutil.Process(os.getpid())    #  import psutil
         mem          = process.memory_info().rss
         # convert to mega and format
         mem_mega     = mem/( 1e6 )
         msg          = f"process memory = {mem_mega:10,.2f} mega bytes "
         print( msg )
-        self.logger.log( AppGlobal.force_log_level,      msg )
-
+        # set up gui thread polling if delta > 0
+        self.logger.log( AppGlobal.force_log_level, msg )
+        self.polling_delta  = self.parameters.polling_delta
+        if self.polling_delta > 0:
+            self.gui.root.after( self.polling_delta, self.polling_0 )
         self.gui.run()
 
         self.logger.info( self.app_name + ": all done" )
+
+    # --------------------------------------------------------
+    def polling_0( self, ):
+        """
+        for first round(s) of polling, then use polling
+        """
+        self.polling_count   = 0
+
+        self.gui.root.after( self.polling_delta, self.polling )  # reschedule event
+
+    # --------------------------------------------------------
+    def polling( self, ):
+        """
+        for usual rounds of polling, then use polling
+        """
+        self.polling_count   += 1
+        pass
+        if self.polling_count > 10:
+            #print( "hi" )
+            self.polling_count = 0
+
+        if self.polling_mode == "on":
+            #print( "checking date...")
+            begin_dt,  end_dt  = self.gui.get_dt_begin_end() # after gui is built
+            if ( begin_dt != self.last_begin_dt ) or ( end_dt != self.last_end_dt ):
+                self.last_begin_dt   = begin_dt
+                self.last_end_dt     = end_dt
+                print( "dt change in polling"   )
+                self.slider_select_1("slider_select", help_mode = False )
+
+        self.gui.root.after( self.polling_delta, self.polling )  # reschedule event
 
     # --------------------------------------------------------
     def config_logger( self, ):
@@ -159,8 +190,8 @@ class TweetApp( object ):
         logger.addHandler( fh )
 
         msg   = "Done config_logger"
-        print( msg )
-        logger.info( msg ) #  .debug   .info    .warn    .error
+        #rint( msg )
+        logger.debug( msg ) #  .debug   .info    .warn    .error
         AppGlobal.set_logger( logger )
 
         return logger
@@ -218,7 +249,8 @@ class TweetApp( object ):
     # ----------------------------------------------
     def os_open_parmfile( self,  ):
         """
-        used as callback from gui button -- rename cb ??
+        parameter file is opened in the configured system editor for the user to view and edit
+        may be used as callback from gui button
         path addition here because parameters.py is not itself a parameter
         """
         a_filename = self.parameters.py_path + os.path.sep + "parameters.py"
@@ -227,17 +259,18 @@ class TweetApp( object ):
     # ----------------------------------------------
     def os_open_logfile( self,  ):
         """
-        used as/by callback from gui button.  Can be called form gt
+        py_log file is opened in the configured system editor for the user to view and edit
+        may be used as/by callback from gui button.  Can be called form gt
         """
         # a_filename = self.parameters.py_path + os.path.sep + self.parameters.pylogging_fn
-
         AppGlobal.os_open_txt_file( self.parameters.pylogging_fn )
 
     # ----------------------------------------------
     def os_open_helpfile( self,  ):
         """
-        used as callback from gui button
-        ?? still need to decide how to manage path if not a url
+        help "file" is opened in the os configured application for the file type:
+        file set in parameters may be txt, pdf, or a url
+        method may be used as callback from gui button
         """
         help_file            = self.parameters.help_file
         AppGlobal.os_open_help_file( help_file )
@@ -257,13 +290,19 @@ class TweetApp( object ):
         """
         pass
 
-   # # ----------------------------------------------
-   #  def cb_define_db( self,  ):
-   #      """
-   #      call back for gui button
-   #      """
-   #      print("cb_define_db not implemented")
-   #      pass
+       # ----------------------------------------------
+    def toggle_ds_mode ( self,  ):
+        """
+        call back for gui button
+
+        """
+        print( f"polling_mode {self.polling_mode}" )
+        if self.polling_mode == "on":
+            self.polling_mode = "off"
+            self.gui.widget_slider.config( text  = "Turn Date\nSlider Mode\nOn"  )
+        else:
+            self.polling_mode = "on"
+            self.gui.widget_slider.config( text  = "Turn Date\nSlider Mode\nOff" )
 
    # ----------------------------------------------
     def cb_show_load_parms ( self,  ):
@@ -274,9 +313,9 @@ class TweetApp( object ):
         msg     = (   f"Load parameters ..... "
                     + f"\nDatabase Name:  {self.parameters.database_name}"
                     + f"\nTweet Input:    {self.parameters.tweet_input_file_name}"
+                    + f"\nTweet For:      {self.parameters.who_tweets}"
                     + f"\nWord Input:     {self.parameters.word_input_file_name}"
                    )
-
 
         self.print_info_string_now( msg )
         AppGlobal.logger.debug(  msg  )
@@ -308,7 +347,6 @@ class TweetApp( object ):
         call back for gui button
         populates words table
         """
-        pass
         msg   = "Defining words table... "
         print( msg )
         #self.print_info_string_now( msg )
@@ -383,7 +421,7 @@ class TweetApp( object ):
         !! catch exceptions
         """
         input_fn   =  self.parameters.tweet_input_file_name
-        msg        = "Loading tweets from {input_fn}..... "
+        msg        = f"Loading tweets from {input_fn}..... "
         print( msg )
         # self.print_info_string_now( msg )
         AppGlobal.gui.display_info_string( msg )
@@ -419,7 +457,6 @@ class TweetApp( object ):
         """
         pass
 
-        #self.gui.root.withdraw()
         continue_flag  = messagebox.askokcancel( "Python", "Would you like to test again ?" )
         msg   = f"continue flag = {continue_flag}"
         self.gui.display_info_string( msg )
@@ -436,44 +473,8 @@ class TweetApp( object ):
         """
         call back for gui button
         """
-        print( "cb_gui_test_1" )
+        print( "tweet_app.cb_gui_test_1" )
 
-
-    # # ----------------------------------------------
-    # def cb_tweet_select_1( self,  ):
-    #     """
-    #     call back for gui button
-    #     -- moved to cb_select_word_count
-    #     """
-    #     print("cb_tweet_select_1")
-    #     builder                     = sql_builder.SQLBuilder()
-    #     builder.help_file           = self.parameters.help_path + "/build_for_tweets.txt"
-
-    #     a_format                    =  self.gui.get_output_format()
-    #     builder.output_format       = a_format
-
-    #     builder.db_name             = self.parameters.database_name
-
-    #     begin_ts, end_ts            = self.gui.get_begin_end()   # return( ts_begin , ts_end  )
-    #     builder.begin_dt            = datetime.datetime.fromtimestamp( begin_ts )
-    #     builder.end_dt              = datetime.datetime.fromtimestamp( end_ts )
-
-    #     ___text, ___sql_text, data  = self.gui.get_is_covid()
-    #     print( "is_covid",  ___text, ___sql_text, data  )
-    #     builder.is_covid            = data # true false none
-
-    #     builder.columns_out         = [ "tweets.tweet_datetime", "tweets.is_covid", "tweets.tweet", ]    # also need my_count? for now have builder add it at end
-    #     builder.order_by            = "tweets.tweet_datetime"  # or "my_count DESC"
-    #     builder.min_word_count      = 5
-
-    #     try:
-    #         builder.build_for_tweets()
-    #         builder.select_and_output()
-
-    #     except app_global.UserCancel as exception:
-    #         # Catch the custom exception but just drop as this is the point
-    #         pass
-    #         print( exception )
     # ------------------ select helpers
     # ----------------------------------------------
     def gui_to_builder( self, builder  ):
@@ -481,279 +482,149 @@ class TweetApp( object ):
         what it says, get gui info for select into builder
         !! looks to overlap with get_gui_into_builder clarify this
         """
-        a_format                    =  self.gui.get_output_format()
-        builder.output_format       = a_format
-
-        builder.a_word              = self.gui.a_word_search.get().strip()
-
-        begin_ts, end_ts            = self.gui.get_begin_end()   # return( ts_begin , ts_end  )
-        builder.begin_dt            = datetime.datetime.fromtimestamp( begin_ts )
-        builder.end_dt              = datetime.datetime.fromtimestamp( end_ts )
-
-        ___text, ___sql_text, data  = self.gui.get_is_covid()
-        print( "is_covid",  ___text, ___sql_text, data  )
-        builder.is_covid            = data # true false none should have any = none
-
-        # ------------------tweet_type
-        builder.tweet_type           = self.gui.get_tweet_type()
-        #print( f">>>>>>>>>>>>>>>>>from gui is this right ..............{builder.tweet_type}" )
-
-        builder.max_count            = self.gui.get_max_count()
-        builder.min_rank             = self.gui.get_min_rank()
-
-        builder.add_row_count        = True   # True or false adds "'rc'"
-
-        builder.gui_order_by         = self.gui.get_sort_order()
-
-        builder.word_type            = self.gui.get_word_type()
+        pass
+        y = 1/0
 
     # ----------------------------------------------
     def get_gui_into_builder( self, builder  ):
         """
+        !! look over and select_manager think needs more fields and some tweaks
         populate builder with user options for select
         mutate builder based on gui ( and parameters )
         return zip but builder mutated
         """
-        print( "....................get_gui_into_builder")
+        #rint( "....................get_gui_into_builder")
 
-        builder.db_name          = self.parameters.database_name
-        builder.help_file        = self.parameters.help_path + "./build_for_word_count.txt"  #?? fix with pathlib
+        # think this is obsolete !! check it out
+        #builder.a_word              = AppGlobal.gui.a_word_search.get().strip()   # should be in gui get....
 
-        # text, sql_text, data     =  self.gui.get_is_covid()
-        # builder.is_covid         = data                # true false none should have any = none
+        # logically next should not be here but is convientient
+        builder.db_name             = self.parameters.database_name
 
-        a_format                 =  self.gui.get_output_format()
-        builder.output_format    = a_format
+        a_format                    =  self.gui.get_output_format()
+        builder.output_format       = a_format
 
-        begin_ts, end_ts            = self.gui.get_begin_end()   # return( ts_begin , ts_end  )
-        builder.begin_dt            = datetime.datetime.fromtimestamp( begin_ts )
-        builder.end_dt              = datetime.datetime.fromtimestamp( end_ts )
+        builder.tweets_word_select   = self.gui.get_tweets_word_select()
+        # builder.a_word              = self.gui.a_word_search.get().strip()
+
+        builder.words_word_select   = self.gui.get_words_word_select()
+
+        builder.begin_dt,  builder.end_dt  = self.gui.get_dt_begin_end()
 
         ___text, ___sql_text, data  = self.gui.get_is_covid()
-        print( "is_covid",  ___text, ___sql_text, data  )
         builder.is_covid            = data # true false none should have any = none
+        #rint( "is_covid tuple ish ",  ___text, ___sql_text, data  )
+
+        ___text, ___sql_text, data  = self.gui.get_is_ascii()
+        builder.is_ascii            = data # true false none should have any = none
+        #rint( "is_ascii tuple ish",  ___text, ___sql_text, data  )
 
         # ------------------tweet_type
         builder.tweet_type           = self.gui.get_tweet_type()
-        #print( f">>>>>>>>>>>>>>>>>from gui is this right ..............{builder.tweet_type}" )
+        #rint( f">>>>>>>>>>>>>>>>>from gui is this right ..............{builder.tweet_type}" )
 
-        builder.max_count            = self.gui.get_max_count()
-        builder.min_rank             = self.gui.get_min_rank()
+        builder.words_word_select    = self.gui.get_words_word_select()
 
+        builder.concord_word_type_select  = self.gui.get_concord_word_type_select()
 
-        # # surprise have some mix up on min mas  count rank .... probably a bug to fix
-        # builder.min_word_count   = self.gui.get_max_count()
+        builder.concord_word_select       = self.gui.get_concord_word_select()
 
-        # # builder.max_word_rank    = 100_000    # keep above 100_000 or do not expect results
-        # builder.max_word_rank    = self.gui.get_min_rank()
+        # msg    = f"zzz getting max count:  {self.gui.get_words_max_count_select()}"
+        # #rint( msg )
 
-        builder.word_rank_null      = "is"     #or isnot  # put in gui
+        builder.max_count           = self.gui.get_words_max_count_select()
 
-        # x   = self.gui.get_sort_order()
-        # print( "sort order",  x  )
-        # builder.sort_order       = self.gui.get_sort_order()
-        builder.sort_order       = self.gui.get_sort_order()
-        builder.gui_order_by     = self.gui.get_sort_order()
+        builder.min_rank            = self.gui.get_min_rank()
+
+        builder.word_type           = self.gui.get_word_type()
+
+        builder.group_by_min_count  = self.gui.get_group_by_min_count()   # ?? check if implemented
+
+        builder.word_rank_null      = "is"     #or isnot  # put in gui  think obsolute
+
+        ___text, ___sql_text, data  = self.gui.get_words_is_word_null_select()
+        builder.words_is_word_null  = data # true false none should have any = none
+
+        builder.output_append       =  self.gui.get_output_append_select()
+
+        # !! eliminate dupe
+        builder.sort_order          = self.gui.get_sort_order()
+        builder.gui_order_by        = self.gui.get_sort_order()
+
+        builder.min_group_by_count  = self.gui.get_group_by_min_count()
+
         #builder.order_by         = "words.word_rank"  #   or "my_count"
+
+        builder.add_row_count        = True   # True or false adds "'rc'"  # think obsolute
 
     # ----------------------------------------------
     def cb_run_select( self,  ):
         """
         run the select specified for the gui
+        # text, foo            = self.gui.get_select_type_text_function( )
+        # foo( text, help_mode = False )
         """
-        text, foo            = self.gui.get_select_type_text_function( )
-        foo( text, help_mode = False )
+        self.gui.set_cursor( "wait" )
+        a_title, foo               = self.gui.get_select_type_constructor()
+
+        #rint( a_title, foo  )
+        a_manager      = foo()
+        #rint( a_manager )
+
+        a_manager.run_sql_builder( a_title, help_mode = False )
+        self.gui.set_cursor( "" )
 
     # ----------------------------------------------
     def cb_about_select( self,  ):
         """
         run the help for select specified for the gui -- the select itself is not run
         """
-        text, foo            = self.gui.get_select_type_text_function( )
-        foo( text, help_mode = True )     # text in control is the select name
+        a_title, foo               = self.gui.get_select_type_constructor()
+        #rint( a_title, foo  )
+        a_manager      = foo()
+        #rint( a_manager )
+        a_manager.run_sql_builder( a_title, help_mode = True )
 
-    # ------------------ select helpers
     # ----------------------------------------------
-    def tweet_select_1( self, select_name, help_mode ):
+    def cb_change_select_type( self, event ):
         """
         Basic Tweet Select
         mostly fixed query for tweet load
         but changing that just use reset select and run
+        args  event   ignored
         """
-
-        builder                  = sql_builder.TweetSelect1()
-        builder.help_mode        = help_mode
-        builder.select_name      = select_name
-
-        #self.gui_to_builder( builder )   # ?? which one
-        self.get_gui_into_builder( builder )
-        # !! wrong here probably self.get_gui_into_buildeself.confirm_continue( info_msg, self.check_title,   self.check_run_select, ) #   r( builder )
-
-        builder.help_file        = self.parameters.help_path + "./tweet_select_1.txt"
-
-        builder.go( )
-
-        # try:
-        #     #db_util_concord.util_select_concord( builder  )
-        #     #builder.build_for_check_tweet_load(   )       # mutates select_dict
-        #     builder.tweet_select_1()
-        #     builder.select_and_output( )    # help_mode ??
-
-        # except app_global.UserCancel as exception:
-        #     # let user cancel or help_mode = True
-        #     print( exception )
-
-        # msg   = f"Select Done, rows selected: {builder.row_count}"   # ?? add time
-        # AppGlobal.gui.display_info_string( msg )
-        # # self.print_info_string_now( msg )
-        # AppGlobal.logger.debug(  msg  )
+        a_title, foo               = self.gui.get_select_type_constructor()
+        #rint( a_title, foo  )
+        self.select_manager       = foo()
+        self.select_manager.set_up_widgets()
 
     # ----------------------------------------------
-    def concord_select_1( self, select_name, help_mode  ):
+    def slider_select_1( self, select_name, help_mode ):
         """
-        concord joined to tweet with counts on each word
-        concord_select_1.txt
+        Slider Select ... not yet optimized for speed
+        problems with unicode may have to "convert"
+        write number of tweets
+        work on way to suppress header
+        might be good time to change versions
+        fix sql generation of column part in other selects
         """
-        # builder                  = sql_builder.SQLBuilder()
-
-        builder                  = sql_builder.ConcordSelect1()
-        self.get_gui_into_builder( builder )
+        builder                  = sql_builder.SliderSelect1()
         builder.help_mode        = help_mode
         builder.select_name      = select_name
-
-        builder.help_file        = self.parameters.help_path + "./concord_select_1.txt"
-
-        builder.tweet_type       = self.gui.get_tweet_type()
-
-        self.gui_to_builder( builder )
-
-        # my count is dynamic to group by and count * as my_count
-        # !! need gui element for this  .. still need developmen for now treat as a minimum
-        builder.my_count           = 3   # if using a groupby with count  !! this is a min needs rename
-
-        #builder.go( which_select = builder.concord_select_1 )
-        builder.go( )
-
-    # ----------------------------------------------
-    def select_03( self, select_name, help_mode ):
-    # def tweet_joined_select_1( self, select_name, help_mode ):
-        """
-        call back for gui button  this is a tweet for a selected word -- date range?
-        this is the part of the sql that may come from the gui and passed to the engine
-        think now route thru cb_run_select
-            # three way join work on next  lets just call select_03   and later will
-        """
-        # print( "cb_select_tweet_word" )
-
-        builder                     = sql_builder.Select_03()
-        builder.help_mode           = help_mode
-        builder.select_name         = select_name
-
-        builder.help_file           = self.parameters.help_path + "/build_for_select_tweet_word.txt"
-        builder.help_file           = self.parameters.help_path + "/tweet_joined_select_1.txt"
-        builder.help_file           = self.parameters.help_path + "/select_03.txt"   #
-
-        # !! think better  get from gui here
-
-        a_format                    = self.gui.get_output_format()
-        builder.output_format       = a_format
-
-        builder.db_name             = self.parameters.database_name
-
-        builder.a_word              = self.gui.a_word_search.get().strip()
-
-        begin_ts, end_ts            = self.gui.get_begin_end()   # return( ts_begin , ts_end  )
-        builder.begin_dt            = datetime.datetime.fromtimestamp( begin_ts )
-        builder.end_dt              = datetime.datetime.fromtimestamp( end_ts )
-
-        ___text, ___sql_text, data  = self.gui.get_is_covid()
-        print( "is_covid",  ___text, ___sql_text, data  )
-        builder.is_covid            = data # true false none should have any = none
-
-        # ------------------tweet_type
-        builder.tweet_type           = self.gui.get_tweet_type()
-        #print( f">>>>>>>>>>>>>>>>>from gui is this right ..............{builder.tweet_type}" )
-
-        builder.max_count            = self.gui.get_max_count()
-        builder.min_rank             = self.gui.get_min_rank()
-
-        builder.add_row_count        = True   # True or false adds "'rc'"
-
-        builder.default_order_by            = "tweets.tweet_datetime"
-        builder.gui_order_by                = self.gui.get_sort_order()
-
-        # if  builder.a_word == "zzzzzzzzzzz":   # !! decide and then fix
-        #     builder.columns_out      = [ "tweets.tweet_type", "'joe'", "tweets.tweet", "tweets.tweet_id", "tweets.tweet_datetime", ]    # also need my_count? for now have builder add it at end
-        # else:
         builder.columns_out      = [ "tweets.tweet_datetime",
-                                      "concord.word",
-                                         "tweets.tweet",
-                                         "tweets.tweet_type",
-                                         "tweets.is_covid",
-                                         "words.word_rank",
 
-                                         "tweets.tweet_id",
-                                         #"SUM( 1 ) ",
-                                         sql_builder.ROW_COUNT_CN,      # pseodo column for row count
-                                         sql_builder.TOTAL_WORD_RANK    # pseodo column for word rank, in flux
-                                         ]
+                                  "tweets.tweet",
+                                ]   # add datetime ??
 
+        self.get_gui_into_builder( builder )
+        # then override some
+        builder.tweet_type          = "tweet"       #self.gui.get_tweet_type()
+        builder.output_format       = "zap"
+        #builder.help_mode        = help_mode
+
+        builder.help_file        = self.parameters.help_path + "./slider_select_1.txt"
+        builder.help_file        = self.parameters.help_path + "./slider_select_1.txt"
         builder.go( )
-
-# ------------------ old selects -- for code salvage -- no longer consisten with builder
-
-    # ----------------------------------------------
-    # xxxxnext to work on   not sure rename  db_select_3    join all select ... no looks like a 2 way join
-    # concord joined to words, thus cannot do dates .... so do not work on
-    # def cb_select_concord( self,  ):
-    def concord_joined_select_1( self, select_name, help_mode ):
-        """
-        call back for gui button  this is a word or concordance selection
-        set up for select ... most from user or parameters
-        """
-        builder                  = sql_builder.SQLBuilder()
-        # builder.help_file        = self.parameters.help_path + "./build_for_word_count.txt"  #?? fix with pathlib
-        builder.help_mode        = help_mode
-        builder.select_name      = select_name
-
-        builder.help_file        = self.parameters.help_path + "./concord_joined_select_1.txt"
-        a_format                 = self.gui.get_output_format()
-        builder.output_format    = a_format
-
-        builder.db_name          = self.parameters.database_name
-
-        builder.min_word_count   = 5
-
-        builder.max_word_rank    = 100_000    # keep above 100_000 or do not expect results
-        builder.max_word_rank    = None       # put in gui
-
-        builder.word_rank_null   = "is"     #or isnot  # put in gui
-
-        # x   = self.gui.get_sort_order()
-        # print( "sort order",  x  )
-        builder.sort_order       = self.gui.get_sort_order()
-
-        builder.order_by         = "words.word_rank"  #   or "my_count"
-
-        builder.columns_out      = [ "concord.word", "words.word", "words.word_rank",  ]    # also need my_count? for now have builder add it at end
-        builder.columns_out      = [ "concord.word", "words.word_rank",  ]
-
-        # consider ?? move to builder
-        try:
-            #db_util_concord.util_select_concord( builder  )
-            # builder.build_for_word_count(   )   # mutates select_dict
-
-            builder.concord_joined_select_1()
-            builder.select_and_output()
-
-        except app_global.UserCancel as exception:   #
-            # Catch the custom exception
-            print( exception )
-
-        msg   = f"Select Done, rows selected: {builder.row_count}"   # ?? add time
-        AppGlobal.gui.display_info_string( msg )
-        # self.print_info_string_now( msg )
-        AppGlobal.logger.debug(  msg  )
 
     # ----------------------------------------------
     def select_zip( self, select_name, help_mode = True ):   # lets just go to select_number
@@ -761,71 +632,7 @@ class TweetApp( object ):
         concordance select 1
         arguments   help_mode ......
         """
-        print( "!! select zip error ")
-
-    # ----------------------------------------------
-    def select_concord_1( self, select_name, help_mode = True ):   # lets just go to select_number
-        """
-        concordance select 1
-        arguments   help_mode ......
-        """
-        print( f"tweet_app select_concord_1 {help_mode}")
-        builder                     = sql_builder.SQLBuilder()
-        builder.help_mode           = help_mode
-        builder.select_name         = select_name
-
-        self.gui_to_builder( builder )
-
-        builder.db_name               = self.parameters.database_name
-        builder.help_file             = self.parameters.help_path + "/concord_1.txt"
-
-        builder.default_order_by      = "tweets.tweet_datetime"
-
-        builder.columns_out           = [   "tweets.tweet_datetime",
-                                             "concord.word",
-                                             "tweets.tweet",
-                                             "tweets.tweet_type",
-                                             "tweets.is_covid",
-                                             "words.word_rank",
-                                             "tweets.tweet_id",
-                                              sql_builder.ROW_COUNT_CN,      # pseudo column for row count
-                                              sql_builder.TOTAL_WORD_RANK ,   # pseudo column for word rank, in flux
-                                           ]
-
-        builder.sql_from                =  ""
-
-        #.....................
-
-        self.group_by       = "concord.word"
-
-        if self.count:
-            self.sql_from       += ", COUNT( * ) as my_count  "
-
-        self.sql_from           += "\n    FROM concord "
-
-        self.sql_from           += "\n    LEFT JOIN words  ON concord.word = words.word  "
-
-        # consider ?? move to builder
-        try:
-            #db_util_concord.util_select_concord( builder  )
-            builder.build_for_select_1( help_mode = help_mode  )   # pass in builder instead ??
-            builder.select_and_output()
-
-        except app_global.UserCancel as exception:
-            # user has canceled
-            pass
-            print( exception )
-        # start_time = time.time()
-        # end_time = time.time()
-        # print( f"for {loop_max} itterations code took {end - start} seconds")
-
-        msg   = "Select Done"
-        self.print_info_string_now( msg )
-
-
-
-
-
+        print( "!! select zip error not implemented")
 
 # ==============================================
 if __name__ == '__main__':

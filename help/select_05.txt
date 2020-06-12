@@ -1,0 +1,38 @@
+select_05  tweet for  experimentation    -> (select_05.txt)
+ t 
+
+Not interesting enough to be worked on perhaps later 
+
+
+seems to be a functionally identical to 01, this may offer nothing new ... 
+
+copied from may be coppied back Basic Tweet Select > ( tweet_select_1.txt  )
+
+General:        
+    Find desired tweets
+    May be used to check tweet load processing 
+    Does not join to concord ( concordance ) or word tables, just tweets 
+ 
+SQL:
+    Straight select from tweets table only no concord or word table info.
+ 
+Select Criteria:         
+    * is Covid   - user input   see dropdown.
+    * date range - user input   whole bunch of different widgets, dropdowns and slider
+    * Word like insert a word or partial word.  Search uses the lower case of your input
+      and tries to match to some part of the lower case version of all the tweets. 
+     ( other gui widgets ignored )    
+    
+Output Format:
+    The usual - user input see dropdown
+  
+Sort:           
+    Default: ( marked with ** below )
+    Working in dropdown ( others in dropdown give default sort )
+       **tweets.tweet_datetime then tweets.tweet_type 
+        *tweets.tweet_type then tweets.tweet_datetime 
+    
+    
+                
+>-----------------------------------------------------------<                       
+>-----------------------------------------------------------<                    

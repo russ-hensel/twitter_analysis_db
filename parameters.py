@@ -27,27 +27,30 @@ class Parameters( object ):
     def choose_mode( self,  ):
         """
         choose your mode, typically only one line is uncommented, or just pass to stay in default mode
-        note addition at end for some testing, keep for that purpose
+        note addition "mode_plus_tests" set up for some testing, keep for that purpose
         """
         # ===========  add your  modes as desired starting here ========
-        # ---------->> call modes here; I comment out ones I am not using.  Makes it really easy to switch modes
-        # these are modes I use, pretty much one for each micro-controller
-        # project that I do.  You can look at them as examples or delete the subroutines
-        # pick one by un-commenting it.  These are typically synced up with an Arduino app
+        # ---------->> call modes here; I comment out ones I am not using.
+        # Makes it really easy to switch modes
 
-        #----------------- begin pick a mode --------------
+        #----------------- begin pick a mode -------------->>
         """
         modes set here override values in the default mode ( and in self.os_tweaks() self.computer_name_tweaks()   )
 
         """
         pass                              # if everything else is commented out
+        self.mode_build_tables_on_ram_drive()
+        self.mode_2020_test()
+        #self.mode_tiny_test()
+        #self.mode_db_in_code_dir()
+        # --- probably obsolete, save for ref
         #self.mode_tiny_trump()
         #self.mode_2Ktrump()
-        #self.mode_tiny_test()
-        self.mode_db_in_code_dir()
-        self.mode_big_test()
-        self.mode_add_2019()
-        self.mode_db_in_code_dir()
+
+        #self.mode_db_in_code_dir()
+        #self.mode_big_test()
+        #self.mode_add_2019()
+        #self.mode_db_in_code_dir()
 
         # ---- additional stuff only for testing -- in addition to another mode
         #self.mode_plus_tests()                # used only for testing
@@ -61,50 +64,79 @@ class Parameters( object ):
         self.logging_level      = logging.DEBUG     #INFO
 
   # ------------------------
+    def mode_build_tables_on_ram_drive( self,  ):
+        """
+        for building on ram drive, one table or time period at a time
+        do not add other data to this db without a copy/rename
+        """
+        self.mode                    = "mode_build_tables_on_ram_drive"
+
+        self.show_db_def             = True    # True or False  normally false so you do not trash db by mistake
+        self.database_name           = r"R:/Temp./all_words.db"
+        self.database_name           = r"R:/Temp./2019_to_dec2019.db"
+        self.database_name           = r"R:/Temp./2018_thru_may_2020.db"
+        self.database_name           = r"R:/Temp./2017_thru_may_2020.db"
+        self.database_name           = r"R:/Temp./2016_thru_may_2020.db"
+
+
+        self.tweet_input_file_name   = r"./input/all_tweets_2019.csv"
+        self.tweet_input_file_name   = r"./input/all_tweets_2020_thru_may.csv"
+        self.tweet_input_file_name   = r"./input/all_tweets_2018.csv"
+        self.tweet_input_file_name   = r"./input/all_tweets_2017.csv"
+        self.tweet_input_file_name   = r"./input/all_tweets_2016.csv"
+
+        self.word_input_file_name    = r"./input/english-word-frequency/unigram_freq.csv"
+        self.logging_level           = logging.DEBUG     #INFO
+
+  # ------------------------
     def mode_db_in_code_dir( self,  ):
         """
-        test with large db size
+        mode for first use, database in directory with code, not best for performance, but no special setup
+        from github download
         """
-        self.mode                    = "db_in_code_dir"   # may run slow, move db to ram drive and change next
-
-        self.database_name           = r"R:/all_words_tweets_to_all2019.db"    # for a ramdrive on R:
-        self.database_name           = r"./all_words_tweets_to_all2019.db"     # on both r and C:  working version
-
+        self.mode                    = "db_in_code_dir"                        # mode for db in same dir as code
+        self.database_name           = r"./all_words_tweets_to_all2019.db"     # location of the sqlite db, file name
+                                                                               # move to ram drive for fasted response
+        self.database_name           = r"R:/Temp./all_words.db"
         # ------------- data load
-        self.show_db_def             = False   #True   # True or False  show db def features in the gui
+        self.show_db_def             = False    # True or False  show db def features in the gui
                                                # normally False so you do not trash db by mistake
-        #self.tweet_input_file_name   = r"./input/tiny_in.txt"   # just for now redo
-        #self.tweet_input_file_name   =  os.path.join( dir_name, base_fn  + os.extsep + ext )
-        #self.tweet_input_file_name   = r"./input/all_tweets_may_16_for_2020.txt"
-        self.tweet_input_file_name   = r"./input/all_tweets_2019.txt"
 
-        self.who_tweets              = "djt"    # not really used yet
-        self.use_spacy               = True
-        self.confirm_selects         = False      # if true use message box to confirm selects
-
-        self.word_input_file_name    = r"./input/english-word-frequency/tiny_unigram_freq.csv"
-        self.word_input_file_name    = r"./input/english-word-frequency/unigram_freq.csv"
-
-        self.default_word_list       = []  # not implemented
-
-        self.default_word            = "joe"
+        self.tweet_input_file_name   = r"./input/all_tweets_2019.txt"   # input data for tweets
 
 
 
 
+        self.who_tweets              = "djt"   # not really used yet -- perhaps later
+        self.use_spacy               = True    # use the spacy processor on input words
+        self.confirm_selects         = False   # if true use message box to confirm selects prior to running
+
+        self.word_input_file_name    = r"./input/english-word-frequency/unigram_freq.csv"   # input to the words table, reference word data
+
+        self.default_word_list       = []  # probably proper name for combo_box_words... now being renamed again ... put in defaults
+
+        self.default_word            = ""
+        self.combo_box_words         = [ "fake", "fraud", "outraged", "dem%", "republican",  "immigration",
+                                         "sam", "joe", "warren", "barr", "more", "bad", "best", "faith", "god", "love", "hate" ]
     # -------
-    def mode_tiny_test( self,  ):
+    def mode_2020_test( self,  ):
         """
-        test with small file size ... good for testing, everything runs fast
+        test with small file size ... good for testing, run on ram drive, everything runs fast
         """
-        self.mode                    = "tiny_test"
+        self.mode                    = "mode_2020_test"
 
-        self.database_name           = "new_test.db"
+        self.database_name           = "all_words_plus_tiny_test.db"  # starting from all words first
+        self.database_name           = r"R:/Temp./2020_test.db"  # copy up fill words, rename
 
         # ------------- data load
         self.show_db_def             = True    # True or False  normally false so you do not trash db by mistake
 
-        self.tweet_input_file_name   = r"./input/tiny_in.txt"
+        self.tweet_input_file_name   = r"./input/all_tweets_2020_thru_may.csv"
+        self.tweet_input_file_name   = r"./input/all_tweets_2019.csv"
+        self.tweet_input_file_name   = r"./input/all_tweets_2018.csv"
+        self.tweet_input_file_name   = r"./input/all_tweets_2017.csv"
+        self.tweet_input_file_name   = r"./input/all_tweets_2016.csv"
+
         #self.tweet_input_file_name   =  os.path.join( dir_name, base_fn  + os.extsep + ext )
 
         self.who_tweets              = "djt"    # not really used yet
@@ -141,7 +173,8 @@ class Parameters( object ):
         self.default_word_list       = []  # not implemented
 
         self.default_word            = "joe"
-
+        self.combo_box_words         = [ "fake", "fraud", "outraged", "dem", "republican",  "immigration",
+                                         "sam", "joe", "warren", "barr", "more", "bad", "best", "faith", "god", "love", "hate" ]
    # ------------------------
     def mode_add_2019( self,  ):
         """
@@ -169,9 +202,10 @@ class Parameters( object ):
         self.word_input_file_name    = r"./input/english-word-frequency/tiny_unigram_freq.csv"
         self.word_input_file_name    = r"./input/english-word-frequency/unigram_freq.csv"
 
-        self.default_word_list       = []  # not implemented
 
         self.default_word            = "joe"
+        self.combo_box_words         = [ "fake", "fraud", "outraged", "dem", "republican",  "immigration",
+                                        "sam", "joe", "warren", "barr", "more", "bad", "best", "faith", "god", "love", "hate" ]
 
     # -------
     def mode_2Ktrump(self,  ):
@@ -310,7 +344,9 @@ class Parameters( object ):
         self.running_on   = RunningOn
         self.running_on.gather_data()
 
-        self.py_path       = self.running_on.py_path
+        self.py_path                = self.running_on.py_path
+
+        self.tweet_input_file_name  = r"./input/all_tweets_2019.txt"
 
         our_os = sys.platform
 #        print( "our_os is ", our_os )
@@ -320,61 +356,64 @@ class Parameters( object ):
         else:
             self.os_win = False
 
-        self.platform   = our_os    # sometimes it matters which os
+        self.platform               = our_os    # sometimes it matters which os
 
-        self.computername   = ( str( os.getenv( "COMPUTERNAME" ) ) ).lower()
+        self.computername           = ( str( os.getenv( "COMPUTERNAME" ) ) ).lower()
 
         # ------------ manual settings
-        self.icon               = r"clipboard_c.ico"
-        self.icon               = r"CHIP.ICO"
+        self.icon                   = r"clipboard_c.ico"
+        self.icon                   = r"CHIP.ICO"
 
-        self.id_color           = "red"                # ?? not implemented
+        self.id_color               = "red"                # ?? not implemented
 
-        self.win_geometry       = '1500x800+20+20'     # width x height position
-        self.win_geometry       = '900x600+700+230'    # width x height position  x, y  --- find code for maximize
-        self.win_geometry       = '1900x1000+2+2'    # width x height position  x, y  --- find code for maximize  good for the prof
+        self.win_geometry           = '1500x800+20+20'     # width x height position
+        self.win_geometry           = '900x600+700+230'    # width x height position  x, y  --- find code for maximize
+        self.win_geometry           = '1900x1000+2+2'    # width x height position  x, y  --- find code for maximize  good for the prof
 
-        self.id_color          = "red"    # the application may have color to help identify the gui. think dead code  "blue"   "green"  and lots of other work
-        self.id_height         = 20       # if there is an id pane, height of id pane, 0 for no pane
+        self.id_color               = "red"    # the application may have color to help identify the gui. think dead code  "blue"   "green"  and lots of other work
+        self.id_height              = 20       # if there is an id pane, height of id pane, 0 for no pane
 
         # tkinter uses bg for background so I should probably make a global change
-        self.bkg_color         = "blue"   # color for the background, you can match the id color or use a neutral color like gray
-        self.bkg_color         = "gray"   # override of above because I could
-        self.bkg_color         = "dark slate gray"
-        self.bn_color          = "light gray"    # color for buttons -- may not be implemented -- use bn to match tkinter api
-        self.btn_color         = self.bn_color
-        self.bn_color_active   = "gray"
+        self.bkg_color              = "blue"   # color for the background, you can match the id color or use a neutral color like gray
+        self.bkg_color              = "gray"   # override of above because I could
+        self.bkg_color              = "dark slate gray"
+        self.bn_color               = "light gray"    # color for buttons -- may not be implemented -- use bn to match tkinter api
+        self.btn_color              = self.bn_color
+        self.bn_color_active        = "gray"
 
-        self.log_gui_text      = True
+        self.log_gui_text           = False  # True log all the stuff put in the message area -- may be issues with unicode??
 
-        self.log_gui_text_level = logging.DEBUG
-        self.pylogging_fn       = "tweet_app.py_log"      # file name for the python logging
+        self.log_gui_text_level     = logging.DEBUG
+        self.pylogging_fn           = "tweet_app.py_log"      # file name for the python logging
 
-        self.logging_level      = logging.DEBUG        # .DEBUG  .INFO   logging level
-#        self.logging_level      = logging.INFO
-        self.logger_id          = "tweet"                # id in logging file
+        self.logging_level          = logging.DEBUG        # .DEBUG  .INFO   logging level
+
+        self.logger_id              = "tweet"                # id in logging file
+        self.who_tweets             = "djt"
 
         # ---- next 4 parms are for the select clause -- may be changed in the GUI
-        self.select_begin_date     = datetime.date( 1981, 6,  16 )    # default beginning date for the sql select  ( year, month, day)
-        self.select_begin_date     = datetime.date( 2019, 10, 10 )    # override of above for no particular reason
-        self.select_end_date       = datetime.date( 2020, 11, 20 )    # default end date for the sql select  ( year, month, day)
+        self.select_begin_date      = datetime.date( 1981, 6,  16 )    # default beginning date for the sql select  ( year, month, day)
+        self.select_begin_date      = datetime.date( 2019, 10, 10 )    # override of above for no particular reason
+        self.select_end_date        = datetime.date( 2020, 11, 20 )    # default end date for the sql select  ( year, month, day)
 
-        self.select_begin_hr       = AppGlobal.dd_hours[0]            # default begin time for the sql select  (  index on 24 hr clock )
-        self.select_end_hr         = AppGlobal.dd_hours[0]            # default end time for the sql select    (  index on 24 hr clock )
-        self.slider_datetime_width = datetime.timedelta( days = 9  )
+        self.select_begin_hr        = AppGlobal.dd_hours[0]            # default begin time for the sql select  (  index on 24 hr clock )
+        self.select_end_hr          = AppGlobal.dd_hours[0]            # default end time for the sql select    (  index on 24 hr clock )
+        self.slider_datetime_width  = datetime.timedelta( days = 9  )
 
-        self.default_word          = "dem%" #  default word for tweet selects president truth fake failing
-        self.confirm_selects       = False      # if true use message box to confirm selects
-        self.show_db_def           = True       #  or False
+        self.default_word           = "dem%" #  default word for tweet selects president truth fake failing
+        self.confirm_selects        = False      # if true use message box to confirm selects
+        self.show_db_def            = True       #  or False
 
-        self.default_scroll        = True
-        self.default_output_format = "text"     # default format for selects  html yaml csv text  see gui..
+        self.default_scroll         = True
+        self.default_output_format  = "html"     # default format for selects  html yaml csv text  see gui..
 
-        self.default_select_type   = ""
+        self.default_select_type     = ""
 
         # take these: as possible suggestions
-        self.combo_box_words       = [ "fake", "fraud", "outraged", "dem", "republican",  "immigration",
-                                       "sam", "joe", "warren", "barr", "more", "bad", "best", "faith", "god", "love", "hate" ]
+        self.combo_box_words        = [ "fake", "fraud", "outraged", "dem", "republican",  "immigration",
+                                        "sam", "joe", "warren", "barr", "more", "bad", "best", "faith", "god", "love", "hate" ]
+
+        self.polling_delta         = 200    # units ms # set to 0 for no polling
 
 # ==============================================
 if __name__ == '__main__':

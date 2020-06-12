@@ -1,0 +1,35 @@
+Concordance Word Count -> ( select_02.txt )
+
+General:
+    A concordance summary giving word count ( number of times a word is used ) is build for
+    a specified time period ( can be "forever" ) and other criteria.
+
+SQL:
+    The concord table is joined to the tweets table, and words are grouped and counted.
+    
+Select Criteria:
+  
+    Date Range -    user input; whole bunch of different widgets, dropdowns and slider.
+                                       ( from tweets.tweet_datetime )
+    Is Covid -      user input; see dropdown.  
+                                       ( from tweets.tweet_is_covid )  
+    Word Like -     user input; sql like  matched to the text of the tweet.  Dropdown and text entry.
+                    Word and tweet adjusted to lower case, use % as n character wild card leading or trailing.    
+                                       ( from tweets.tweet ) 
+    Tweet Type -    user input; see dropdown.
+                                       ( from tweets.tweet_type )   
+  
+    and more .............. see gui 
+  
+Sort Order:
+    Large selection - user input; see dropdown
+                
+Output Format:
+    The usual - user input see dropdown       
+        
+Note: 
+    To better understand the select you may want to go to <Help> and
+    read the section on the database.        
+                
+>-----------------------------------------------------------<  
+ 

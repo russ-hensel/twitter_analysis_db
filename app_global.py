@@ -148,7 +148,7 @@ class OSCall( object, ):
         add a command at the beginning and re init the list
         call internally at init or externally ( parameters ) to add to list
         """
-        print( f"adding {more_command_list}")
+        # print( f"AppGlobal.add_command() adding {more_command_list}")
         if more_command_list is None:
             self.command_list        = more_command_list     # [   r"D:\apps\Notepad++\notepad++.exe", r"gedit", r"xed", r"leafpad"   ]   # or init from parameters or put best guess first
 

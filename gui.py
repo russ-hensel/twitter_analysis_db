@@ -18,7 +18,7 @@ import ctypes   # probably should be used to set icon.
 
 #------- local imports
 from   app_global import AppGlobal
-
+import select_manager
 
 # ======================= begin class ====================
 class GUI:
@@ -63,52 +63,52 @@ class GUI:
 
         self.rb_var              = IntVar() #Tk.IntVar()
 
-        #------ drop down dicts ( integrate into a calss ?? )  ------  concord_joined_select_1
+        #------ drop down dicts ( integrate into a class ?? )
 
-        # key what displays in gui, value what program uses. constants
-        self.select_type_dict     =  {
-                                       "Basic Tweet Select":                     self.controller.tweet_select_1,       # #self.controller.cb_check_tweet_load,
-                                       "Basic Concordance Select":               self.controller.concord_select_1,       #self.controller.cb_check_concord_load,
-                                       "Three Way Join; Full Tweet Text":        self.controller.select_03,
-
-                                       # "Tweet  joined to Concord 1":  self.controller.select_zip,     # self.controller.tweet_joined_select_1,    # was tweet
-
-                                       # #"Basic Concordance Select":    self.controller.concord_select_1,       #self.controller.cb_check_concord_load,
-                                       # "Concordance joined to Words": self.controller.concord_joined_select_1,
-
-                                       # "Concordance":                self.controller.tweet_select_1,    # was concord
-                                       # "concord 1":                  self.controller.tweet_select_1,    # was concord_1
+        # use constructor name
+        self.select_type_dict     =  {  # connot lay out in columns easily if font not proportional
+                                       "Tweets ( tweets ) - 01":           select_manager.SM_Select_01,
+                                       "Concordance Word Count ( concord:tweets ) - 02":  select_manager.SM_Select_02,
+                                       "Three Way Join; Full Tweet Text -              03": select_manager.SM_Select_03,
+                                       "Experimental Select - 04": select_manager.SM_Select_04,
+                                       "Experimental Tweet Select -                    05": select_manager.SM_Select_05,
+                                       "Word rank average - ( words:concord:tweets ) - 06": select_manager.SM_Select_06,
+                                       "Select Words Like ( words )  07": select_manager.SM_Select_07,
+                                       "Concordance with Tweet ( concord:tweets ) - X1": select_manager.SM_Select_X1,
                                        }
 
         self.select_word_type_dict  =  { "Any":           None,
-                                         "Regular Word":  1,
+                                         "Regular":       1,
                                          "Hashtag":       3,
-                                         "Regular Word":  1,
                                          "Url":           2,
                                          "@...":          4,
-                                         "Leading Num":   5,
+                                         "Num...":        5,
                                          }
 
-        self.decode_word_type_dict     = dict(map(reversed, self.select_word_type_dict.items()))  # invert the dict above
+        self.decode_word_type_dict      = dict(map(reversed, self.select_word_type_dict.items()))  # invert the dict above
 
+        self.select_tweet_type_dict     = {    "Any":              None,
+                                               "ReTweet":          "retweet",
+                                               "Tweet":            "tweet",
+                                          }
 
-        self.select_tweet_type_dict =  { "Any":          None,
-                                         "ReTweet":      "retweet",
-                                         "Tweet":        "tweet",     }
+        self.output_format_dict         = {    "text":      "txt",
+                                                "csv":      "csv",
+                                                "yaml":     "yaml",
+                                                "html":     "html",
+                                                # "sql":    "sql",
+                                                "msg":      "msg"
+                                          }
 
-        self.output_format_dict   =  { "text":      "txt",
-                                       "csv":       "csv",
-                                       "yaml": "yaml",
-                                       "html":      "html",
-                                        # "sql":    "sql",
-                                        "msg":  "msg"
-                                       }
-
-        self.sort_order_dict      =  { "Default":     "default",
-                                       "Date":        "date",
-                                       "Word":        "word",
-                                       "Word Count":  "word _count",
-                                       "Word Rank":   "word_rank" }
+        # some seem to be litterally what you sort on other key words....decide ... need one for_my count??
+        # !! I may have broken some by using full columnname
+        self.sort_order_dict            = {    "Default":              "default",
+                                                "Date":                 "tweets.tweet_datetime",
+                                                "Date, Tweet Type":     "tweets.tweet_datetime, tweets.tweet_type",
+                                                "Tweet Type, Date":     "tweets.tweet_type, tweets.tweet_datetime",
+                                                "Word":        "word",
+                                                "Word Count":  "words.word_count",
+                                                "Word Rank":   "words.word_rank" }
 
         self.dd_zero              = [ "data_begin", "data_end",  "db_sql_begin",  "db_sql_end"  ]
 
@@ -125,10 +125,78 @@ class GUI:
         self.btn_color            = self.parameters.btn_color
         self.bkg_color            = self.parameters.bkg_color
 
+        # get widget names into existance
+        #widgets    = [ self.tweets_word_widget, self.is_covid,  self.tweet_type, self.word_type ]
+        self.tweets_word_widget   = None    # need to define now so....
+        self.is_covid             = None    # need to define now so....
+        self.tweet_type           = None    # need to define now so....
+        self.word_type            = None    # need to define now so....
+
+        # instead of above lets try
+        self.select_widget_list   = []      # and controls will add themselves
+
         self.root.grid_columnconfigure( 0, weight=1 ) # final missing bit of magic
 #        self.root.grid_rowconfigure(    0, weight=1 )
+        self._master_frame_maker( )
 
-        # ------------ start making frames
+# ------ frame building helpers  ------------------------
+    # ----------------------------------------
+    def _set_lambda_callback( self, a_widget, a_function ):
+        """
+        a_function to set the callback in case_dict for a_widget
+        also adds to list to control color for active button _set_active_date_widget
+        a bit indirect as this seems to 'hide' the parm a_widget and make it the "current" value
+        perhaps a closure?
+        """
+        a_widget.config( command = lambda: a_function( a_widget ) )
+        self.dt_widgets.append( a_widget )
+
+   # ------------------------------------------
+    def _set_active_date_widget( self, a_widget, ):
+        """
+        indicate the last active date widget used, detail in flux
+        change to loop over list of date widgets
+        """
+        #rint( "_set_active_date_widget" )
+        for i_widget in self.dt_widgets:
+            #rint( f"widgets: {a_widget} == ? {i_widget}")
+            if i_widget == a_widget:
+                #rint( "_set_active_date_widget   this button" )  # we are not getting this
+                i_widget.configure( background = self.parameters.bn_color_active )
+            else:
+                i_widget.configure( background = self.parameters.bn_color )
+
+    # ------------------------------------------
+    def _make_label( self, a_frame, a_row, a_col, a_text, ):
+        """
+        make a label and auto place in grid, return new value for a_row, a_col for
+        use next time.
+        placement goes down a row then up to the next column, intended for
+        pairs of labels ( more or less assumes we do not need ref to label )
+        return tuple -- or by ref do not need to , test this in templates
+        return label
+        increment row col
+        """
+        a_row    += 1
+        if a_row >= 2:
+                a_row   =  0
+                a_col   += 1
+
+        a_label   = ( Label( a_frame, text = a_text, relief = RAISED,  )  )
+        a_label.grid( row=a_row, column=a_col, sticky=E + W + N + S )    # sticky=W+E+N+S  )
+
+        # set weight seems not to be needed ??
+        return ( a_row, a_col, a_label )
+
+# ------ frame building methods  ---------  should be from top to bottom on the window
+
+    # ------------------------------------------
+    def _master_frame_maker( self,  ):
+        """
+        make a frame for generic system level functions  .....
+        Return:  a frame with the widgets placed in it
+        buttons, mostly  ?? fix name
+        """
         next_frame                = 0      # index of frames and position row for frames
 
         a_frame = self._make_button_frame( self.root,  )
@@ -136,19 +204,22 @@ class GUI:
         next_frame += 1
 
         a_frame  = self._make_other_select_frame( self.root,  )
-        a_frame.grid( row=next_frame, column=0, sticky = E + W + N + S )   # + N + S  )  # actually only expands horiz
+        a_frame.grid( row=next_frame, column=0, sticky = E + W + N + S )   # + N + S  )
+        next_frame += 1
+
+        a_frame  = self._make_select_datetime_frame( self.root,  )
+        a_frame.grid( row=next_frame, column=0, sticky = E + W + N + S )   # + N + S  )
         next_frame += 1
 
         a_frame  = self._make_select_values_frame( self.root,  )
-        a_frame.grid( row=next_frame, column=0, sticky = E + W + N + S )   # + N + S  )  # actually only expands horiz
+        a_frame.grid( row=next_frame, column=0, sticky = E + W + N + S )   # + N + S  )
         next_frame += 1
 
+        a_frame  = self._make_select_values_frame_2( self.root,  )
+        a_frame.grid( row=next_frame, column=0, sticky = E + W + N + S )   # + N + S  )
+        next_frame += 1
 
         if AppGlobal.parameters.show_db_def:
-            a_frame  = self._make_input_frame( self.root,  )
-            a_frame.grid( row=next_frame, column=0, sticky = E + W + N + S )
-            next_frame += 1
-
             a_frame = self._make_load_frame( self.root,  )
             a_frame.grid(row=next_frame, column=0, sticky=E + W + N)
             next_frame += 1
@@ -160,36 +231,14 @@ class GUI:
         self.root.grid_columnconfigure( 0, weight=1 )
         self.root.grid_rowconfigure(    0, weight=0 )
         self.root.grid_rowconfigure( ( next_frame - 1 ), weight=1 )
-
-# ------ build frames  ------------------------
-    # ------------------------------------------
-    def _make_input_frame( self, parent, ):
-        """
-        make a frame for input parameters  .....
-        Return:  a frame with the controls in it
-        """
-        a_frame  = Frame( parent, width=600, height=200, bg =self.bkg_color, relief=RAISED, borderwidth=1 )
-
-        # add some more for db, different style, which do I like best?
-        lrow   =  0
-        lcol   =  0
-#        a_spacer  = Frame( a_frame, width=60, height=60, bg ="green", relief=RAISED, borderwidth=1 )
-#        a_spacer.grid( row = 0, column = lcol, sticky = E + W + N + S, rowspan = 2 )
-
-        bw_for_db      = FileBrowseWidget( a_frame )
-        bw_for_db.grid( row = lrow, column = lcol, columnspan = 6, )
-        bw_for_db.set_text( AppGlobal.parameters.database_name )
-        self.bw_for_db = bw_for_db  # save reference
-
-        lrow   =  2
-        lcol   =  0
-
-        return  a_frame
+        self.reset_select_values()
 
     # ------------------------------------------
     def _make_button_frame( self, parent, ):
             """
-            buttons, mostly system level not app
+            make a frame for generic system level functions  .....
+            Return:  a frame with the widgets placed in it
+            buttons, mostly  ?? fix name
             """
             a_frame  = Frame( parent, width=300, height=200, bg = self.parameters.id_color, relief=RAISED, borderwidth=1 )
 
@@ -211,10 +260,6 @@ class GUI:
             a_button.config( command = self.controller.restart )
             a_button.pack( side = LEFT )
 
-            a_button = Button( a_frame , width=10, height=2, text = "Test" )
-            a_button.config( command = self.controller.cb_test )
-            a_button.pack( side = LEFT )
-
             # --- help
             a_button = Button( a_frame , width=10, height=2, text = "Help" )
             a_button.config( command = self.controller.os_open_helpfile )
@@ -225,14 +270,19 @@ class GUI:
             a_button.config( command = self.controller.cb_about )
             a_button.pack( side = LEFT )
 
+            # --- test  -- comment out when not testing
+            a_button = Button( a_frame , width=10, height=2, text = "Test" )
+            a_button.config( command = self.cb_test )
+            a_button.pack( side = LEFT )
+
             return a_frame
 
     # ------------------------------------------
     def _make_other_select_frame( self, parent, ):
         """
-        make vale frame for selects = queries -- input from users
-
-        Return: a frame with the widgets in it
+        this is the frame that kicks off the select and
+        specified general features of the select
+        Return:  a frame with the widgets placed in it
         """
         a_frame  = Frame( parent, width=600, height=200,
                           bg = self.bkg_color, relief=RAISED, borderwidth=1 )
@@ -242,110 +292,101 @@ class GUI:
 
         # ----- run select
         lcol   += 1
-        a_widget = Button( a_frame , width=10, height=2, text = "Selection:" )
-        #a_widget.config( command = self.controller.cb_gui_test_1 )
+        a_widget = Label( a_frame , width=10, height=2, text = "General\nSelect:" )
+        #a_widget.config( command = self.controller.cb_xxxx)
         a_widget.pack( side = LEFT )
-        a_widget.grid( row = lrow, column = lcol,  sticky=E + W + N + S )
+        a_widget.grid( row = lrow, column = lcol, rowspan = 2, sticky=E + W + N + S )
+        lcol   += 1
 
         # ----- select type
-        lcol   += 1
-        a_widget   = ( Label( a_frame, text = "Select Type:", width = 30, height=2, relief = RAISED,  )  )
-        a_widget.grid( row = lrow, column = lcol, columnspan = 2,  sticky = E + W + N + S )
-
+        a_widget   = ( Label( a_frame, text = "Select Type:", width = 40, height=2, relief = RAISED,  )  )
+        a_widget.grid( row = lrow, column = lcol, columnspan = 3,  sticky = E + W + N + S )
         lrow   += 1
+
         a_list     = list(self.select_type_dict.keys())
         a_widget   =  ttk.Combobox( a_frame,
-                                values = a_list,
-                                height = 20, state='readonly')
+                                    values = a_list,
+                                    height = 20, state = 'readonly')
 
-        #a_widget.pack( side = LEFT )
-        a_widget.grid( row = lrow, column = lcol, columnspan = 2, rowspan = 1, sticky=E + W + N + S )
+        a_widget.bind("<<ComboboxSelected>>", self.controller.cb_change_select_type  )
+
+        a_widget.grid( row = lrow, column = lcol, columnspan = 3, rowspan = 1, sticky=E + W + N + S )
         #a_widget.set( AppGlobal.parameters.default_output_format )
         a_widget.set( a_list[1] )    # default not in parms ??
         self.select_type  = a_widget
         lrow   += -1
+        lcol   += 3 # see above
 
-        lcol   += 2 # see above
         a_widget = Button( a_frame , width = 10, height=2, text = "About It" )
         a_widget.config( command = self.controller.cb_about_select )
-        #a_widget.pack( side = LEFT )
-        a_widget.grid( row = lrow, column = lcol,  sticky=E + W + N + S )
+        a_widget.grid( row = lrow, column = lcol, rowspan = 2, sticky=E + W + N + S )
 
         lcol   += 1
         a_widget = Button( a_frame , width=10, height=2, text = "Run It" )
         a_widget.config( command = self.controller.cb_run_select )
-        #a_widget.pack( side = LEFT )
-        a_widget.grid( row = lrow, column = lcol,  sticky=E + W + N + S )
-
+        a_widget.grid( row = lrow, column = lcol, rowspan = 2, sticky=E + W + N + S )
         lcol   += 1
-        a_widget   = ( Label( a_frame, text = "Other Select\nInfo", height=2, relief = RAISED,  )  )
-        #a_widget.grid( row = lrow, column = lcol,  sticky=E + W + N + S )
-        a_widget.grid( row = lrow, column = lcol,  sticky=E + W + N + S )
 
-        # ----- sort order
+        # ---------------
+        a_widget   = ( Label( a_frame, text = "Other Select\nInfo:", height=2, relief = RAISED,  )  )
+        a_widget.grid( row = lrow, column = lcol, rowspan = 2, sticky=E + W + N + S )
         lcol   += 1
+
+        # ----- sort order  -- !! why not span
         a_widget   = ( Label( a_frame, text = "Sort", relief = RAISED,  )  )
-        a_widget.grid( row = lrow, column = lcol,  sticky=E + W + N + S )
+        a_widget.grid( row = lrow, column = lcol, columnspan = 3, sticky = E + W + N + S )
 
-        lrow   += 1
         a_list     = list(self.sort_order_dict.keys())
         a_widget   =  ttk.Combobox( a_frame, values = a_list,  state='readonly')
-        a_widget.grid( row = lrow, column = lcol, rowspan = 1, sticky=E + W + N + S )
+        a_widget.grid( row = lrow + 1, column = lcol, rowspan = 1, columnspan = 3,  sticky = E + W + N + S )
         a_widget.set( a_list[0] )
         self.sort_order = a_widget
-        lrow   += -1
+        lcol   += 3
 
         # ----- output format
-        lcol   += 1
-        a_widget   = ( Label( a_frame, text = "Output Format:", height=2, relief = RAISED,  )  )
-        a_widget.grid( row = lrow, column = lcol,  sticky=E + W + N + S )
-        #a_widget.pack( side = LEFT )
+        a_widget   = ( Label( a_frame, text = "Output Format:", height = 2, relief = RAISED,  )  )
+        a_widget.grid( row = lrow, column = lcol,  sticky = E + W + N + S )
 
-        lrow   += 1
         a_widget   =  ttk.Combobox( a_frame,
-                                values=list(self.output_format_dict.keys()),
-                                height=10,  state='readonly')
-        #_widget.configure( ""
-        a_widget.grid( row = lrow, column = lcol, rowspan = 1, sticky=E + W + N + S )
-        # a_widget.set( AppGlobal.parameters.default_output_format )
+                                values = list(self.output_format_dict.keys()),
+                                height = 10,  state='readonly')
+        a_widget.grid( row = lrow + 1, column = lcol, rowspan = 1, sticky = E + W + N + S )
         self.output_format  = a_widget
-        lrow   += -1
+
+        lcol   += 1
+
+        # ----- output append
+        a_widget   = ( Label( a_frame, text = "Append to Output:", height = 2, relief = RAISED,  )  )
+        a_widget.grid( row = lrow, column = lcol,  sticky = E + W + N + S )
+
+        a_widget   =  ttk.Combobox( a_frame,
+                                values = [ "No Append", "Append" ],
+                                height = 10,  state='readonly')
+        a_widget.grid( row = lrow + 1, column = lcol, rowspan = 1, sticky = E + W + N + S )
+        a_widget.set( "No Append" )
+        self.output_append_widget  = a_widget
+        lcol   += 1
+        # zz
+
+        # ----- reset
+        a_widget = Button( a_frame , width = 10, height = 4, text = "Turn Date\nSlider Mode\nOn" )
+        a_widget.config( command = self.controller.toggle_ds_mode )
+        # self._set_lambda_callback( a_widget, self.set_select_this_month )
+        a_widget.grid( row = lrow, column = lcol,  rowspan = 2, sticky=E + W + N + S )
+        self.widget_slider   = a_widget
+        lcol   += 1
 
         return a_frame
 
     # ------------------------------------------
-    def _set_active_date_widget( self, a_widget, ):
+    def _make_select_datetime_frame( self, parent, ):
         """
-        indicate the last active date widget used, detail in flux
-        change to loop over list of date widgets
+        make value frame for selects values that control data selected -- input from users
+        reset_select_values -- for defaults not here called at end
+        Return:  a frame with the widgets placed in it
         """
-        print( "_set_active_date_widget" )
-        for i_widget in self.dt_widgets:
-            #print( f"widgets: {a_widget} == ? {i_widget}")
-            if i_widget == a_widget:
-                #print( "_set_active_date_widget   this button" )  # we are not getting this
-                i_widget.configure( background = self.parameters.bn_color_active )
-            else:
-                i_widget.configure( background = self.parameters.bn_color )
-
-    # ----------------------------------------
-    def _set_lambda_callback( self, a_widget, a_function ):
-        """
-        a_function to set the callback in case_dict for a_widget
-        also adds to list to control color for active button _set_active_date_widget
-        a bit indirect as this seems to 'hide' the parm a_widget and make it the "current" value
-        perhaps a closure?
-        """
-        a_widget.config( command = lambda: a_function( a_widget ) )
-        self.dt_widgets.append( a_widget )
-
-    # ------------------------------------------
-    def _make_select_values_frame( self, parent, ):
-        """
-        make value frame for selects values -- input from users
-       reset_select_values -- for defaults not here called ate end
-        Return: a frame with the widgets in it
-        """
+        # msg   = f"_make_select_datetime_frame{''}"
+        #rint( msg )
         a_frame  = Frame( parent, width=600, height=200,
                           bg = self.bkg_color, relief=RAISED, borderwidth=1 )
 
@@ -355,40 +396,88 @@ class GUI:
         # some spacers might be nice -- may put back as we play with the look
 #        a_spacer  = Frame( a_frame, width=60, height=60, bg ="green", relief=RAISED, borderwidth=1 )
 #        a_spacer.grid( row = 0, column = lcol, sticky = E + W + N + S, rowspan = 2 )
-
-        # ---------------- buttons for datetimes
+        # ----------------Label band of buttons
         lcol   += 1
-        a_widget = Button( a_frame , width=10, height=2, text = "Set Today" )
-        self._set_lambda_callback( a_widget, self.set_select_this_week )
-        a_widget.grid( row = lrow, column = lcol, rowspan = 1, sticky=E + W + N + S )
 
-        #lcol   += 1
+        # a_widget = Label( a_frame , width=10, height=2, text = "Selection\nCriteria:" )
+        # #self._set_lambda_callback( a_widget, self.set_select_this_week )
+        # a_widget.grid( row = lrow, column = lcol, rowspan = 2, columnspan = 1, sticky=E + W + N + S )
+        # lcol   += 1
+
+        a_widget = Label( a_frame , width=10, height=2, text = "Date Selection:\n(tweets)" )
+        #self._set_lambda_callback( a_widget, self.set_select_this_week )
+        a_widget.grid( row = lrow, column = lcol, rowspan = 2, columnspan = 1, sticky=E + W + N + S )
+        lcol   += 1
+
+        # ---------------- buttons for datetimes !! next two need appropriate functions not ones in place
+
+        # ----- years ago today
+        a_widget = Button( a_frame , width=10, height=2, text = "1 Year Ago\nToday" )
+        self._set_lambda_callback( a_widget, self.set_1_year_ago  )
+        #a_widget.config( command = self.set_1_year_ago )
+        a_widget.grid( row = lrow, column = lcol, rowspan = 1, sticky=E + W + N + S )
+        self.dt_widgets.append( a_widget )
+
+        a_widget = Button( a_frame , width=10, height=2, text = "2 Years Ago\nToday" )
+        self._set_lambda_callback( a_widget, self.set_2_year_ago  )
+        a_widget.grid( row = lrow +1, column = lcol, rowspan = 1, sticky=E + W + N + S )
+        self.dt_widgets.append( a_widget )
+        lcol   += 1
+
+        # ----- years ago today
+        a_widget = Button( a_frame , width=10, height=2, text = "3 Year Ago\nToday" )
+        self._set_lambda_callback( a_widget, self.set_3_year_ago )
+        a_widget.grid( row = lrow, column = lcol, rowspan = 1, sticky=E + W + N + S )
+        self.dt_widgets.append( a_widget )
+
+        a_widget = Button( a_frame , width=10, height=2, text = "4 Years Ago\nToday" )
+        self._set_lambda_callback( a_widget, self.set_4_year_ago )
+        a_widget.grid( row = lrow + 1, column = lcol, rowspan = 1, sticky=E + W + N + S )
+        self.dt_widgets.append( a_widget )   # !! chdek all widgets some seem to be missing
+        lcol   += 1
+
+        # ----- both dates back
+        a_widget = Button( a_frame , width=10, height=2, text = "Dates Back\nA Week" )
+        self._set_lambda_callback( a_widget, self.set_dates_back_a_week )
+        a_widget.grid( row = lrow, column = lcol, rowspan = 1, sticky=E + W + N + S )
+        self.dt_widgets.append( a_widget )
+
+        a_widget = Button( a_frame , width=10, height=2, text = "Dates Back\nA Month" )
+        self._set_lambda_callback( a_widget, self.set_dates_back_a_month )
+        a_widget.grid( row = lrow + 1, column = lcol, rowspan = 1, sticky=E + W + N + S )
+        self.dt_widgets.append( a_widget )
+        lcol   += 1
+
+        # ---- this day and week
+        a_widget = Button( a_frame , width = 10, height = 2, text = "Set Today" )
+        self._set_lambda_callback( a_widget, self.set_select_today )    # may blow out silently if function does not exist
+        a_widget.grid( row = lrow, column = lcol, rowspan = 1, sticky=E + W + N + S )
+        self.dt_widgets.append( a_widget )
+
         a_widget = Button( a_frame , width=10, height=2, text = "Set This\n Week" )
         self._set_lambda_callback( a_widget, self.set_select_this_week )
         a_widget.grid( row = lrow +1, column = lcol, rowspan = 1, sticky=E + W + N + S )
         self.dt_widgets.append( a_widget )
-
         lcol   += 1    # comment out for row 2 add 1 in row below
+
         a_widget = Button( a_frame , width=10, height=2, text = "Set This\n Month" )
         self._set_lambda_callback( a_widget, self.set_select_this_month )
         a_widget.grid( row = lrow, column = lcol, rowspan = 1, sticky = E + W + N + S )
 
-        #lcol   += 1
         a_widget = Button( a_frame , width=10, height=2, text = "Set\nForever" )
         self._set_lambda_callback( a_widget, self.set_select_forever )
-        a_widget.grid( row = lrow +1, column = lcol, rowspan = 1, sticky = E + W + N + S )
+        a_widget.grid( row = lrow + 1, column = lcol, rowspan = 1, sticky = E + W + N + S )
+        #lrow    = 0
+        lcol   += 1    # comment out for row 2 add 1 in row below
 
         # ------ date slider
-        lrow    = 0
-        lcol   += 1    # comment out for row 2 add 1 in row below
         a_widget =  Label( a_frame, text = "Set Weeks\nin Past", relief = RAISED,  )
         a_widget.grid( row = lrow, column = lcol, sticky = E + W + N + S )    # sticky=W+E+N+S  )
-        #self.dt_widgets.append( a_widget )
 
         #lcol   += 1
         a_widget = Scale( a_frame, orient ='horizontal', from_= -52, to= 0, command = self.set_select_slier_datetimes )
         #a_widget.config( command = self.set_select_forever )
-        a_widget.grid( row = lrow +1, column = lcol, rowspan = 1, sticky =E + W + N + S )
+        a_widget.grid( row = lrow + 1, column = lcol, rowspan = 1, sticky =E + W + N + S )
         self.date_slider = a_widget
         self.dt_widgets.append( a_widget )
 
@@ -401,7 +490,6 @@ class GUI:
                                                              lrow, lcol, "End date and hour:", )
 
         lrow    = 0
-        #lcol    = 2
         cal     = DateEntry( a_frame, width=12, background='darkblue',
                     foreground='white', borderwidth=2, year=2010,    bordercolor = "red",     )
 
@@ -409,6 +497,9 @@ class GUI:
         cal.configure( date_pattern = "yyyy/mm/dd" )
         # cal.set_date( self.parameters.select_begin_date  )
         self.cal_begin = cal
+
+        # msg   = f"_make_select_datetime_frame self.cal_begin{ self.cal_begin }"
+        # print( msg )
 
         cal     = DateEntry( a_frame, width=12, background='darkblue',
                              foreground='white',
@@ -418,7 +509,7 @@ class GUI:
         # cal.set_date( self.parameters.select_end_date  )
         self.cal_end     = cal
 
-        #-------------------- drop down for hours
+        #-------------------- drop downs for hours
         lrow    = 0
         lcol    += 1
 
@@ -430,79 +521,96 @@ class GUI:
 
         a_widget   =  ttk.Combobox( a_frame, values=AppGlobal.dd_hours, state='readonly')
         a_widget.grid( row = lrow + 1, column = lcol, rowspan = 1, sticky=E + W + N + S )
-        # a_widget.set( self.parameters.select_end_hr )
         self.time_end  = a_widget
 
-        # ------ text word input -- ?? check default
-        lcol   += 3
-        a_widget   = ( Label( a_frame, text = "Word Search: ", relief = RAISED,  )  )
+        #msg   = f"_make_select_datetime_frame returning frame self.cal_begin{ self.cal_begin }"
+        #rint( msg )
+
+        return  a_frame
+
+    # ------------------------------------------
+    def _make_select_values_frame( self, parent, ):
+        """
+        make value frame for selects values that control data selected -- input from users
+        reset_select_values -- for defaults not here called at end
+        Return: a frame with the widgets in it
+        Return:  a frame with the widgets placed in it
+        """
+        a_frame  = Frame( parent, width=600, height=200,
+                          bg = self.bkg_color, relief=RAISED, borderwidth=1 )
+
+        lrow   =  0
+        lcol   =  0
+
+        # some spacers might be nice -- may put back as we play with the look
+#        a_spacer  = Frame( a_frame, width=60, height=60, bg ="green", relief=RAISED, borderwidth=1 )
+#        a_spacer.grid( row = 0, column = lcol, sticky = E + W + N + S, rowspan = 2 )
+
+        # ----- start band of buttons
+        lcol   += 1
+
+        a_widget = Label( a_frame , width=10, height=2, text = "Selection\nCriteria:" )
+        #self._set_lambda_callback( a_widget, self.set_select_this_week )
+        a_widget.grid( row = lrow, column = lcol, rowspan = 2, columnspan = 1, sticky=E + W + N + S )
+        lcol   += 1
+
+        # ----- is_covid tweets
+        a_widget   = ( Label( a_frame, text = "Is Covid:\n(tweets)", relief = RAISED,  )  )
         a_widget.grid( row = lrow, column = lcol,  sticky=E + W + N + S )
 
-        lrow   += 1
-        self.a_word_search       = StringVar()
+        a_widget   =  ttk.Combobox( a_frame, values=[ "Any", "Yes", "No",  ], state='readonly')  # move to dict approach ?
+        a_widget.grid( row = lrow + 1, column = lcol, rowspan = 1, sticky=E + W + N + S )
+        self.select_widget_list.append( a_widget )
+        self.is_covid               = a_widget   # phase out
+        self.tweets_is_covid_widget = a_widget
+        #lrow   += -1
+        lcol  += 1
 
-        a_widget               = ttk.Combobox( a_frame, values = self.parameters.combo_box_words, textvariable = self.a_word_search )
+        # ------ tweets_word !! still need to do default reset
+        a_widget   = ( Label( a_frame, text = "Word Like:\n(tweets)", relief = RAISED,  )  )
+        a_widget.grid( row = lrow, column = lcol,  sticky=E + W + N + S )
+
+        self.tweets_word_var      = StringVar()
+        a_widget               = ttk.Combobox( a_frame, values = self.parameters.combo_box_words, textvariable = self.tweets_word_var )
         a_widget.configure(  height = 50 )   # height of what --- dropdown size on down arrow
-
-        #a_widget               = Entry( a_frame , width=30,  text = "bound", textvariable = self.a_word_search )
-        a_widget.grid( row = lrow, column = lcol,  sticky = E + W + N + S )
-        # self.a_word_search.set( AppGlobal.parameters.default_word   )
-        #print(  "set    ", AppGlobal.parameters.default_word )
-        lrow   += -1
-
-        # ----- is covid
+        a_widget.grid( row = lrow + 1, column = lcol,  sticky = E + W + N + S )
+        self.tweets_word_widget    = a_widget
+        self.select_widget_list.append( a_widget )
         lcol   += 1
-        a_widget   = ( Label( a_frame, text = "Is Covid:", relief = RAISED,  )  )
+
+        # ----- tweets_type tweets
+        a_widget   = ( Label( a_frame, text = "Tweet Type:\n(tweets)", relief = RAISED,  )  )
         a_widget.grid( row = lrow, column = lcol,  sticky=E + W + N + S )
-
         lrow   += 1
-        a_widget   =  ttk.Combobox( a_frame, values=[ "Any", "Yes", "No",  ], state='readonly')
-        a_widget.grid( row = lrow, column = lcol, rowspan = 1, sticky=E + W + N + S )
-        a_widget.set( "Any" )
-        self.is_covid  = a_widget
-        lrow   += -1
 
-        # ----- max_count
-        lcol   += 1
-        a_widget   = ( Label( a_frame, text = "Max Count", relief = RAISED,  )  )
-        a_widget.grid( row = lrow, column = lcol,  sticky=E + W + N + S )
-
-        lrow   += 1
-        a_widget   =  ttk.Combobox( a_frame, values=[ "Any", "100", "100,000",  ], state='readonly')
-        a_widget.grid( row = lrow, column = lcol, rowspan = 1, sticky=E + W + N + S )
-        a_widget.set( "Any" )
-        self.max_count  = a_widget
-        lrow   += -1
-
-        # ----- min_rank
-        lcol   += 1
-        a_widget   = ( Label( a_frame, text = "Min Rank", relief = RAISED,  )  )
-        a_widget.grid( row = lrow, column = lcol,  sticky=E + W + N + S )
-
-        lrow   += 1
-        a_widget   =  ttk.Combobox( a_frame, values=[ "Any", "100", "500", "1000", "2000", "5000", "10000", ], state='readonly')
-        a_widget.grid( row = lrow, column = lcol, rowspan = 1, sticky=E + W + N + S )
-        a_widget.set( "Any" )
-        self.min_rank  = a_widget
-        lrow   += -1
-
-        # ----- tweet_type
-        lcol   += 1
-        a_widget   = ( Label( a_frame, text = "Tweet Type", relief = RAISED,  )  )
-        a_widget.grid( row = lrow, column = lcol,  sticky=E + W + N + S )
-
-        lrow   += 1
         a_widget   =  ttk.Combobox( a_frame, values=[ "Any", "ReTweet", "Tweet",  ], state='readonly')
         a_widget.grid( row = lrow, column = lcol, rowspan = 1, sticky=E + W + N + S )
         a_widget.set( "Any" )
-        self.tweet_type = a_widget
-
+        self.select_widget_list.append( a_widget )
+        self.tweet_type               = a_widget
+        self.tweets_tweet_type_widget = a_widget
         lrow   += -1
+        lcol    += 3   # why 3
 
-        # ----- word_type  !! got get and reset
+        # ----- min_time_of_day
+        a_widget   = ( Label( a_frame, text = "Min Time of:\nDay (tweets)", relief = RAISED,  )  )
+        a_widget.grid( row = lrow, column = lcol,  sticky=E + W + N + S )
+
+        a_widget   =  ttk.Combobox( a_frame, values=[ "Any", "00:00", "01:00", "02:00", "03:00", "04:00", "05:00",
+                                                             "06:00", "07:00", "08:00", "09:00",
+                                                             "10:00", "11:00", "12:00", "13:00", "14:00", "15:00",
+                                                             "16:00", "17:00", "18:00", "19:00",
+                                                             "20:00", "21:00", "22:00", "23:00", "24:00",
+                                                          ], state='readonly')
+        a_widget.grid( row = lrow + 1, column = lcol, rowspan = 1, sticky = E + W + N + S )
+        a_widget.set( "Any" )
+        self.select_widget_list.append( a_widget )
+        self.min_rank               = a_widget
+        self.tod_min_widget  = a_widget
         lcol   += 1
 
-        a_widget   = ( Label( a_frame, text = "Word Type", relief = RAISED,  )  )
+        # ----- concord_word_type  concord !! got get and reset
+        a_widget   = ( Label( a_frame, text = "Word Type:\n(concord)", relief = RAISED,  )  )
         a_widget.grid( row = lrow, column = lcol,  sticky=E + W + N + S )
         lrow   += 1
 
@@ -510,27 +618,144 @@ class GUI:
         a_widget   =  ttk.Combobox( a_frame, values = a_list, state='readonly')
         a_widget.grid( row = lrow, column = lcol, rowspan = 1, sticky=E + W + N + S )
         a_widget.set( "Any" )
-        self.word_type = a_widget
-        lcol   += 1   # !! change style to setup for next
+        self.select_widget_list.append( a_widget )
+        self.word_type                = a_widget  # phase out
+        self.concord_word_type_widget = a_widget
+        lcol   += 1
+        lrow    = 0
+
+        # ----- is_ascii concord
+        a_widget   = ( Label( a_frame, text = "Is Ascii:\n(concord)", relief = RAISED,  )  )
+        a_widget.grid( row = lrow, column = lcol,  sticky=E + W + N + S )
+        lrow   += 1
+
+        a_widget   =  ttk.Combobox( a_frame, values=[ "Any", "Yes", "No",  ], state='readonly')
+        a_widget.grid( row = lrow, column = lcol, rowspan = 1, sticky=E + W + N + S )
+        self.is_ascii  = a_widget
+        self.select_widget_list.append( a_widget )
+        lrow  += -1
+        lcol  += 1
+
+        # ------ concord_word !! still need to do default reset
+        lcol   += 3
+        a_widget   = ( Label( a_frame, text = "Word Search:\n(concord %)", relief = RAISED,  )  )
+        a_widget.grid( row = lrow, column = lcol,  sticky=E + W + N + S )
+        lrow   += 1
+
+        self.concord_word_var      = StringVar()
+        a_widget               = ttk.Combobox( a_frame, values = self.parameters.combo_box_words, textvariable = self.concord_word_var )
+        a_widget.configure(  height = 50 )   # height of what --- dropdown size on down arrow
+        a_widget.grid( row = lrow, column = lcol,  sticky = E + W + N + S )
+
+        self.select_widget_list.append( a_widget )
+        self.concord_word_widget   = a_widget
+        lrow   += -1
+        lcol   += 3   # think +1 would do it , check
+
 
         # ----- reset
-
-        a_widget = Button( a_frame , width=10, height=2, text = "Reset" )
+        a_widget = Button( a_frame , width=10, height=4, text = "Reset\nCriteria" )
         a_widget.config( command = self.reset_select_values )
-        # self._set_lambda_callback( a_widget, self.set_select_this_month )
-        # a_widget.
-        # a_widget   = ( Label( a_frame, text = "Tweet Type", relief = RAISED,  )  )
-        a_widget.grid( row = lrow, column = lcol,  sticky=E + W + N + S )
-
-        # lrow   += 1
-        # a_widget   =  ttk.Combobox( a_frame, values=[ "Any", "ReTweet", "Tweet",  ], state='readonly')
-        # a_widget.grid( row = lrow, column = lcol, rowspan = 1, sticky=E + W + N + S )
-        # a_widget.set( "Any" )
-        # self.tweet_type = a_widget
-
+        a_widget.grid( row = lrow, column = lcol,  rowspan = 2, sticky=E + W + N + S )
         lrow   += -1
 
-        self.reset_select_values()
+        #self.reset_select_values()
+
+        return  a_frame
+
+    # ------------------------------------------
+    def _make_select_values_frame_2( self, parent, ):
+        """
+        make value frame for selects values that control data selected -- input from users
+        reset_select_values -- for defaults not here called at end
+        Return: a frame with the widgets in it
+        Return:  a frame with the widgets placed in it
+        """
+        a_frame  = Frame( parent, width=600, height=200,
+                          bg = self.bkg_color, relief=RAISED, borderwidth=1 )
+
+        lrow   =  0
+        lcol   =  0
+
+        # some spacers might be nice -- may put back as we play with the look
+#        a_spacer  = Frame( a_frame, width=60, height=60, bg ="green", relief=RAISED, borderwidth=1 )
+#        a_spacer.grid( row = 0, column = lcol, sticky = E + W + N + S, rowspan = 2 )
+
+        # ----- start band of buttons
+        lcol   += 1
+
+        a_widget = Label( a_frame , width=10, height=2, text = "More\nCriteria:" )
+        #self._set_lambda_callback( a_widget, self.set_select_this_week )
+        a_widget.grid( row = lrow, column = lcol, rowspan = 2, columnspan = 1, sticky=E + W + N + S )
+        lcol   += 1
+
+        # ------ words_word
+        a_widget   = ( Label( a_frame, text = "Word Like:\n(words)", relief = RAISED,  )  )
+        a_widget.grid( row = lrow, column = lcol,  sticky=E + W + N + S )
+
+        self.words_word_var    = StringVar()
+        a_widget               = ttk.Combobox( a_frame, values = self.parameters.combo_box_words, textvariable = self.words_word_var )
+        a_widget.configure(  height = 50 )
+        a_widget.grid( row = lrow + 1, column = lcol,  sticky = E + W + N + S )
+        self.select_widget_list.append( a_widget )
+        self.words_word_widget = a_widget
+        lcol   += 1
+
+        # ----- min_rank words
+        a_widget   = ( Label( a_frame, text = "Min Rank:\n(words)", relief = RAISED,  )  )
+        a_widget.grid( row = lrow, column = lcol,  sticky=E + W + N + S )
+        lrow   += 1
+
+        a_widget   =  ttk.Combobox( a_frame, values=[ "Any", "100", "500", "1000", "2000", "5000", "10000", ], state='readonly')
+        a_widget.grid( row = lrow, column = lcol, rowspan = 1, sticky = E + W + N + S )
+        a_widget.set( "Any" )
+        self.select_widget_list.append( a_widget )
+        self.min_rank               = a_widget
+        self.words_min_rank_widget  = a_widget
+        lrow   += -1
+        lcol   += 1
+
+        # ----- words_null  !! can we embed the where in the control, with a new class ??
+        a_widget   = ( Label( a_frame, text = "Word Null:\n(words)", relief = RAISED,  )  )
+        a_widget.grid( row = lrow, column = lcol,  sticky=E + W + N + S )
+
+        a_widget   =  ttk.Combobox( a_frame, values=[ "Any", "Yes", "No",  ], state='readonly')
+        a_widget.grid( row = lrow + 1, column = lcol, rowspan = 1, sticky=E + W + N + S )
+        a_widget.set( "Any" )
+        self.select_widget_list.append( a_widget )
+        self.words_word_null_widget  = a_widget
+        lcol   += 1
+
+        # ----- words_max_count words
+        a_widget   = ( Label( a_frame, text = "Max Count:\n(words)", relief = RAISED,  )  )
+        a_widget.grid( row = lrow, column = lcol,  sticky=E + W + N + S )
+
+        a_widget   =  ttk.Combobox( a_frame, values=[ "Any", "100", "100,000",  ], state='readonly')
+        a_widget.grid( row = lrow + 1, column = lcol, rowspan = 1, sticky=E + W + N + S )
+        a_widget.set( "Any" )
+        self.select_widget_list.append( a_widget )
+        self.max_count               = a_widget
+        self.words_max_count_widget  = a_widget
+        lcol   += 1
+
+        # ----- min_group_by_count
+        a_widget   = ( Label( a_frame, text = "Min Group By:\nCount", relief = RAISED,  )  )
+        a_widget.grid( row = lrow, column = lcol,  sticky=E + W + N + S )
+
+        a_widget   =  ttk.Combobox( a_frame, values=[ "0", "100", "100", "100,000",  ], state='readonly')
+        a_widget.grid( row = lrow + 1, column = lcol, rowspan = 1, sticky=E + W + N + S )
+        a_widget.set( "0" )
+        self.select_widget_list.append( a_widget )
+        self.group_by_min_count_widget  = a_widget
+        lcol   += 1
+
+        # ----- reset
+        a_widget = Button( a_frame , width=10, height=4, text = "Reset\nCriteria" )
+        a_widget.config( command = self.reset_select_values )
+        a_widget.grid( row = lrow, column = lcol,  rowspan = 2, sticky=E + W + N + S )
+        lrow   += -1
+
+        # self.reset_select_values()
 
         return  a_frame
 
@@ -538,61 +763,46 @@ class GUI:
     def _make_load_frame( self, parent, ):
             """
             this frame for loading from input files
-            make a frame in parent and
-            return frame for placement by caller
+            make a frame in parent and return frame for placement by caller
             """
             a_frame  = Frame( parent, width=300, height=200,
                               bg = self.parameters.id_color, relief=RAISED, borderwidth=1 )
 
-            buttonOpen = Button( a_frame , width=10, height=2, text = "Show Load\nParameters" )
-            buttonOpen.config( command = self.controller.cb_show_load_parms )
-            buttonOpen.pack( side = LEFT )
+            a_widget = Label( a_frame , width=10, height=2, text = "Database\nTable Load:" )
+            #buttonOpen.config( command = self.controller.cb_show_load_parms )
+            a_widget.pack( side = LEFT )
 
-            a_button = Button( a_frame , width=10, height=2, text = "Spacer" )
-            a_button.config( command = self.controller.cb_gui_test_1 )
-            a_button.pack( side = LEFT )
+            a_widget = Button( a_frame , width=10, height=2, text = "Show Load\nParameters" )
+            a_widget.config( command = self.controller.cb_show_load_parms )
+            a_widget.pack( side = LEFT )
 
-            buttonOpen = Button( a_frame , width=10, height=2, text = "Define Tweets\nConcord" )
-            buttonOpen.config( command = self.controller.cb_define_tweets_concord )
-            buttonOpen.pack( side = LEFT )
+            a_widget = Label( a_frame , width=10, height=2, text = "Spacer" )
+            # a_widget.config( command = self.controller.cb_gui_test_1 )
+            a_widget.pack( side = LEFT )
 
+            a_widget = Button( a_frame , width=10, height=2, text = "Define Tweets\nConcord" )
+            a_widget.config( command = self.controller.cb_define_tweets_concord )
+            a_widget.pack( side = LEFT )
 
-            buttonOpen = Button( a_frame , width=10, height=2, text = "Load Tweets\n(Concord)" )
-            buttonOpen.config( command = self.controller.cb_load_tweets )
-            buttonOpen.pack( side = LEFT )
+            a_widget = Button( a_frame , width=10, height=2, text = "Load Tweets\n(Concord)" )
+            a_widget.config( command = self.controller.cb_load_tweets )
+            a_widget.pack( side = LEFT )
 
-            a_button = Button( a_frame , width=10, height=2, text = "Spacer" )
-            a_button.config( command = self.controller.cb_gui_test_1 )
-            a_button.pack( side = LEFT )
+            a_widget = Label( a_frame , width=10, height=2, text = "Spacer" )
+            # a_widget.config( command = self.controller.cb_gui_test_1 )
+            a_widget.pack( side = LEFT )
 
-            buttonOpen = Button( a_frame , width=10, height=2, text = "Define\nWords" )
-            buttonOpen.config( command = self.controller.cb_define_words )
-            buttonOpen.pack( side = LEFT )
+            a_widget = Button( a_frame , width=10, height=2, text = "Define\nWords" )
+            a_widget.config( command = self.controller.cb_define_words )
+            a_widget.pack( side = LEFT )
 
-            buttonOpen = Button( a_frame , width=10, height=2, text = "Load\nWords" )
-            buttonOpen.config( command = self.controller.cb_load_words )
-            buttonOpen.pack( side = LEFT )
+            a_widget = Button( a_frame , width=10, height=2, text = "Load\nWords" )
+            a_widget.config( command = self.controller.cb_load_words )
+            a_widget.pack( side = LEFT )
 
-            buttonOpen = Button( a_frame , width=10, height=2, text = "Rank\nWords" )
-            buttonOpen.config( command = self.controller.cb_rank_words )
-            buttonOpen.pack( side = LEFT )
-
-            # a_button = Button( a_frame , width=10, height=2, text = "Spacer" )
-            # a_button.config( command = self.controller.cb_gui_test_1 )
-            # a_button.pack( side = LEFT )
-
-            # buttonOpen = Button( a_frame , width=10, height=2, text = "Check Select\nCWords" )
-            # buttonOpen.config( command = self.controller.cb_check_concord_load )
-            # buttonOpen.pack( side = LEFT )
-
-
-            # buttonOpen = Button( a_frame , width=10, height=2, text = "Check Select\nTweets" )
-            # buttonOpen.config( command = self.controller.cb_check_tweet_load )
-            # buttonOpen.pack( side = LEFT )
-
-            # a_button = Button( a_frame , width=10, height=2, text = "Define/load\n concord DB" )
-            # a_button.config( command = self.controller.cb_define_db )
-            # a_button.pack( side = LEFT )
+            a_widget = Button( a_frame , width=10, height=2, text = "Rank\nWords" )
+            a_widget.config( command = self.controller.cb_rank_words )
+            a_widget.pack( side = LEFT )
 
             return a_frame
 
@@ -604,7 +814,8 @@ class GUI:
         """
         self.max_lines      = 500
         self.cb_scroll_var  = IntVar()  # for check box in reciev frame
-        color   = "red"
+        color               = "red"
+
         iframe  = Frame( parent, width=300, height=800, bg ="blue", relief=RAISED, borderwidth=1,  )
 
         bframe  = Frame( iframe, bg ="black", width=30  )
@@ -622,7 +833,6 @@ class GUI:
         text0.config( yscrollcommand=s_text0.set )
 
         text0.grid( row=0, column=1, sticky = N + S + E + W  )
-
         self.rec_text  = text0
 
         iframe.grid_columnconfigure( 1, weight=1 )
@@ -639,11 +849,24 @@ class GUI:
         b_clear.grid( row=row_ix, column=0   )
         row_ix   += 1
 
-        #-----
-        b_copy = Button( bframe , width=10, height=2, text = "copy all" )
-        b_copy.bind( "<Button-1>", self.do_copy_button )
-        b_copy.grid( row=row_ix, column=0   )
+        #----- copy selection, moving to my new coding standards
+        a_widget = Button( bframe , width=10, height=2, text = "Copy/Sel." )
+        # a_widget.bind( "<Button-1>", self.do_copy_button )
+        a_widget.config( command = self.cb_copy_selection )
+        a_widget.grid( row=row_ix, column=0   )
         row_ix += 1
+
+        #----- copy selection, moving to my new coding standards
+        a_widget = Button( bframe , width=10, height=2, text = "Copy/All" )
+        # a_widget.bind( "<Button-1>", self.do_copy_button )
+        a_widget.config( command = self.cb_copy_all )
+        a_widget.grid( row=row_ix, column=0   )
+        row_ix += 1
+        # #-----
+        # b_temp = Button( bframe , width=10, height=2, text = self.BN_CP_SELECTION )
+        # b_temp.bind( "<Button-1>", self.doButtonText )
+        # b_temp.grid( row=row_ix, column=0   )
+        # row_ix   += 1
 
         # -------------
         a_widget = Checkbutton( bframe,  width=7, height=2, text="A Scroll",
@@ -655,27 +878,30 @@ class GUI:
 
         return iframe
 
-    # ------------------------------------------
-    def _make_label( self, a_frame, a_row, a_col, a_text, ):
+   # ------------------------------------------
+    def _make_input_frame( self, parent, ):
         """
-        make a label and auto place in grid, return new value for a_row, a_col for
-        use next time.
-        placement goes down a row then up to the next column, intended for
-        pairs of labels ( more or less assumes we do not need ref to label )
-        return tuple -- or by ref do not need to , test this in templates
-        return label
-        increment row col
+        apparently dead
+        is this still used ?? for what !!
+        Return:  a frame with the widgets placed in it
         """
-        a_row    += 1
-        if a_row >= 2:
-                a_row   =  0
-                a_col   += 1
+        a_frame  = Frame( parent, width=600, height=200, bg =self.bkg_color, relief=RAISED, borderwidth=1 )
 
-        a_label   = ( Label( a_frame, text = a_text, relief = RAISED,  )  )
-        a_label.grid( row=a_row, column=a_col, sticky=E + W + N + S )    # sticky=W+E+N+S  )
+        # add some more for db, different style, which do I like best?
+        lrow   =  0
+        lcol   =  0
+#        a_spacer  = Frame( a_frame, width=60, height=60, bg ="green", relief=RAISED, borderwidth=1 )
+#        a_spacer.grid( row = 0, column = lcol, sticky = E + W + N + S, rowspan = 2 )
 
-        # set weight??
-        return ( a_row, a_col, a_label )
+        bw_for_db      = FileBrowseWidget( a_frame )
+        bw_for_db.grid( row = lrow, column = lcol, columnspan = 6, )
+        bw_for_db.set_text( AppGlobal.parameters.database_name )
+        self.bw_for_db = bw_for_db  # save reference
+
+        lrow   =  2
+        lcol   =  0
+
+        return  a_frame
 
 # -----  functions mostly for controller to call  sets and gets ------------------------
 
@@ -691,7 +917,7 @@ class GUI:
 
         self.output_format.set( AppGlobal.parameters.default_output_format  )
 
-        self.a_word_search.set( AppGlobal.parameters.default_word   )
+        #self.a_word_search.set( AppGlobal.parameters.default_word   )
 
         self.tweet_type.set( "Tweet" )
 
@@ -700,6 +926,8 @@ class GUI:
         self.max_count.set( "Any" )
 
         self.is_covid.set(  "Any" )
+
+        self.is_ascii.set(  "Yes"  )
 
         self.word_type.set( "Any" )
 
@@ -711,20 +939,71 @@ class GUI:
         self.cal_begin.set_date( self.parameters.select_begin_date  )
 
     # ------------------------------------------
-    def get_units( self, ):
+    def set_sort_order_dict( self, sort_order_dict ):
         """
-        get units for the graph as a string
+        what it says
+        gui.set_sort_order_dict( self.sort_order_dict )
         """
-        return self.units_widget.get()
+        a_widget               = self.sort_order
+        self.sort_order_dict   = sort_order_dict
+        a_list                 = list(self.sort_order_dict.keys())
+        a_widget.configure( values = a_list, )
+        a_widget.set( a_list[0] )
 
     # ------------------------------------------
-    def get_word_type( self ):
+    def configure_select_widgets( self, a_control_dict ):
         """
-        what it says:
-        return function to be run for the select
+        deactivate all
+        for dates separate function
+        change name to disable  ?? think comment ng
         """
-        cb_text    = self.word_type.get()  # compact syntax ??
-        return self.select_word_type_dict[cb_text]
+        for  key_widget, i_widget_tuple in a_control_dict.items():
+             #rint( f"in configure_select_widgets {key_widget}: {i_widget_tuple}" )
+
+             dd_list  = i_widget_tuple.dd_list
+             if dd_list is not None:
+                 key_widget.configure( values = dd_list )
+             # need to set state after changing list values or state will be normal
+             key_widget.configure( state = i_widget_tuple.state  )      # =Tk.DISABLED   = Tk.NORMAL   "readonly"
+
+    # ------------------------------------------
+    def deactivate_select_widgets( self,  ):
+        """
+        deactivate all
+        special for dates list for rest ??
+        change name to disable
+        """
+        #rint( "deactivate_select_widgets ")
+        # need to pass in so can be defined after widgets are constructed
+        #bn_color_inactive               = "dark gray"
+        # widgets    = [ self.tweets_word_widget, self.is_covid,  self.tweet_type, self.word_type ]
+        widgets    = self.select_widget_list
+        for i_widget in widgets:
+            #i_widget.configure( bn_color = bn_color )
+            #rint( i_widget )
+            i_widget.config( state = DISABLED )      # =Tk.DISABLED   = Tk.NORMAL ......
+
+    # ------------------------------------------
+    def set_date_widget_state_normal( self, state ):  #    Normal
+        """
+        what it says
+        arg True for N else....
+        """
+        if state:
+            set_to  = NORMAL
+        else:
+            set_to  = DISABLED
+
+        for i_widget in self.dt_widgets:
+            i_widget.config( state = set_to )
+
+        # above not include the calenders so:
+        self.cal_begin.config(  state = set_to )
+        self.cal_end.config(    state = set_to )
+        self.time_begin.config( state = set_to )
+        self.time_end.config(   state = set_to )
+
+# ----- gets ------------------------
 
     # ------------------------------------------
     def get_select_type( self ):
@@ -736,29 +1015,185 @@ class GUI:
         return self.select_type_dict[cb_text]
 
     # ------------------------------------------
+    def get_select_type_constructor( self ):
+        """
+        what it says:
+        return  tuple ( name of the select, constructor )
+        """
+        cb_text    = self.select_type.get()  # compact syntax ??
+        return ( cb_text, self.select_type_dict[cb_text] )
+
+    # ------------------------------------------
     def get_select_type_text_function( self ):
         """
+        may be dead
         what it says:
         return
         """
         cb_text    = self.select_type.get()  # compact syntax ??
         return ( cb_text, self.select_type_dict[cb_text] )
 
+    # -------------------- gets by table tweets ... concord   words
     # ------------------------------------------
-    def get_max_count( self ):
+    def get_begin_end( self ):
         """
+        !! is all this stuff right do we go back and forth between controls -- think is ok check later
         what it says:
-        return string for file_writers
+        get begin end times from the gui -- combine dates and hours
+        may need to extend to date times
+        return tuple (begin, end )  -- types may vary as I mess about
         """
-        cb_text    = self.max_count.get().replace( ",", "" )  # compact syntax ??
-        #print( cb_text )
-        if cb_text == "Any":
-            return None
-        else:
-            return int( cb_text )
+        hour         = AppGlobal.dd_hours.index( self.time_begin.get() )
+        time_begin   = datetime.time(hour = hour )
+        hour         = AppGlobal.dd_hours.index( self.time_end.get() )
+        time_end     = datetime.time(hour = hour )
+
+#        my_date    = datetime.date.today()
+        # min_time      = datetime.time.min   # means midnight
+        dt_begin      = datetime.datetime.combine(self.cal_begin.get_date(), time_begin )
+        dt_end        = datetime.datetime.combine(self.cal_end.get_date(),   time_end )
+
+        ts_begin      = dt_begin.timestamp()
+        ts_end        = dt_end.timestamp()
+
+        return( ts_begin , ts_end  )
 
     # ------------------------------------------
-    def get_min_rank( self ):
+    def get_dt_begin_end( self ):
+        """
+        what it says:   zz
+        get begin end times from the gui -- combine dates and hours into a datetime
+        return tuple (begin, end )
+        """
+        hour         = AppGlobal.dd_hours.index( self.time_begin.get() )
+        time_begin   = datetime.time( hour = hour )
+        hour         = AppGlobal.dd_hours.index( self.time_end.get() )
+        time_end     = datetime.time( hour = hour )
+
+#        my_date    = datetime.date.today()
+        # min_time      = datetime.time.min   # means midnight
+        dt_begin      = datetime.datetime.combine( self.cal_begin.get_date(), time_begin )
+        dt_end        = datetime.datetime.combine( self.cal_end.get_date(),   time_end )
+
+        return( dt_begin , dt_end  )
+
+    # ------------------------------------------
+    def get_tweets_word_select( self ):
+        """
+        what it says:
+        return function to be run for the select
+        """
+        ret = self.tweets_word_widget.get().strip()    # or the var
+        return ret
+
+    # ------------------------------------------
+    def get_tweets_is_covid_select( self ):
+        """
+        what it says:
+        return tuple ( text, sql_text, data )
+        cut/paste text, sql_text, data   =  gui.get_is_covid()
+        cut/paste    cb_text, cb_sql_text, cb_sql_value  =  self.gui.
+        """
+        # unpack done elsewhere
+        #  _1, _2, tf  =  self.get_logic_values_combobox( self.is_covid )
+        # return  tf
+        return self.get_logic_values_combobox( self.is_covid )
+
+    # ------------------------------------------
+    def get_is_covid( self ):
+        """
+        return  True False, None ??
+
+        """
+        msg   =  f" self.get_tweets_is_covid_select()   {self.get_tweets_is_covid_select()}"
+        #rint( msg )
+        return self.get_tweets_is_covid_select()
+
+    # ------------------------------------------
+    def get_words_is_word_null_select( self ):
+        """
+        what it says:  zz
+        return tuple ( text, sql_text, data )  !! change to dict approach
+        cut/paste text, sql_text, data   =  gui.get_is_covid()
+        cut/paste    cb_text, cb_sql_text, cb_sql_value  =  self.gui.
+        """
+        # unpack done elsewhere
+        #  _1, _2, tf  =  self.get_logic_values_combobox( self.is_covid )
+        # return  tf
+        return self.get_logic_values_combobox( self.words_word_null_widget )
+
+
+    # ------------------------------------------
+    def get_output_append_select( self ):
+        """
+        what it says:
+        return function to be run for the select
+        """
+        ret = self.output_append_widget.get()
+        return ret
+
+    # ------------------------------------------
+    def get_tweets_tweet_type_select( self ):
+        """
+        what it says:
+        """
+        cb_text    = self.tweet_type.get()
+        return self.select_tweet_type_dict[cb_text]
+
+    # ------------------------------------------
+    def get_tweet_type( self ):
+        """
+        what it says:
+        """
+        return self.get_tweets_tweet_type_select()
+
+    # ------------------------------------------
+    def get_concord_is_ascii_select( self ):
+        """
+        what it says:
+        return tuple ( text, sql_text, data )
+        cut/paste text, sql_text, data   =  gui.get_is_covid()
+        cut/paste    cb_text, cb_sql_text, cb_sql_value  =  self.gui.
+        """
+        return self.get_logic_values_combobox( self.is_ascii )
+
+    # ------------------------------------------
+    def get_is_ascii( self ):
+        """
+        what it says:
+        return tuple ( text, sql_text, data )
+        cut/paste text, sql_text, data   =  gui.get_is_covid()
+        cut/paste    cb_text, cb_sql_text, cb_sql_value  =  self.gui.
+        """
+        return self.get_concord_is_ascii_select()
+
+    # ------------------------------------------
+    def get_concord_word_type_select( self ):
+        """
+        what it says:
+        return function to be run for the select
+        """
+        cb_text    = self.word_type.get()  # compact syntax ??
+        return self.select_word_type_dict[cb_text]
+
+    # ------------------------------------------
+    def get_concord_word_select( self ):
+        """
+        what it says:
+        return function to be run for the select
+        """
+        return self.concord_word_widget.get()
+
+    # ------------------------------------------
+    def get_word_type( self ):
+        """
+        what it says:
+        return function to be run for the select --- looks like old funct forwarede to new
+        """
+        return self.get_concord_word_type_select(  )
+
+    # ------------------------------------------
+    def get_words_min_rank_select( self ):
         """
         what it says:
         """
@@ -769,31 +1204,56 @@ class GUI:
             return int( cb_text )
 
     # ------------------------------------------
-    def get_tweet_type( self ):
+    def get_min_rank( self ):
         """
         what it says:
         """
-        cb_text    = self.tweet_type.get()  # compact syntax ??
-        return self.select_tweet_type_dict[cb_text]   # this is where adapt to butto
+        return self.get_words_min_rank_select()
 
     # ------------------------------------------
-    def get_output_format( self ):
+    def get_words_word_select( self ):
         """
         what it says:
+        return function to be run for the select
         """
-        cb_text    = self.output_format.get( )
-        return self.output_format_dict[cb_text]
+        ret = self.words_word_widget.get().strip()
+        return ret
 
     # ------------------------------------------
-    def get_is_covid( self ):
+    def get_words_max_count_select( self ):
         """
         what it says:
-        return tuple ( text, sql_text, data )
-        cut/paste text, sql_text, data   =  gui.get_is_covid()
-        cut/paste    cb_text, cb_sql_text, cb_sql_value  =  self.gui.
+        return string for file_writers
         """
-        return self.get_logic_values_combobox( self.is_covid )
+        cb_text    = self.max_count.get().replace( ",", "" )  # compact syntax ?? -- changing widget name??
+        # msg        = f"cb_text for max_count {cb_text}"
+        # #rint( cb_text )
+        if cb_text == "Any":
+            return None
+        else:
+            return int( cb_text )
 
+    # ------------------------------------------
+    def get_group_by_min_count( self ):
+        """
+        what it says:
+
+        """
+        cb_text    = self.group_by_min_count_widget.get().replace( ",", "" )
+        if cb_text == "Any":
+            return None
+        else:
+            return int( cb_text )
+
+    # ------------------------------------------
+    def get_max_countxxx( self ):
+        """
+        what it says:    for words.word_count
+        return string for file_writers
+        """
+        self.get_words_max_count_select()
+
+# ----------- end gets by table
     # ------------------------------------------
     def get_sort_order( self ):
         """
@@ -808,33 +1268,12 @@ class GUI:
         #return self.get_logic_values_combobox( self.is_covid )
 
     # ------------------------------------------
-    def get_begin_end( self ):
+    def get_output_format( self ):
         """
         what it says:
-        get begin end times from the gui -- combine dates and hours
-        may need to extend to date times
-        return tuple (begin, end )  -- types may vary as I mess about
         """
-        hour         = AppGlobal.dd_hours.index( self.time_begin.get() )
-        time_begin   = datetime.time(hour = hour )
-        hour         = AppGlobal.dd_hours.index( self.time_end.get() )
-        time_end     = datetime.time(hour = hour )
-
-#        my_date    = datetime.date.today()
-        min_time      = datetime.time.min   # means midnight
-        dt_begin      = datetime.datetime.combine(self.cal_begin.get_date(), time_begin )
-        dt_end        = datetime.datetime.combine(self.cal_end.get_date(),   time_end )
-
-        ts_begin      = dt_begin.timestamp()
-        ts_end        = dt_end.timestamp()
-
-#        a_datetime_begin     = datetime.datetime.fromtimestamp( ts_begin )
-#        print( f"a_datetime_begin = { type(a_datetime_begin)}  {a_datetime_begin} " )
-#
-#        a_datetime_end     = datetime.datetime.fromtimestamp( ts_end )
-#        print( f"a_datetime_end = { type(a_datetime_end)}  {a_datetime_end} " )
-
-        return( ts_begin , ts_end  )
+        cb_text    = self.output_format.get( )
+        return self.output_format_dict[cb_text]
 
     #   -----  functions mostly for controller to call ------------------------
     def get_db_file_name( self, ):
@@ -907,7 +1346,7 @@ class GUI:
     # ---------------------------------------
     def display_string( self, a_string, update_now = False ):
         """
-        print to receive area, with scrolling and
+        p rint to receive area, with scrolling and
         delete if there are too many lines in the area
         logging here !!  looks done test
         """
@@ -934,19 +1373,45 @@ class GUI:
 
         if update_now:
             self.root.update()
-        return
+
+# ----- button actions - some may be too indirect, so recode ?? low priority  may be too indirect
+    # ------------------------------------------
+    def cb_test( self, ):
+        """
+        for test button, but only if so configured, may go to controller instead
+        """
+        pass
+        # widgets   = [ self.tweets_word_widget, self.is_covid,  self.tweet_type, self.word_type ]
+        # # do we want to reset
+        # self.deactivate_select_widgets( widgets )
+
+        # a_select_manager   = select_manager.SM_Select_03()
+        # a_select_manager.set_up_widgets()
+
+    # ---------------------------------------
+    def paste_string( self, a_string, update_now = False ):
+        """
+        will mess up uses copy paste -- could save and put back would loose formatting I thik
+        will this get aroung unicode issues up pyperclip
+        data  = self.rec_text.get( 1.0, END )
+        pyperclip.copy( data )
+        new_clip  = pyperclip.paste()
+        looks like will not work can we try to put in a ctrl-v ??
+        need to search  send keystroke to tk text control
+        """
+        pass
 
     # ------------------------------------------
     def set_cursor( self, cursor_type ):
         """
         what it says
-        arg:   now: "" or "wait"  else ??
+        arg:   now: "" or "wait"  else ?? !! is this working do we need
+        something more a repaint....
 
         """
         self.root.config( cursor = cursor_type )
         self.root.update()
 
-# ----- button actions - this may be too indirect
     # ------------------------------------------
     def do_restart_button( self, event):
         self.controller.restart()
@@ -956,9 +1421,12 @@ class GUI:
     def do_clear_button( self, event):
         """
         for the clear button
+        arguments:  event, ignored can be anything
         clear the receive area
         """
         self.rec_text.delete( 1.0, END )
+        # !! may need refresh here is next any good
+        self.root.update()
         return
 
     # ------------------------------------------
@@ -968,7 +1436,18 @@ class GUI:
         """
         data  = self.rec_text.get( 1.0, END )
         pyperclip.copy( data )
-        return
+
+    # # ------------------------------------------
+    # def cb_copy_selection( self, event ):
+    #     """
+    #     copy selected text in the receive/message area
+
+    #     """
+    #     try:
+    #         data  = self.rec_text.get( "sel.first", "sel.last" )
+    #         pyperclip.copy( data )
+    #     except Exception as exception:  # if no selection -- this is too broad and exception !!
+    #         pass
 
     # ------------------------------------------
     def do_auto_scroll( self,  ):
@@ -981,17 +1460,127 @@ class GUI:
         pass
         return
 
-# ---- Set datetimes ------------------------------------
+    # ------------------------------------------
+    def cb_copy_selection( self,  ):
+        """
+        copy selected text in the message/receive area
+        """
+        try:
+            data  = self.rec_text.get( "sel.first", "sel.last" )
+            pyperclip.copy( data )
+        except Exception as exception:  # if no selection -- this is too broad and exception !!
+            pass
+
+    # ------------------------------------------
+    def cb_copy_all( self,  ):
+        """
+        copy all from message/receive area
+        new from terminal implementation
+        """
+        # pass
+        #rint("implemen me cb_copy_all")
+        data  = self.rec_text.get( 1.0, END )
+        pyperclip.copy( data )
+
+    # ---- Set datetimes ------------------------------------
+
+    #-------------------------------------------
+    def set_1_year_ago( self,  my_widget,  ):
+        """
+        what it says
+
+        """
+        self._set_active_date_widget( my_widget )
+        self.set_years_ago_datetimes( 1, 1 )    # second arg, no of days ?
+
+    #-------------------------------------------
+    def set_2_year_ago( self,  my_widget, ):
+        """
+        what it says
+
+        """
+        self._set_active_date_widget( my_widget )
+        self.set_years_ago_datetimes( 2, 1 )
+
+    #-------------------------------------------
+    def set_3_year_ago( self,  my_widget,  ):
+        """
+        what it says
+        """
+        self._set_active_date_widget( my_widget )
+        self.set_years_ago_datetimes( 3, 1 )
+
+    #-------------------------------------------
+    def set_4_year_ago( self,   my_widget,  ):
+        """
+        what it says
+        """
+        self._set_active_date_widget( my_widget )
+        self.set_years_ago_datetimes( 4, 1 )
+
+    #-------------------------------------------
+    def set_years_ago_datetimes( self, a_year_delta, a_day_delta   ):
+        """
+        what it says
+        args    a_year_delta int, normally positive, a_day_delta  int usually 1
+        returns  changed state of date elements
+        """
+        year_delta    = datetime.timedelta( weeks  = a_year_delta * 52 )  # no years argument
+        day_delta     = datetime.timedelta( days   = a_day_delta   )
+
+        dt_now         = datetime.datetime.now()
+        dt_begin       = dt_now      - year_delta
+        dt_end         = dt_begin    + day_delta
+
+        self.set_select_datetimes( dt_begin, dt_end )
+
+    #-------------------------------------------
+    def set_dates_back_a_month( self, my_widget ):
+        """
+        what it say
+        returns  changed state of gui date elements
+        """
+        self._set_active_date_widget( my_widget )
+        self.set_both_datetimes_ahead( a_year_delta = 0, a_day_delta = - ( 7 * 4 ) )
+
+    #-------------------------------------------
+    def set_dates_back_a_week( self, my_widget ):
+        """
+        what it say
+        returns  changed state of gui date elements
+        """
+        #rint( "set_dates_back_a_week")
+        self._set_active_date_widget( my_widget )
+        self.set_both_datetimes_ahead( a_year_delta = 0, a_day_delta = - 7 )
+
+    #-------------------------------------------
+    def set_both_datetimes_ahead( self, a_year_delta, a_day_delta   ):
+        """
+        what it says
+        args    a_year_delta int, neg for back in time, a_day_delta
+        returns  changed state of gui date elements
+        """
+        dt_begin, dt_end    = self.get_dt_begin_end()
+
+        year_delta          = datetime.timedelta( weeks  = a_year_delta * 52 )  # no years argument
+        day_delta           = datetime.timedelta( days   = a_day_delta   )
+
+        dt_begin            += ( year_delta + day_delta )
+        dt_end              += ( year_delta + day_delta )
+
+        #rint( f">>>> date_begin  {dt_begin}"  )
+
+        self.set_select_datetimes( dt_begin, dt_end )
+
     #-------------------------------------------
     def set_select_slier_datetimes( self, val  ):
         """
         what it says"
-
         """
-        #print( val )
+        #rint( val )
 
-        big_delta     = datetime.timedelta( weeks = int(val) )
-        plus_delta    = AppGlobal.parameters.slider_datetime_width
+        big_delta      = datetime.timedelta( weeks = int( val) )
+        plus_delta     = AppGlobal.parameters.slider_datetime_width
 
         dt_now         = datetime.datetime.now()
         dt_begin       = dt_now      + big_delta
@@ -1022,8 +1611,7 @@ class GUI:
         #self._set_active_date_widget( self.set_select_this_month )  # make easier by having as arg ??
         # continue to simplify
         dt_now         = datetime.datetime.now()
-        dt_begin       = dt_now + datetime.timedelta(weeks=-4)
-        #date_begin     = dt_begin.date()
+        dt_begin       = dt_now + datetime.timedelta( weeks=-4 )
 
         dt_end         = dt_now + datetime.timedelta( days=1 )
 
@@ -1038,7 +1626,7 @@ class GUI:
         self._set_active_date_widget( my_widget )  # make easier by having as arg ??
         # continue to simplify
         dt_now         = datetime.datetime.now()
-        dt_begin       = dt_now + datetime.timedelta(weeks=-1)
+        dt_begin       = dt_now + datetime.timedelta( weeks=-1 )
 
         dt_end         = dt_now + datetime.timedelta( days=1 )
 
@@ -1053,15 +1641,13 @@ class GUI:
         self._set_active_date_widget( my_widget )
 
         dt_now         = datetime.datetime.now()
-        #tt_now         = dt_now.timetuple( )
-        dt_now         = datetime.datetime.now()
 
         # March 2006 by Jack Dorsey, Noah Glass, Biz Ston
         self.cal_begin.set_date( datetime.date( 2006,3, 1 ) )
         self.time_begin.set( AppGlobal.dd_hours[0] )
 
         # set to begin tomorrow, end today
-        date_end     =  ( dt_now + datetime.timedelta( days = 1 ) ).date()  #
+        date_end     =  ( dt_now + datetime.timedelta( days = 1 ) ).date()
         self.cal_end.set_date( date_end )
         self.time_end.set( AppGlobal.dd_hours[0] )
 
@@ -1071,7 +1657,7 @@ class GUI:
         what it says
         put values into gui
         """
-#        print( "db_select_today" )
+        #rint( "db_select_today" )
         #self._set_active_date_widget( self.          )
         self._set_active_date_widget( my_widget )
 
@@ -1093,9 +1679,9 @@ class GUI:
     def run( self,  ):
         """
         run the gui
-
         """
-        # move from controller to decouple type of gui
+        # move from controller to decouple type of gui ??
+        AppGlobal.controller.cb_change_select_type( None ) # so right options out of the shute
         self.gui_running        = True
 #        self.root.after( self.parameters.gt_delta_t, self.controller.polling )
         self.root.mainloop()
@@ -1132,11 +1718,9 @@ class ComboboxDecodexxx( ttk.Combobox ):
         super(  ).__init__( parent, width=60, height=20, bg ="red")
         self.label_1      = Label( self, text="Input File: ").grid(row=1, column=0)
 
-
     # ------------------------------------------
     def foo(self, ) :
         pass
-
 
 # -----------------------------------------
 class FileBrowseWidget( Frame ):
@@ -1182,7 +1766,7 @@ class FileBrowseWidget( Frame ):
         root.filename =  filedialog.askopenfilename( initialdir = "/",
                                             title = "Select file",
                                             filetypes = (("jpeg files","*.jpg"),("all files","*.*")))
-        print (root.filename)
+        #rint (root.filename)
         or use asksaveasfilename
         filedialog.asksaveasfile
         import tkinter.filedialog
@@ -1209,7 +1793,7 @@ class FileBrowseWidget( Frame ):
             return
 
         self.set_text( filename )
-        #print( f"get_text = {self.get_text()}", flush = True )
+        #rint( f"get_text = {self.get_text()}", flush = True )
 
     # ------------------------------------------
     def set_text( self, a_string ):

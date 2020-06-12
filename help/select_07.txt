@@ -1,0 +1,28 @@
+Select Words Like....    -> (select_07.txt)
+
+General:        
+    Find words using words table alone. 
+     
+SQL:
+    Straight select from words table only no concord or tweets table info.
+ 
+Select Criteria:         
+    * word like   - user input  use % as wildcard.  Because there are so many words
+                    in the table, some input is required here.
+    
+Sort: 
+    User input dropdown   
+        Word
+        Word Rank, Word
+        Word Count, Word
+  
+Output Format:
+    The usual - user input see dropdown    
+                
+Note: 
+    To better understand the select you may want to go to <Help> and
+    read the section on the database.  
+
+Review for Version 14:    
+    
+>-----------------------------------------------------------<                    

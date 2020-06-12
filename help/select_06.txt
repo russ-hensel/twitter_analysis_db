@@ -1,0 +1,40 @@
+Word Rank Average - working but still in development - info incomplete/inaccurate/subject to change -> (select_06.txt)
+
+General:
+    This select does a running average of the word rank of a concordance ( the concordance subject to other select criteria ).
+    This give a measure of how common/uncommon the words in the concordance are.
+    It is a running average, but really all that matters is the value for the final entry in the select.
+    In the future we may have an option of suppressing the individual row output.
+    
+    The average is weighted ( by how many times the word is used ), and words that do not match anything
+    in the words table are simply dropped from the average ( another option might be to assign a word rank of
+    0 to such unmatched words.
+    
+    For inquiring minds the word rank is not implemented directly in the sql but in a pseudo column in Python.
+    
+For other info, experiment with it, perhaps running only about it to 
+
+SQL:
+    The concord table is joined to the tweets table, and to the words table.  <Use About It> for moLre 
+    SQL info.  Post processed to add word_rank running average.
+ 
+
+Output Format:
+    the usual    user input  drop down        
+ 
+Sort Order:
+    Large selection - user input; see dropdown
+                
+Output Format:
+    The usual - user input see dropdown       
+        
+Note: 
+    To better understand the select you may want to go to <Help> and
+    read the section on the database.       
+        
+Note: 
+    to better understand the select you may want to go to <Help> and
+    read the section on the database.        
+                
+>-----------------------------------------------------------<  
+ 

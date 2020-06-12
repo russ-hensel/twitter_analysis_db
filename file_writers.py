@@ -31,7 +31,7 @@ def add_data_path(  file_name ):
         AppGlobal.gui_write_error(   exception.msg )
         #self.os_open_text_file( self.parameters.pylogging_fn )
         msg     = "Exception building file name {AppGlobal.parameters.data_dir} and {file_name} see py_log"
-        AppGlobal.print_debug(       msg )
+        #AppGlobal.print_debug(       msg )
         AppGlobal.gui_write_error(   msg )
 
     return ret
@@ -50,7 +50,7 @@ def make_file_writer(  builder,  ):
     output_format   = builder.output_format
 
     # msg     = f"make_file_writer: for format {output_format}"
-    # print( msg )
+    #rint( msg )
 
     # some are left over and need to be changed
 
@@ -90,6 +90,11 @@ def make_file_writer(  builder,  ):
         builder.output_name    = AppGlobal.parameters.output_path  +  f"{os.sep}output_select.msg"
         select_writer          = SelectMessageWriter( builder )
 
+    elif output_format == "zap":
+        #fileout_name      = add_data_path( "output_select.html"  )
+        builder.output_name    = AppGlobal.parameters.output_path  +  f"{os.sep}output_select.msg"
+        select_writer          = SelectZapWriter( builder )
+
     else:
         msg   =  f"invalid output_format = {output_format}"
         AppGlobal.gui.display_info_string( msg )
@@ -101,86 +106,70 @@ def make_file_writer(  builder,  ):
 
     return ( select_writer )
 
-# --------------- Select Output Export Report -----------------------
-class SelectExportWriter( object ):
-    """
-    this is absolete, code for salvage more useful would be an sql writer but I would just rebuild the db
-    what is says
-    Args:
 
-    for now make this writer out lines in order
-    export is the same format as required for input with the pupose:export which needs
-    to be changed if you want to input the file
+
+#====================================
+class SelectWriter( object ):
+    """
+    Purpose: base class for all writers
     """
     #----------- init -----------
-    def __init__(self, file_name, table_info ):
+    def __init__(self, builder ):
         """
-        see class doc
+        what it says
         """
-        self.file_name       = file_name
-        self.table_info      = table_info
-        # more def in other functions
+        self.builder                = builder
+        self.file_name              = builder.output_name
+        self.columns_out            = builder.columns_out
+        self.columns_info           = builder.columns_info
 
     #----------- init -----------
-    def write_header(self, ):
+    def open_output_file(self,  ):
         """
-        what is says
-        Args: Return: state change, output
-        Raises: none planned
+        what it says
+        arguments:  from builder
+        mutates to give self.fileout for output
         """
-#        msg   = "write header...."
-#        AppGlobal.print_debug( msg )
+        #rint( f"append to output {self.builder.output_append} " )
 
-        self.fileout                = open( self.file_name, "w", encoding = "utf8", errors = 'replace' )
+        if self.builder.output_append == "Append":
+            mode    = "a"
 
-        self.col_names              =  [ i_format[0] for i_format in self.table_info.format_list ]
-        msg   = f"write_header()  self.col_names  {self.col_names}"
-        AppGlobal.print_debug( msg )
+        else:
+            mode    = "w"
 
-        i_line    = f"#---------- file output from {AppGlobal.controller.app_name} {AppGlobal.controller.app_version}"
-        self.fileout.write( i_line   + "\n" )
+        self.fileout                = open( self.file_name, mode, encoding = "utf8", errors = 'replace' )
 
-        i_line    = f"# sql = {self.table_info.sql}"
-        self.fileout.write( i_line   + "\n" )
-
-        i_line    = f"purpose:export"
-        self.fileout.write( i_line   + "\n" )
-
-        i_line    = f"use_table: {self.table_info.table_name}"
-        self.fileout.write( i_line   + "\n" )
-
-    #----------------------
-    def write_row(self, row_object ):
+    #----------- init -----------
+    def format_row( self, row_object ):
         """
-        what is says
-        Args: Return: state change, output
-        Raises: none planned
+        what i says
+        take row, return line_parts, row formatted ( all parts a string ?? )
         """
-#        i_line    =  ":===================="
-        self.fileout.write( BREAK_LINE  + "\n" )
+        columns_info  = self.columns_info   # believe it is also a dict like a data dict
+        columns_out   = self.columns_out
+        line_parts    = []
+        for  ix, i_col in enumerate( columns_out ):
 
-        for ix_col, i_col in enumerate( self.col_names ):
-            #i_data    = self.fix_null( row[ ix_col ] )
+            i_col_info   = columns_info[i_col]
+            i_col_data   = row_object[ix]
+            fmt          = i_col_info["curly_format"]
 
-            i_data    = row_object.get_value( i_col,  row_object.ix_db_value )
-            i_line    = f"{i_col}:{i_data}"
-            self.fileout.write( i_line   + "\n" )
+            if i_col_data is None:
+                fmt          = i_col_info["text_format"]
+                line_parts.append( fmt.format( x = ".n." ) )
 
-    #---------------------
-    def write_footer(self, footer_info ):
-        """
-        what is says
-        Args: Return: state change, output
-        Raises: none planned
-        """
-        i_line    =  BREAK_LINE + " eof footer ============"
-        self.fileout.write( i_line   + "\n" )
+            else:
+                fmt          = i_col_info["curly_format"]
+                # print( f"formatting:  >{fmt}< >{i_col_data}<")   # surround try except
+                line_parts.append( fmt.format( x = i_col_data ) )
 
-        self.fileout.close( )
+        return line_parts
 
 #====================================
 class SelectLogWriter( object ):
     """
+    obsolete not sure if will being back
     this writes output in compact form to the logger
     not working but would not be hard fix first
     """
@@ -242,6 +231,8 @@ class SelectLogWriter( object ):
 ##        msg       = "\n".join( lines )
 #        AppGlobal.logger.log( AppGlobal.force_log_level, i_line )
 
+
+
 #====================================
 class SelectCSVWriter( object ):
     """
@@ -252,9 +243,10 @@ class SelectCSVWriter( object ):
         """
         what it says
         """
-        self.builder                = builder
-        self.file_name              = builder.output_name
-        self.columns                = builder.columns_out
+        super().__init__( builder )
+        # self.builder                = builder
+        # self.file_name              = builder.output_name
+        # self.columns                = builder.columns_out
 
   #----------------------
     def write_header(self, ):
@@ -265,8 +257,9 @@ class SelectCSVWriter( object ):
         """
         msg   = "write header...."
         AppGlobal.print_debug( msg )
+        self.open_output_file()
 
-        self.fileout                = open( self.file_name, "w", encoding = "utf8", errors = 'replace' )
+        #self.fileout                = open( self.file_name, "w", encoding = "utf8", errors = 'replace' )
 
         columns_info  = self.builder.columns_info   # believe it is also a dict like a data dict
         columns_out   = self.builder.columns_out
@@ -274,14 +267,15 @@ class SelectCSVWriter( object ):
         for  ix, i_col in enumerate( columns_out ):
 
             i_col_info   = columns_info[i_col]
-            fmt          = i_col_info["curly_format"]
+            fmt          = i_col_info["text_format"]
             col_text     = i_col_info["column_head"]
+
 
             line_parts.append( fmt.format( x =  col_text  ) )
 
         line    = "\t".join( line_parts )
 
-        #print( line, flush = True )
+        #rint( line, flush = True )
 
         self.fileout.write( line   + "\n" )
 
@@ -304,7 +298,7 @@ class SelectCSVWriter( object ):
 
         line    = "\t".join( line_parts )
 
-        #print( line, flush = True )
+        #rint( line, flush = True )
 
         self.fileout.write( line   + "\n" )
 
@@ -324,11 +318,11 @@ class SelectCSVWriter( object ):
         self.fileout.close( )
 
 #====================================
-class SelectTxtWriter( object ):
+class SelectTxtWriter( SelectWriter ):
 
     """
     Tabular output with justification to a .txt file
-    ??do simple string formatting for now later get fancier
+
     """
     #----------- init -----------
     def __init__(self, builder ):
@@ -336,9 +330,12 @@ class SelectTxtWriter( object ):
         what it says
         all have the same init signature, may allow nulls in some cases, see code
         """
-        self.builder                = builder
-        self.file_name              = builder.output_name
-        self.columns                = builder.columns_out
+        #rint( "init SM_Select_02")
+        super().__init__( builder )
+
+        # self.builder                = builder
+        # self.file_name              = builder.output_name
+        # self.columns                = builder.columns_out
 
     #----------- init -----------
     def write_header(self, ):
@@ -348,9 +345,16 @@ class SelectTxtWriter( object ):
         Raises: none planned, file open could fail
         """
         msg   = "write header...."
-        AppGlobal.print_debug( msg )
+        #AppGlobal.print_debug( msg )
 
-        self.fileout                = open( self.file_name, "w", encoding = "utf8", errors = 'replace' )
+        # if builder.output_append == "Append":
+        #     mode    = "a"
+        # else:
+        #     mode    = "w"
+
+        # self.fileout                = open( self.file_name, mode, encoding = "utf8", errors = 'replace' )
+
+        self.open_output_file()
 
         self.fileout.write( f"Output for: {self.builder.select_name}\n" )
 
@@ -360,13 +364,13 @@ class SelectTxtWriter( object ):
         for  ix, i_col in enumerate( columns_out ):
 
             i_col_info   = columns_info[i_col]
-            fmt          = i_col_info["curly_format"]
+            fmt          = i_col_info["text_format"]
             col_text     = i_col_info["column_head"]
 
             line_parts.append( fmt.format( x =  col_text  ) )
 
         line    = "".join( line_parts )
-        #print( line, flush = True )
+        #rint( line, flush = True )
 
         self.fileout.write( line   + "\n" )
 
@@ -418,7 +422,6 @@ class SelectTxtWriter( object ):
         i_line   = " | ".join( out_columns )
         return i_line
 
-
    #----------------------
     def write_row(self, row_object ):
         """
@@ -431,24 +434,32 @@ class SelectTxtWriter( object ):
 
         self.columns                = sql_builder.columns
         self.sql_builder.column_info which currently has {} format whatever
-
-
-        Raises: none planned
         """
         # probably could zip columns and row_object
-        columns_info  = self.builder.columns_info   # believe it is also a dict like a data dict
-        columns_out   = self.builder.columns_out
-        line_parts    = []
-        for  ix, i_col in enumerate( columns_out ):
 
-            i_col_info   = columns_info[i_col]
-            fmt          = i_col_info["curly_format"]
 
-            line_parts.append( fmt.format( x = str( row_object[ix] ) ) )
+        line_parts   = self.format_row( row_object )    # apply formatting to exch item in row
+
+        # columns_info  = self.builder.columns_info   # believe it is also a dict like a data dict
+        # columns_out   = self.builder.columns_out
+        # line_parts    = []
+        # for  ix, i_col in enumerate( columns_out ):
+
+        #     i_col_info   = columns_info[i_col]
+        #     i_col_data   = row_object[ix]
+        #     fmt          = i_col_info["curly_format"]
+
+        #     if i_col_data is None:
+        #         fmt          = i_col_info["text_format"]
+        #         line_parts.append( fmt.format( x = ".n." ) )
+        #         line_parts.append( ".none." )
+        #     else:
+        #         fmt          = i_col_info["curly_format"]
+        #         line_parts.append( fmt.format( x = i_col_data ) )
 
         line    = "".join( line_parts )
 
-        #print( line, flush = True )
+        # rint( line, flush = True )
 
         self.fileout.write( line   + "\n" )
 
@@ -480,10 +491,11 @@ class SelectYamlWriter( object ):
         """
         what is says
         """
-        self.builder               = builder
-        #self.select_dict            = select_dict
-        self.file_name              = builder.output_name
-        self.columns                = builder.columns_out
+        super().__init__( builder )
+        # self.builder               = builder
+        # #self.select_dict            = select_dict
+        # self.file_name              = builder.output_name
+        # self.columns                = builder.columns_out
 
 
     #----------- init -----------
@@ -493,10 +505,11 @@ class SelectYamlWriter( object ):
         Args: Return: state change, output
         Raises: none planned, file open could fail
         """
-        msg   = "write header...."
-        AppGlobal.print_debug( msg )
+        #msg   = "write header...."
+        #AppGlobal.print_debug( msg )
+        self.open_output_file()
 
-        self.fileout                = open( self.file_name, "w", encoding = "utf8", errors = 'replace' )
+        #self.fileout                = open( self.file_name, "w", encoding = "utf8", errors = 'replace' )
 
         columns_info  = self.builder.columns_info   # believe it is also a dict like a data dict
         columns_out   = self.builder.columns_out
@@ -504,14 +517,14 @@ class SelectYamlWriter( object ):
         for  ix, i_col in enumerate( columns_out ):
 
             i_col_info   = columns_info[i_col]
-            fmt          = i_col_info["curly_format"]
+            fmt          = i_col_info["text_format"]
             col_text     = i_col_info["column_head"]
 
             line_parts.append( fmt.format( x =  col_text  ) )
 
         line    = "".join( line_parts )
 
-        #print( line, flush = True )
+        #rint( line, flush = True )
 
         self.fileout.write( line   + "\n" )
 
@@ -545,7 +558,7 @@ class SelectYamlWriter( object ):
 
         line    = "\n".join( line_parts )
 
-        #print( line, flush = True )
+        #rint( line, flush = True )
 
         self.fileout.write( line   + "\n" )
 
@@ -553,8 +566,9 @@ class SelectYamlWriter( object ):
     def write_footer(self, footer_info,  ):
         """
         what is says
-        ?? add args for sql time date blank lines .... perhaps a dict or a footer object
-        Args: Return: mutate self, output
+
+        Args:
+        Return: mutate self, output
         """
         if footer_info != "":
             self.fileout.write( footer_info   + "\n" )
@@ -588,7 +602,7 @@ class SelectMessageWriter( object ):
         Raises: none planned
         """
         msg   = "write header for MessageWriter ...."
-        AppGlobal.print_debug( msg )
+        #AppGlobal.print_debug( msg )
 
         self.fileout                = open( self.file_name, "w", encoding = "utf8", errors = 'replace' )
 
@@ -598,13 +612,13 @@ class SelectMessageWriter( object ):
         for  ix, i_col in enumerate( columns_out ):
 
             i_col_info   = columns_info[i_col]
-            fmt          = i_col_info["curly_format"]
+            fmt          = i_col_info["text_format"]
             col_text     = i_col_info["column_head"]
 
             line_parts.append( fmt.format( x =  col_text  ) )
 
         line    = "".join( line_parts )
-        #print( line, flush = True )
+        #rint( line, flush = True )
 
         self.fileout.write( line   + "\n" )
 
@@ -619,21 +633,21 @@ class SelectMessageWriter( object ):
         this needs a parse in the header to get the right columns, for now hardcode
         """
         # probably could zip columns and row_object
-        self.included_columns
+        #self.included_columns
         columns_info  = self.builder.columns_info   # believe it is also a dict like a data dict
         columns_out   = self.builder.columns_out
         line_parts    = []
         for  ix   in self.included_columns :
             i_columns_out  = columns_out[ix]
-            i_col_info   = columns_info[i_columns_out]
-            fmt          = i_col_info["curly_format"]
+            i_col_info     = columns_info[i_columns_out]
+            fmt            = i_col_info["curly_format"]
 
             line_parts.append( fmt.format( x = str( row_object[ix] ) ) )
 
         line    = " - ".join( line_parts )    # but odd if just one cloumn
-        # print( "the line is", line )
+        #rint( "the line is", line )
 
-        #print( line, flush = True )
+        #rint( line, flush = True )
 
         self.fileout.write( ">> " +  line   + "\n\n" )
 
@@ -647,15 +661,11 @@ class SelectMessageWriter( object ):
         self.fileout.close( )
 #        msg       = "\n".join( lines )
 #        AppGlobal.logger.log( AppGlobal.force_log_level, i_line )
-
 #====================================
-class SelectHTMLWriter( object ):
+class SelectZapWriter( object ):
     """
-    HTML.py - a Python module to easily generate HTML tables and lists | Decalage
-        *>url  https://www.decalage.info/python/html
-    ?? first implementation lots of room for improve
-    !! add paging option
-    ?? use tuple to reduce memory use
+    Zap right to message area
+    how different from message one or other not maintained neight works right now
     """
     #----------- init -----------
     def __init__(self, builder ):
@@ -665,8 +675,7 @@ class SelectHTMLWriter( object ):
         self.builder                = builder
         self.file_name              = builder.output_name
         self.columns                = builder.columns_out
-        self.current_rows           = 0
-        self.max_current_rows       = 200    # plan to output after this many !!
+        self.included_columns       = [ 2 ]   # later parse for these
 
     #----------- init -----------
     def write_header(self,  ):
@@ -675,13 +684,12 @@ class SelectHTMLWriter( object ):
         Args: Return: state change, output
         Raises: none planned
         """
-        #msg   = "html write header...."
-        #AppGlobal.print_debug( msg )
+        msg   = "write header for MessageWriter ...."
+        AppGlobal.print_debug( msg )
 
-        self.fileout       = open( self.file_name, "w", encoding = "utf8", errors = 'replace' )
+        #self.fileout                = open( self.file_name, "w", encoding = "utf8", errors = 'replace' )
 
-
-        columns_info  = self.builder.columns_info
+        columns_info  = self.builder.columns_info   # believe it is also a dict like a data dict
         columns_out   = self.builder.columns_out
         line_parts    = []
         for  ix, i_col in enumerate( columns_out ):
@@ -692,11 +700,102 @@ class SelectHTMLWriter( object ):
 
             line_parts.append( fmt.format( x =  col_text  ) )
 
+        line    = "".join( line_parts )
+        #rint( line, flush = True )
 
+        AppGlobal.gui.display_string( line   + "\n" )
+
+    #----------------------
+    def write_row(self, row_object ):
+        """
+        what is says
+        Args: Return: state change, output
+        Raises: none planned
+        for now just accumulate, then render in footer
+        might want to output in pages... chunks
+        this needs a parse in the header to get the right columns, for now hardcode
+        """
+        # probably could zip columns and row_object
+        columns_info  = self.builder.columns_info   # believe it is also a dict like a data dict
+        columns_out   = self.builder.columns_out
+        line_parts    = []
+
+        for  ix, i_col in enumerate( columns_out ):
+
+            i_col_info   = columns_info[i_col]
+            fmt          = i_col_info["curly_format"]
+            line_parts.append( fmt.format( x = str( row_object[ix] ) ) )
+
+        line    = " - ".join( line_parts )    # but odd if just one cloumn
+        #rint( "the line is", line , flush = True)
+
+        #self.fileout.write( ">> " +  line   + "\n\n" )
+        AppGlobal.gui.display_string( ">> " +  line   + "\n\n" )
+
+    #---------------------
+    def write_footer(self, footer_info ):
+        """
+        what is says
+        Args: Return: state change, output
+        Raises: none planned
+        """
+        pass
+        #self.fileout.close( )
+#        msg       = "\n".join( lines )
+#        AppGlobal.logger.log( AppGlobal.force_log_level, i_line )
+
+
+#====================================
+class SelectHTMLWriter( SelectWriter ):
+    """
+    HTML.py - a Python module to easily generate HTML tables and lists | Decalage
+        *>url  https://www.decalage.info/python/html
+    ?? use tuple to reduce memory use
+    """
+    #----------- init -----------
+    def __init__(self, builder ):
+        """
+        what is says
+        """
+        super().__init__( builder )
+
+        # self.builder                = builder
+        # self.file_name              = builder.output_name
+        # self.columns                = builder.columns_out
+
+        self.current_rows           = 0
+        self.max_current_table_rows = 200    # plan to output after this many !!
+        self.current_table_rows     = 0
+
+    #----------- init -----------
+    def write_header(self,  ):
+        """
+        what is says
+        Args: Return: state change, output
+        Raises: none planned
+        """
+        #msg   = "html write header...."
+        #AppGlobal.print_debug( msg )
+        self.open_output_file()
+        #self.fileout       = open( self.file_name, "w", encoding = "utf8", errors = 'replace' )
+
+
+        columns_info  = self.builder.columns_info
+        columns_out   = self.builder.columns_out
+        line_parts    = []
+        for  ix, i_col in enumerate( columns_out ):
+
+            i_col_info   = columns_info[i_col]
+            fmt          = i_col_info["text_format"]
+            col_text     = i_col_info["column_head"]
+
+            line_parts.append( fmt.format( x =  col_text  ) )
+
+        self.line_parts    = line_parts   # for later use
         self.html_table    = HTML.Table( header_row = line_parts )
 
         msg   = f"SelectHTMLWriter write_header()  columns_out  {columns_out}"
-        AppGlobal.print_debug( msg )
+        #AppGlobal.print_debug( msg )
 
         self.fileout                = open( self.file_name, "w", encoding = "utf8", errors = 'replace' )
 
@@ -725,44 +824,21 @@ class SelectHTMLWriter( object ):
         for now just accumulate, then render in footer
         might want to output in pages... chunks
         """
+        self.current_table_rows     += 1
+        # may want to add formatting see txt write_row
+        line_parts   = self.format_row( row_object )
+        self.html_table.rows.append( line_parts )
+        if self.current_table_rows > self.max_current_table_rows:
+            # output and start a new one
+            # !! put some blank space between tables, move max to parameters,
+            #?? can we keep col width more consisten
+            # perhaps thru headers
+            htmlcode      = str( self.html_table )
+#           AppGlobal.print_debug( htmlcode )
+            self.fileout.write( htmlcode )
+            self.current_table_rows     = 0
 
-        self.html_table.rows.append( row_object )
-
-#        htmlcode = str(t)
-#        print htmlcode
-#        Rows may be any iterable (list, tuple, ...) including a generator. This is useful to save memory when generating a large table.
-
-#        msg   =  str( row_object )   #.ix_db_value
-#        AppGlobal.logger.log( AppGlobal.force_log_level, msg )
-
-    #----------------------
-    def write_row_old(self, row_object ):
-        """
-        what is says
-        Args: Return: state change, output
-        Raises: none planned
-        for now just accumulate, then render in footer
-        might want to output in pages... chunks
-        """
-        #row_for_html         =  [ i_column_in_row[ row_object.ix_db_value ] for i_column_in_row in row_object.edit_dict ]
-        data_columns    = []
-        for ix_col, i_col in enumerate( self.col_names ):
-            # list comp ?? perhaps not, or perhaps
-            i_data    = row_object.get_value( i_col,  row_object.ix_db_value )
-            data_columns.append( i_data )
-
-        row_for_html    =  data_columns
-#        msg   = f"row_for_html >>{row_for_html}<<"
-#        AppGlobal.print_debug( msg )
-
-        self.html_table.rows.append( row_for_html )
-
-#        htmlcode = str(t)
-#        print htmlcode
-#        Rows may be any iterable (list, tuple, ...) including a generator. This is useful to save memory when generating a large table.
-
-#        msg   =  str( row_object )   #.ix_db_value
-#        AppGlobal.logger.log( AppGlobal.force_log_level, msg )
+            self.html_table    = HTML.Table( header_row = self.line_parts )
 
     #---------------------
     def write_footer(self, footer_info ):

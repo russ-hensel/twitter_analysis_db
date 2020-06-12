@@ -1,8 +1,91 @@
 this is a scratch file for note that will not endure
 
 
-..... right now none have ( except for this ) 
+http problems
 
 
 
-  
+https://t.co/gddcamhy9m
+	https://t.co/2iv5aifevu
+	https://t.co/5yjlsvext
+
+================ ok in sqlitestudio
+
+SELECT  '*rc*',  concord.word, concord.word_type, concord.is_ascii,  COUNT(*) AS my_count
+
+    FROM concord
+    JOIN tweets  ON concord.tweet_id = tweets.tweet_id
+    LEFT OUTER JOIN words  ON concord.word = words.word
+    GROUP BY concord.word
+
+
+SELECT  '*rc*',  concord.word, words.word, concord.word_type, concord.is_ascii,  COUNT(*) AS my_count
+
+    FROM concord
+    JOIN tweets  ON concord.tweet_id = tweets.tweet_id
+    LEFT OUTER JOIN words  ON concord.word = words.word
+    GROUP BY concord.word
+    ORDER BY concord.word
+
+SELECT  '*rc*',  concord.word, words.word, concord.word_type, concord.is_ascii,  COUNT(*) AS my_count
+
+    FROM concord
+    JOIN tweets  ON concord.tweet_id = tweets.tweet_id
+    LEFT OUTER JOIN words  ON concord.word = words.word
+    WHERE concord.word_type = 1
+    GROUP BY concord.word
+    ORDER BY concord.word
+
+SELECT  '*rc*',  concord.word, words.word, words.word_rank, concord.word_type, concord.is_ascii,  COUNT(*) AS my_count
+
+    FROM concord
+    JOIN tweets  ON concord.tweet_id = tweets.tweet_id
+    LEFT OUTER JOIN words  ON concord.word = words.word
+    WHERE concord.word_type = 1 AND words.word is not null
+    GROUP BY concord.word
+    ORDER BY my_count, concord.word
+
+
+
+
+---- parse issues found in above
+accountability!!!!""we'll
+acted:*most
+basis"@comey
+be?shouldn
+beach!the
+you!!!laura
+yesterday:"for
+
+
+
+
+
+================================
+
+
+
+seem to be mixed case at end of line
+
+SELECT DISTINCT '*rc*',  COUNT(*) AS my_count , concord.word, concord.word_type, concord.is_ascii, words.word, words.word_rank
+
+    FROM concord
+    JOIN tweets  ON concord.tweet_id = tweets.tweet_id
+    LEFT OUTER JOIN words  ON concord.word = words.word
+ WHERE
+
+    tweets.tweet_type = "tweet"    AND
+    concord.word_type = "1"  AND
+    words.word IS NULL
+    GROUP BY concord.word
+    ORDER BY tweets.tweet_datetime, tweets.tweet_type
+
+....>>sql_data is:  [datetime.datetime(2006, 3, 1, 0, 0), datetime.datetime(2020, 6, 10, 0, 0), 'tweet', 1]
+....>>sql_data is:  [datetime.datetime(2006, 3, 1, 0, 0), datetime.datetime(2020, 6, 10, 0, 0), 'tweet', 1]
+....>>Select Done, rows selected: 0 time = 0
+
+
+
+
+
+....

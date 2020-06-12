@@ -2,7 +2,7 @@ Basic Tweet Select > ( tweet_select_1.txt  )
 
 General:        
     Find desired tweets
-    Check tweet loading 
+    May be used to check tweet load processing 
     Does not join to concord ( concordance ) or word tables, just tweets 
  
 SQL:

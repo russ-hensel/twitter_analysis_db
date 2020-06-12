@@ -1,0 +1,10 @@
+Output for: Word rank average - ( words:concord:tweets ) - 06
+Concord Word        W TypeAscii Row#    RaRank      RaWL     Count    Rank
+Done: >
+     total number of rows = 995
+     select and file write took 0.06982159614562988 seconds
+
+footer_function from row count
+final value of average word rank is 3474.3362541073384
+final value of average word length is 4.982870846180199
+:========  footer eof  ============

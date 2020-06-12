@@ -64,24 +64,24 @@ that may be parsed later
 "we
 
 """
-
-replace_list      = [  ( "’", "'" )
-                     , ( "”", '"' )
-                     , ( "“", '"' )
+# this really should only be non ascii char
+replace_list      = [  ( "’", "'"   )
+                     , ( "”", '"'   )
+                     , ( "“", '"'   )
                      , ( "…", "..." )
-                     , ( ".", " " )   # to white space for word split
-                     , ( ",", " " )   # to white ... or iterate through punctuation
-                     , ( "↓", " " )   # to white ... oor iterate through punctuation
+                     , ( ",", " "   )   # to white ... or iterate through punctuation
+                     , ( "↓", " "   )   # to white ... or iterate through punctuation
+                     , ( "‘", " "   )
 
                     ]
 
 """
 also found
-⚙️⛰️🇺🇸
+⚙️⛰️🇺🇸   ... treat emogi as words, do we need white space around
 ""
 """
 
-remove_ascii        = "\"!$%&'()*+,-./:;<=>?[\]^_`{|}~"   # removable ascii not @ #
+remove_ascii        = "\"!$%&'()*+,-./:;<=>?[\]^_`{|}~"   # removable ascii not @ #  not ' as may be a contraction
 # for i_char in remove_ascii:
 #     print( i_char )
 
@@ -95,10 +95,10 @@ def is_ascii( string_like ):
     try:
         string_like.decode('ascii')
     except UnicodeDecodeError:
-        #print "it was not a ascii-encoded unicode string"
+        #rint "it was not a ascii-encoded unicode string"
         return False
     else:
-        #print "It may have been an ascii-encoded unicode string"
+        #rint "It may have been an ascii-encoded unicode string"
         return True
 
 # ----------------------------------------------
@@ -106,7 +106,7 @@ def define_table_concord( db_name, allow_drop = False ):
     """
     what it says
     """
-    # print( "  ============= define_table_concord() db {db_name} drop {allow_drop}========== " )
+    #rint( "  ============= define_table_concord() db {db_name} drop {allow_drop}========== " )
 
     try:
         sql_con = lite.connect( db_name )
@@ -152,6 +152,7 @@ def define_table_tweets( db_name, allow_drop = False ):
             cur.execute(
                 "CREATE TABLE tweets( "
                 "tweet_datetime DATETIME, "
+                "time_of_day TEXT, "
                 "is_covid   BOOLEAN, "
                 "line_no    INT, "
                 "tweet_type TEXT, "
@@ -168,31 +169,71 @@ def define_table_tweets( db_name, allow_drop = False ):
 
     sql_con.close()
 
+    def __str__( self,  ):
+        my_str    = "parsed_tweet = "
+        my_str    = f"{my_str}\n  tweet_cleaned:        {self.tweet_cleaned}"
+        #my_str    = f"{my_str}\n  concordance_words:    {info_about_list( self.concordance_words )}"
+        #my_str    = f"{my_str}\n  concordance_words:    {self.concordance_words}"
+
+# ----------------------------------------
+def list_to_str( a_obj, msg = "for a list:" ):
+    if  isinstance( a_obj, list ):
+        my_str    = f"{msg} = "
+        my_str    = f"    {my_str}\n  length of list is: {len( a_obj )}"
+        #my_str    = f"{my_str}\n  length of list is: {len( a_obj )}"
+        for  i_list in a_obj:
+             my_str    = f"        {my_str}\n     ** {i_list}"
+
+    else:
+        my_str    = f"\nfor msg = {msg} object is not an instance of list but is a {type(a_obj)}"
+
+    return my_str
+
 
 # ==========================================
 class ConcordanceWord( ):
     """
     basically a struct ( could put in parse functions here but not now )
     we will store words here prior to saving
+
     """
     def __init__( self, a_string, tweet_id ):
-        pass
-        self.reset_data( a_string, tweet_id )
-
-    #------------------
-    def reset_data( self, a_string, tweet_id ):
         """
+        ?? change to create with type as well
+
         """
         self.string     = a_string
         self.type       = AppGlobal.word_types["word"]
         #self.is_covid   = not used at this level, see tweets
-        self.is_ascii   = True
+
         self.tweet_id   = tweet_id
+
+        if  a_string.isascii():
+            self.is_ascii   = True
+        else:
+            self.is_ascii   =  False
+
+    # ----------------------------------------
+    def __str__( self,  ):
+        my_str    = "ConcordanceWord = "
+        my_str    = f"{my_str}\n          string:       {self.string}"
+        my_str    = f"{my_str}\n          is_ascii:     {self.is_ascii}"
+        my_str    = f"{my_str}\n          type:         {self.type}"
+
+        return my_str
+
+    # ----------------------------------------
+    def is_covid( self,  ):
+
+        return  self.string in covid_words
+
 
 # ==========================================
 class ParsedTweet( ):
     """
     basically a self parsing  structure
+    ?? this should probably have internal method renamed with _xxx
+
     """
     def __init__( self, tweet, tweet_id ):
         pass
@@ -200,7 +241,13 @@ class ParsedTweet( ):
 
     #------------------
     def reset_data( self, tweet, tweet_id ):
-        """ most of this stuff will probably be mutated, partly here for doc """
+        """
+        most of this stuff will probably be mutated, partly here for doc
+
+        we build up the list  self.concordance_words and...
+
+        pretty much all of these instance var
+        """
         self.concordance_words    = []     # what do we put in the list concordance_word
         self.tweet_raw            = tweet
         self.tweet_cleaned        = tweet  # will be mutated # check we are doing this right
@@ -208,37 +255,180 @@ class ParsedTweet( ):
         self.is_covid             = False
         self.tweet_id             = tweet_id
         self.tweet_datetime       = None    # next from where data line is split
+        self.time_of_day          = None    # a 24 hr clock... as a string
         #self.tweet_id             = None
         self.line_no              = 0
         self.tweet_type           = "tweet"   # what are the types
         self.who_tweets           = "?"
 
     # ----------------------------------------
+    def __str__( self,  ):
+        my_str    = "parsed_tweet = "
+        my_str    = f"    {my_str}\n  tweet_cleaned:        {self.tweet_cleaned}"
+        my_str    = f"    {my_str}\n  concordance_words:    {list_to_str( self.concordance_words )}"
+        #my_str    = f"{my_str}\n  concordance_words:    {self.concordance_words}"
+
+        return my_str
+
+    # ----------------------------------------
     def parse_me( self, ):
-        self.clean_tweet(  )
-        self.tweet_to_concordance_words()
+        """
+
+
+        """
+        #self._clean_tweet(  )
+        self._tweet_to_concordance_words()
 
     # ----------------------------------------
-    def apply_replace_list( self,  ):
+    def _apply_replace_list( self, a_string ):
         """
         mutates self.tweet_cleaned
-        mostly removes non ascii, not for punctuation
+        mostly removes non ascii, not for punctuation  look for it ....
         """
+        ret_string    = a_string
+
         for i_replace in replace_list:
-            a, b        = i_replace
-            self.tweet_cleaned    = self.tweet_cleaned.replace( a, b )
+            a, b          = i_replace
+            ret_string    = ret_string.replace( a, b )
+
+        return ret_string
 
     # ----------------------------------------
-    def clean_tweet( self,    ):
+    def _extract_urls( self,  ):
         """
+        returns mutates self, self.tweet_cleaned and self.concordance_words
+        """
+        continue_flag  = True
+        while continue_flag:
+            continue_flag  = self._extract_a_url(  )
+
+    # ----------------------------------------
+    def _extract_a_url( self,  ):
+        """
+        look for one url at end of tweet and in tweet.
+        watch for early return?
+        returns  True if one extracted and  mutates self, self.tweet_cleaned and self.concordance_words
+
+        better ?? use tuple unpack -- did second time... looks better -- slightly
+        !! worry about cap and mixed case http .....
+
+        """
+        a_rpartition    =  self.tweet_cleaned.rpartition( "http:"   )
+
+        if a_rpartition[1] == "http:":
+            # so all of part0 belongs to tweet, and some of part2, if we can break it also
+            self.tweet_cleaned   = a_rpartition[ 0 ]      # mutate with url removed
+            word                 = a_rpartition[ 1 ] +  a_rpartition[ 2 ]    # url but maybe some additional words as well
+            #msg = f"found  http:  >{word}<  partition tuple >>>>>>  >{a_rpartition[ 0 ]}< >{a_rpartition[ 1 ]}< >{a_rpartition[ 2 ]}<"
+            #rint( msg )
+            # if we can then partition on a space ( any whitespace ?? )
+            # put that peice back else put whole tail back
+            partition_url_0, partition_url_1, partition_url_2     =  word.partition( " " )
+            #rint( f">>>>>>partition tuple >>>>>>  {partition_url_0}< >{partition_url_1}< >{partition_url_2}<" )
+            if partition_url_2 != "":
+                word  = partition_url_0
+                self.tweet_cleaned   += " " + partition_url_2
+                #rint( f"**>>>>>>partition tuple >>>>>>  {partition_url_0}< >{partition_url_1}< >{partition_url_2}<" )
+
+            concordance_word         = ConcordanceWord( word, self.tweet_id )
+            concordance_word.type    = AppGlobal.word_types["url"]
+            #rint( f"adding a url http >{word}<" )
+            self.concordance_words.append(  concordance_word  )
+            return True
+
+        a_rpartition    =  self.tweet_cleaned.rpartition( "https:"   )
+
+        if a_rpartition[1] == "https:":
+
+            self.tweet_cleaned   = a_rpartition[ 0 ]      # mutate with url removed
+            word                 = a_rpartition[ 1 ] +  a_rpartition[ 2 ]
+            # msg = f"found  https:  >{word}<  partition tuple >>>>>>  >{a_rpartition[ 0 ]}< >{a_rpartition[ 1 ]}< >{a_rpartition[ 2 ]}<"
+            #rint( msg )
+            partition_url_0, partition_url_1, partition_url_2     =  word.partition( " " )
+            #rint( f">>>>>>partition tuple >>>>>>  {partition_url_0}< >{partition_url_1}< >{partition_url_2}<" )
+            if partition_url_2 != "":
+                word  = partition_url_0
+                self.tweet_cleaned   += " " + partition_url_2
+                #rint( f"**>>>>>>partition tuple >>>>>>  {partition_url_0}< >{partition_url_1}< >{partition_url_2}<" )
+            concordance_word         = ConcordanceWord( word, self.tweet_id )
+            #rint( f"adding a url https >{word}<" )
+            concordance_word.type    = AppGlobal.word_types["url"]
+            self.concordance_words.append(  concordance_word  )
+            return True
+
+        return False
+
+
+    # ----------------------------------------
+    def _extract_a_url_old( self,  ):
+        """
+        look for one url at end of tweet and in tweet.
+        watch for early return?
+        returns  True if one extracted and  mutates self, self.tweet_cleaned and self.concordance_words
+
+        better ?? use tuple unpack -- did second time... looks better -- slightly
+        !! worry about cap and mixed case http .....
+
+
+        """
+        a_rpartition    =  self.tweet_cleaned.rpartition( "http:"   )
+
+        if a_rpartition[0] != "":
+
+            self.tweet_cleaned   = a_rpartition[ 0 ]      # mutate with url removed
+            word                 = a_rpartition[ 1 ] +  a_rpartition[ 2 ]
+            #msg = f"found  http:  >{word}<  partition tuple >>>>>>  >{a_rpartition[ 0 ]}< >{a_rpartition[ 1 ]}< >{a_rpartition[ 2 ]}<"
+            #rint( msg )
+            # if we can then partition on a space ( any whitespace ?? )
+            # put that peice back else put whole tail back
+            partition_url_0, partition_url_1, partition_url_2     =  word.partition( " " )
+            #rint( f">>>>>>partition tuple >>>>>>  {partition_url_0}< >{partition_url_1}< >{partition_url_2}<" )
+            if partition_url_2 != "":
+                word  = partition_url_0
+                self.tweet_cleaned   += " " + partition_url_2
+                #rint( f"**>>>>>>partition tuple >>>>>>  {partition_url_0}< >{partition_url_1}< >{partition_url_2}<" )
+
+            concordance_word         = ConcordanceWord( word, self.tweet_id )
+            concordance_word.type    = AppGlobal.word_types["url"]
+            self.concordance_words.append(  concordance_word  )
+            return True
+
+        a_rpartition    =  self.tweet_cleaned.rpartition( "https:"   )
+
+        if a_rpartition[0] != "":
+
+            self.tweet_cleaned   = a_rpartition[ 0 ]      # mutate with url removed
+            word                 = a_rpartition[ 1 ] +  a_rpartition[ 2 ]
+            # msg = f"found  https:  >{word}<  partition tuple >>>>>>  >{a_rpartition[ 0 ]}< >{a_rpartition[ 1 ]}< >{a_rpartition[ 2 ]}<"
+            #rint( msg )
+            partition_url_0, partition_url_1, partition_url_2     =  word.partition( " " )
+            #rint( f">>>>>>partition tuple >>>>>>  {partition_url_0}< >{partition_url_1}< >{partition_url_2}<" )
+            if partition_url_2 != "":
+                word  = partition_url_0
+                self.tweet_cleaned   += " " + partition_url_2
+                #rint( f"**>>>>>>partition tuple >>>>>>  {partition_url_0}< >{partition_url_1}< >{partition_url_2}<" )
+            concordance_word         = ConcordanceWord( word, self.tweet_id )
+            concordance_word.type    = AppGlobal.word_types["url"]
+            self.concordance_words.append(  concordance_word  )
+            return True
+
+        return False
+
+    # ----------------------------------------
+    def _clean_tweetxxxx( self,    ):
+        """
+        right now lowers and removes replaces ( mostly non standard char with mostly spaces or equivalents )
         mutates self.tweet_cleaned
+        ?? take urls out first  !! recheck this whole thing
         """
-        self.tweet_cleaned   = self.tweet_raw.lower()
-        self.apply_replace_list()
+        #self.tweet_cleaned   = self.tweet_raw.lower()
+        self.tweet_cleaned   = self.tweet_raw
+        self._apply_replace_list()
 
     # ----------------------------------------
-    def tweet_to_concordance_words( self, use_spacy = False  ):
+    def _tweet_to_concordance_words( self, use_spacy = False  ):
         """
+        break out urls, then hash tags and @ .... then remove non-ascii then spacify .... when does punctuation come out
         works with self.tweet_cleaned to break into words
         may reclassify self based on word content
         break line into clean words -- even lemmas
@@ -248,61 +438,105 @@ class ParsedTweet( ):
 
         check for leading punctuation ** and numbers ?? ... add type leading nunmber or contains number really numeral
         """
+        self.tweet_cleaned   = self.tweet_raw  # tweet_cleaned will be worked over extractes/rebuilt....
+
+        continue_flag  = True
+        while continue_flag:
+            continue_flag  = self._extract_urls( )   # ?? apply befor lower back in clean tweet think that is better !!
+
         words                    = self.tweet_cleaned.split()
-        self.concordance_words   = []
+        words_for_new_line       = []    # will rebuild line for spacy
         for word  in words:
-            # clean out punctuation to nothing
+            """
+            new idea here is to loop through words based on split/strip and
+            add to concordance words the special types, reassemble the rest into
+            a line for spacy, and take the spacy output for words.
+            """
+            # clean out punctuation to nothing ... need to check list remove asciii
 
             # apply at word level for ends
-            word = word.strip( remove_ascii )
+            word     = word.strip( remove_ascii )
+            word     = word.strip( )     # skipping blanks for words
+            if word == "":
+                continue
 
-            # maybe later check whole word as numeral/number ??
-            concordance_word = ConcordanceWord( word, self.tweet_id )
-            self.concordance_words.append(  concordance_word  )
+            if word.lower(  ) in covid_words:
+               self.is_covid  = True
 
-            string_part    = concordance_word.string  # or just use word for speed ??
+            if word.lower(  )  == "rt":   # change to a stop list, set
+                self.is_retweet = True
+
+            # # maybe later check whole word as numeral/number ??
+            # concordance_word = ConcordanceWord( word, self.tweet_id )
+            # self.concordance_words.append(  concordance_word  )
+
+            # string_part    = concordance_word.string  # or just use word for speed ??
 
             # ?? need check here for empty
             # move this stuff into corcordanceWord ??
 
-            if len( string_part ) and ( string_part[0].isdigit()):
+            if  word[0].isdigit():
+                concordance_word         = ConcordanceWord( word, self.tweet_id )
                 concordance_word.type    = AppGlobal.word_types["lead_num"]
-
-            # if string_part.startswith( "@" ):
-            #     concordance_word.type    = AppGlobal.word_types["at_ref"]
+                self.concordance_words.append(  concordance_word  )
+                continue
 
             # think all thees mutates work
             # remove at ref
-            if string_part.startswith( "@" ):
+            if word.startswith( "@" ):
+                concordance_word         = ConcordanceWord( word, self.tweet_id )
                 concordance_word.type    = AppGlobal.word_types["at_ref"]
+                self.concordance_words.append(  concordance_word  )
+                continue
 
-            if string_part.startswith( "#" ):   # remove hastag
+            if word.startswith( "#" ):   # remove hastag
+                concordance_word         = ConcordanceWord( word, self.tweet_id )
                 concordance_word.type    = AppGlobal.word_types["hashtag"]
+                self.concordance_words.append(  concordance_word  )
+                continue
 
-            if string_part.startswith( "http" ) or word.startswith( "https" ):
-                concordance_word.type    = AppGlobal.word_types["url"]
+            # # note error look in py_log -- should have been removed earlier
+            # if string_part.startswith( "http" ) or word.startswith( "https" ):
+            #     concordance_word.type    = AppGlobal.word_types["url"]
+            #     # no longer an error this seems common
+            #     # msg     = f"_tweet_to_concordance_words found a url where it should not be {string_part}"
+            #     # AppGlobal.logger.error( msg )
 
-            #if not is_ascii( string_part ):
-            if not string_part.isascii():
-                concordance_word.is_ascii    =  False
+            words_for_new_line.append( word )
 
-            # right place for spacy ??
+        # run thru spacy wich will lower case it tokenize...
+        new_line   = " ".join( words_for_new_line )
 
-            if string_part in covid_words:
-               self.is_covid  = True
+        new_line   = self._apply_replace_list( new_line )
+        # right place for spacy ??
+        # these cannot be in the word because they are ratchet like
 
-            if string_part == "rt":   # change to a stop list, set
-                self.is_retweet = True
+        doc        = nlp( new_line )
+        #npl_words   = []
+        for token in doc:
+            #rint( f"        >{token}< >>{token.lemma}< >>>{token.lemma_}<" )     # debug
+            #npl_words.append( (token.lemma_) )
+
+            # print( f"  spacy_line: {spacy_line}" )
+            # print( f"  npl_words:  {npl_words}" )                # debug
+
+            concordance_word         = ConcordanceWord( token.lemma_, self.tweet_id )
+            #concordance_word.type    = AppGlobal.word_types["at_ref"]
+
+            self.concordance_words.append(  concordance_word  )
+
+
+
+
 
 # ==========================================
 class TweetTableWriter( ):
     """
-     was   class FileReadDBWrite( ):
+    was   class FileReadDBWrite( ):
 
-        old code for ref
+    old code for ref
     """
     def __init__( self,  db_name ):
-
 
         self.db_name    = db_name
         self.open(  )
@@ -318,11 +552,11 @@ class TweetTableWriter( ):
 
     #------------------
     def write_record( self, a_parsed_tweet ):
-        print( "---------- write tweet record ------------------" )
+        #rint( "---------- write tweet record ------------------" )
 
         try:
             #still needs fix up
-            tweet_id       = a_parsed_tweet.tweet_id      #   8 dbcolumns
+            tweet_id       = a_parsed_tweet.tweet_id
             #line_no        = self.data["line_no"]
             tweet_type     = a_parsed_tweet.tweet_type
             is_covid       = a_parsed_tweet.is_covid
@@ -333,84 +567,38 @@ class TweetTableWriter( ):
             #tweet_raw      = a_parsed_tweet.raw_tweet
 
             tweet_datetime = a_parsed_tweet.tweet_datetime
+            time_of_day    = a_parsed_tweet.time_of_day
             who            = a_parsed_tweet.who_tweets
 
 
             with self.sql_con:    # !! remember what
                 cur  = self.sql_con.cursor()
-                data = [(     tweet_id, line_no, tweet_datetime, is_covid, tweet, tweet_type, who )]     # 7   dbcolumns
+                data = [(     tweet_id, line_no, tweet_datetime, time_of_day, is_covid, tweet, tweet_type, who )]     # 7   dbcolumns
                 sql  = ( "INSERT INTO tweets "
-                         " (  tweet_id, line_no, tweet_datetime, is_covid, tweet, tweet_type, who ) VALUES  "
-                         " (         ?,       ?,              ?,        ?,     ?,         ?,        ?  )" )
+                         " (  tweet_id, line_no, tweet_datetime, time_of_day,  is_covid, tweet, tweet_type, who ) VALUES  "
+                         " (         ?,       ?,              ?,           ?,         ?,     ?,          ?,   ?  )" )
 
-                print( f"{sql}" )
+                #rint( f"{sql}" )   # but it is always the same, so only for debug
 
                 cur.executemany( sql, data )
 
                 self.sql_con.commit()
 
         except Exception as a_except:  # !! be more specific
+            msg     = f" {type(a_except)} :: {a_except}"
+            AppGlobal.logger.debug( msg )
+            print( msg )
 
-            print( type(a_except), '::', a_except )
+            msg  = f"record dropped data was {data}"
+            AppGlobal.logger.debug( msg )
+            print( msg )
+            # so after dropping record lets try to continue
+
+
             #return "error create_table_tweets, exception {a_except}"
-            raise
+            # raise
 
         # self.reset_data()
-
-    # #------------------
-    # def read_line( self):
-
-    #     while True:    # do until
-    #         # note early returns and continues
-    #         line   = self.file_src.readline()
-    #         self.in_count   += 1
-    #         #print( f"line{self.in_count} is {line}" )
-
-    #         if not line:
-    #             return -1  # eof
-    #         line   = line.rstrip('\n')
-    #         line   = line.strip( )       # may make above unnecessary
-
-    #         if line == "": # blank after strip is empty line -- skip
-    #             continue
-
-    #         if line.startswith( "#" ):   # comment
-    #             continue
-
-    #         self.line   = line    # put in instance var
-
-    #         print( f"line{self.in_count} is {line}" )
-
-    #         return self.in_count  # line no, data in self.
-
-    # #------------------
-    # def parse_line( self ):
-    #     """
-    #     parse line and take appropriate action
-    #         save data to dict
-    #         save record to database
-    #         exception if bad line
-    #     return  None and self.mutate
-    #     """
-    #     if self.line.startswith( ":======" ):    # this is a record break -- do we have data ??
-    #         if self.data  == {}:
-    #             pass # no data
-    #             return
-    #         else:
-    #             self.write_record( )
-    #             return
-
-    #     splits   = self.line.split( ":", 1 )
-    #     if len( splits ) < 2:
-    #         print( "bad line ")
-    #         pass # bad line quit??
-
-    #     data_name     = splits[0].strip()
-    #     data_value    = splits[1].strip()
-    #     print( f"data_name >{data_name}< data_value >>{data_value}<< ")
-    #     self.data[data_name]   = data_value
-
-    #     # print( self.data )
 
     #------------------
     def close( self   ):
@@ -446,7 +634,7 @@ class ConcordTableWriter(   ):
         """
         # if not( os.path.isfile( db_file_name  )):      # already checked in caller but move whole connect back there
         #     msg   =  f"Error: db file does not exist: {db_file_name}"
-        #     print( msg )
+        #     #rint( msg )
         #     raise FileNotFoundError( f"could not find {db_file_name}" )
         #     #AppGlobal.gui.display_info_string( msg )
         #     return
@@ -461,19 +649,13 @@ class ConcordTableWriter(   ):
         """
         #self.tweet_count   += 1
 
-        print( "---------- write db  concord record pass------------------" )
+        #rint( "---------- write db  concord record pass------------------" )
 
         """
         tweet_id
         words  = list of words, cleaned up in the tweet
         this really tries to use execute many
         """
-                # "CREATE TABLE concord( "
-                # "word      Text, "
-                # "tweet_id  Text, "  # , " on most ) on last
-                # "word_type Int, "     # word types in  AppGlobal.word_types[ "word" ]
-                # "is_ascii  BOOLEAN )"
-
 
         concordance_words      = a_parsed_tweet.concordance_words
         data         = []
@@ -481,8 +663,7 @@ class ConcordTableWriter(   ):
             data.append( ( i_concordance_word.tweet_id, i_concordance_word.type,
                            i_concordance_word.string,   i_concordance_word.is_ascii  ) )
 
-
-        # print( f"tweet count* =  {self.tweet_count}" )
+        #rint( f"tweet count* =  {self.tweet_count}" )
         try:
 
             with self.sql_con:
@@ -492,7 +673,7 @@ class ConcordTableWriter(   ):
                          " (  tweet_id, word_type, word, is_ascii   ) VALUES  "
                          " (         ?,         ?,    ?,        ?  )" )
 
-                print( f"{sql}  {data}" )
+                #rint( f"{sql}  {data}" )
                 cur.executemany( sql, data )
             self.sql_con.commit()
 
@@ -550,172 +731,13 @@ class TweetFileProcessor(   ):
         self.concord_table_writer.close()
         self.file_src.close
 
-    # # ----------------------------------------
-    # def apply_replace_list( self, a_string ):
-
-    #     b_string   = a_string
-    #     for i_replace in replace_list:
-    #         a, b        = i_replace
-    #         #b_string    = b_string.replace( "’", "'" )
-    #         b_string    = b_string.replace( a, b )
-
-    #     return b_string
-
-    # # ----------------------------------------
-    # def remove_urls( self, a_string ):
-    #     """
-    #     what it says
-    #     most but not all at begin or end of line, location may mean something, some imbedded
-    #     reassemble line without url's'
-    #     need to do this befor other clean up migh split up  url
-    #     mutate  TweetOutput
-    #     return a cleaned string
-    #     """
-    #     words         = a_string.split()
-    #     clean_words   = []
-    #     for word  in words:
-
-    #         # do this before more break up
-    #         # clean words do not start witn http, it is a url not a word
-    #         # things like https://t.co/2cfwNTvpNX are already split
-    #         if word.startswith( "http" ) or word.startswith( "https" ):   # ?? right way to manage?  https:
-    #             self.tweet_output.url_list.append( word )
-    #             continue
-    #         clean_words.append( word )
-
-    #     return " ".join( clean_words )
-
-
-    #  # ----------------------------------------
-    # def is_ascii( self, a_string ):
-    #     """
-    #     what it says -- like remove urls ( may combine with it )
-    #     need to enhance TweetTabel, concord write to have this
-    #     """
-    #     words         = a_string.split()
-    #     clean_words   = []
-    #     for word  in words:
-
-    #         if not word.is_ascii(   ):   # ?? right way to manage?  https:
-    #              print( f"word is not ascii {word}")
-
-    #     return a_string
-
-    # # ----------------------------------------
-    # def remove_hashtags( self, a_string ):
-    #     """
-    #     what it says -- like remove urls ( may combine with it )
-    #     most but not all at begin or end of line, location may mean something, some imbedded
-    #     reassemble line without url's'
-    #     need to do this befor other clean up migh split up  url
-    #     mutate  TweetOutput
-    #     return a cleaned string
-    #     """
-    #     words         = a_string.split()
-    #     clean_words   = []
-    #     for word  in words:
-
-    #         if word.startswith( "#" ):   # remove hastag
-    #             self.parsed_tweet.hashtag_list.append( word )
-    #             continue
-    #         clean_words.append( word )
-
-    #     return " ".join( clean_words )
-
-    # # ----------------------------------------
-    # def remove_at_ref( self, a_string ):
-    #     """
-    #     what it says -- like remove urls ( may combine with it )
-    #     most but not all at begin or end of line, location may mean something, some imbedded
-    #     reassemble line without url's'
-    #     need to do this befor other clean up migh split up  url
-    #     mutate  TweetOutput
-    #     return a cleaned string
-    #     """
-    #     words         = a_string.split()
-    #     clean_words   = []
-    #     for word  in words:
-
-    #         if word.startswith( "@" ):   # ?? right way to manage?  https:
-    #             self.parsed_tweet.at_references.append( word )
-    #             continue
-    #         clean_words.append( word )
-
-    #     return " ".join( clean_words )
-
-    # ----------------------------------------
-    def leftovers( self, ):
-
-    # !! remove_hashtags()  remove @references
-
-        tweet         = apply_replace_list( tweet )  # some may cause a word break  problem in links
-        words         = tweet.split()       # get word list from line -- this was all original code did
-        clean_words   = []
-        for i_word in words:
-            j_word   = clean_word( i_word )
-            if j_word == "":
-                continue
-            # since looping thru words check for covid words
-            if j_word in covid_words:
-               tweet_output.is_covid  = True
-
-            if not j_word == "" and not j_word == "rt":   # change to a stop list, set
-                # tweet_output.words.append( j_word )
-                clean_words.append( j_word )
-
-        if use_spacy:   # if using npl spacy....
-            "rebuild line, then convert to list again "
-            spacy_line  = " ".join( clean_words )
-            doc         = nlp( spacy_line )
-            """
-            what is doc?
-            """
-            # clean_words = doc    # this is not array of words, may need to convert
-
-            npl_words = []
-            for token in doc:
-                #print( token, token.lemma, token.lemma_)  # debug
-                npl_words.append( (token.lemma_) )  # token   just messing with this
-            #print( f"npl_words {npl_words}" )  # debug
-            clean_words   = npl_words
-
-        return clean_words
-
-
-    # def clean_word( self, word ):
-    #     """
-    #     clean a word may change to "" if no other clean version --
-    #           so dropping as a word.
-
-    #     Note eary returns in code
-
-    #     comments may help define what is 'clean'
-    #     takes word and returns word
-    #     """
-
-    #     # clean words do not start with punctuation
-    #     word = word.strip( string.punctuation ).lower()
-
-    #     if len(word) == 0:
-    #          return ""
-
-    #     # clean words do not start witn http, it is a url not a word
-    #     # things like https://t.co/2cfwNTvpNX are already split
-    #     if word.startswith( "http" ):   # ?? right way to manage?  https:
-    #         return ""
-
-    #     #..... more "cleaning" is probably needed
-
-    #     #print( f"word = {word}")
-    #     return word
-
     # ----------------------------------------
     def line_to_tweet( self, a_line  ):
         """
         parse clean and classify the line, return
         classify:   see line_type, and code
         clean:  means clean the line ( some in this code some in function clean_word() )
-        note that for the word ananysis we convert to lowere case
+        note that for the word ananysis we convert to lower case
 
         Return:
             ParsedTweet or None --
@@ -740,11 +762,18 @@ class TweetFileProcessor(   ):
 
         input_timestamp         = line_parts[2]
         try:
-            parsed_tweet.tweet_datetime   = datetime.datetime.strptime( input_timestamp, datetime_fmt )
-            # print( ">>>>", dt )
+
+            dt_data    = datetime.datetime.strptime( input_timestamp, datetime_fmt )  # move into parsed tweet ??
+            parsed_tweet.tweet_datetime     = dt_data
+            str_hr                          = ("0" + str( dt_data.hour   ))[ -2 : ]   # may be number formatting that puts on missing leading 0
+            str_min                         = ("0" + str( dt_data.minute ))[ -2 : ]
+            parsed_tweet.time_of_day        = str_hr + ":" + str_min
+
         except:
             print( f"bad datetime {input_timestamp}")
             parsed_tweet.tweet_datetime   = None
+            parsed_tweet.time_of_day      = None
+
 
         parsed_tweet.who_tweets  = self.who_tweets
 
@@ -762,7 +791,6 @@ class TweetFileProcessor(   ):
     # ----------------------------------------
     def read_process_lines( self, ):
         """
-
         read lines then output process all of open file
 
         """
@@ -771,7 +799,7 @@ class TweetFileProcessor(   ):
 
             line_no               += 1
             # self.tweet_output.line_no   = line_no
-            print( f"input line {line_no}" )
+            #rint( f"input line {line_no}" )
             # self.tweet_output.reset_defaults()        # may be reduandant with open and write
 
             parsed_tweet                  =  self.line_to_tweet( line  )
@@ -787,52 +815,6 @@ class TweetFileProcessor(   ):
         print( f"=========== TweetFileProcessor done at input line {line_no}" )
 
         return  line_no
-
-# # ----------------------------------------
-# def main(  ):
-#     """
-#     build concondance
-#     write 'list' file and to db
-#     sort and print
-#     """
-#     print( "\n\n----------------- start concordance ----------------------" )
-
-#     my_parameters      = parameters
-
-#     """
-#     # fn = file name -- may be come table or database name
-#     fn_src          = r"D:\Russ\0000\python00\python3\_projects\covid_data\trump\tiny_tweet_download.txt"
-#     #fn_src         = r"D:\Russ\0000\python00\python3\_projects\covid_data\trump\tweet_download.csv"
-#     fn_src          = r"tiny_tweet_download.txt"
-#     fn_src          = r"tiny_in.txt"
-#     """
-
-#     fn_list         = r"D:\Russ\0000\python00\python3\_projects\covid_data\trump\tiny_list.txt"
-#     fn_list         = r"tiny_out.txt"
-
-#     fn_tweet_out    =  parameters.tweet_out_file_name
-#     fn_concordance  = "tiny_concordance.txt"
-
-#     concordance     = concord_from_file( parameters.tweet_input_file_name, fn_list )
-
-#     # print without sorting
-#     #info_about_dict( c )
-
-#     # try with better names
-#     # a_dict   = c
-
-#     # this is the old style
-#     # sort on key and output to file whole concordance in the dict
-#     if True:
-#         a_ordered_dict    = collections.OrderedDict( sorted( concordance.items(), key=lambda a_item: a_item[0])) # items makes dict to tuples
-#         info_about_dict( a_ordered_dict, max_lines = 10 )
-#         concordance_output   = ConcordanceDictOutput( fn_concordance )
-#         concordance_output.write( a_ordered_dict )
-#         concordance_output.close()
-
-#     print( "\n---------------- end concordance ----------------------\n\n" )
-
-#     #print ( string.punctuation )
 
 # ==============================================
 if __name__ == '__main__':

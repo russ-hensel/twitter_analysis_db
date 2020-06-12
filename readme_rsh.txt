@@ -1,37 +1,135 @@
 C:\Russ\python\tweet_concordance\readme_rsh.txt
 
 This is documentation file mostly for the author rsh
-It contains a sort of todo list and random notes 
+It contains a sort of todo list and random notes
+
+        !! looks like spicy stuff got lost, get back in see if it hangles andy of current problems
+        !! reparse all tweets
 
 
- 
+
+    !! more work on url"s   add count > to the gui and to selects and perhaps take out of basic concord
+    !! dates may be gettin split into words 12-02-20 and like, do we care ?
+
+==================== scratch notes -- transient skip over ========================
+
+================== start up again at PseudoColumnRa_Word_Rank  -- not sure which report -- maybe an
+                   exp one that groups on words.word
+
+
+-------------------
+
+
+
+
+
+
+----------------------
+witch-hunts         RegularYes   3048         1  None
+women's             RegularYes   3049        10  None
+won't               RegularYes   3050        58  None
+wonerful            RegularYes   3051         2  None
+world's             RegularYes   3052         5  None
+worsts              RegularYes   3053         1  None
+wouldn't
+
+!! set up lemma nizer demo to see what happens
+
+!! possevis seem not to be broken up ( also contractions it's should the leminizer be doing this )
+
+!! and hypyenated ... split ??
+----------------------------
+
+‘monday             RegularNo    3383         1  None
+‘no                 RegularNo    3384         1  None
+‘professional       RegularNo    3385         1  None
+‘the                RegularNo    3386         1  None
+‘unmasking          RegularNo    3387         1  None
+‘unmistakably
+
+special character issue .. what is it suppose to mean
+
+can we fetch colums only to be passed to pseodo columns
+perhaps:
+     two different columns_out
+     a special format ( how do we switch formats )
+
+
+     collumns_out   and columns_select    .... perhaps collumsn out must be first columns in columns_select
+
+     how does a psedo column suppress a line     sql_builder.skip_row_output ???
+
+
+
+
+
+---------------------
+for line in ["零壹贰叁肆伍陆柒捌玖", "०१२३४५६७८९", "٠١٢٣٤٥٦٧٨٩"]:
+    print line
+this pastes in just fine licies:✅Year-r
+
+
+
+ UnicodeEncodeError: 'charmap' codec can't encode character '\u30fc' in position 162: character maps to <undefined>
+Call stack:
+  File "C:\apps\Anaconda3\lib\runpy.py", line 193, in _run_module_as_main
+    "__main__", mod_spec)
+
+    vivek    in if     equal not equal is greater than less than     and or ......
 
 =========== Status:
 
-=========== Some ideas for work or past work !! = do it, ?? = perhaps do it, ** = done, xx = dropped at least for now
+    Running but many bugs in selects, next is to clean this up
 
+=========== Work list Some ideas for work or past work !! = do it, ?? = perhaps do it, ** = done, xx = dropped at least for now
 
 
         **  Ver 10 fix up names for selects
-        **  Ver 11 subclass sql_builder 
-        
-        !!  always use cut and paste.... with your own examples
+        **  Ver 11 subclass sql_builder
+        **  Ver 12
+        **  Ver 13 convert all over to select_manager
+        **  Ver 14 debug all current selects... no new tech or features, re-run improved tweet import  url...
 
-        !!  get some better floating point formatting 
-            
-            
-            
-        !!  get Obama data 
-        
-        !!   select types .....
+            ** count number of letters per word average
+
+
+        ** signs of parsing issues  -- put in spacy see test
+
+        ** add is ascii  criteria
+
+
+
+        !! tweet ranking with all the ususal criteria add his rank .... think this is a sort and then row#
+        ** word seraces strip whitspace from ends
+        !! all add to where' s thru functions
+
+        !! esp for long selects clear message areas and .... before runnig
+        !! make bins for every total interval of usage
+        ** add formattin to html .... make a base class and add a format row method there
+        ** add time of day to tweet
+        !! add device and device
+        !! group count select min max ??
+        !! add append mode to output
+        !! graph number of words in each log grouping -- may want to precalculate the logs
+        !! count tweets for each day/week for plotting
+        ** get some better floating point formatting
+
+        ** after reloading values into comboboxes do we need to reset state to readonly  tested yes -- put in cofig dict
+        ** initialize to first report on list
+        !! reuse managers  self.xxxxx
+        !! button to nudge dates
+        ** new buttons, a year ago today, two years ago today
+
+        !! tweets per day over time     output  day   tweets ..... 2 columns ... just select all tweets and
+           count with a special column
+        **  get Obama data
+        **  average word rank for a tweet -- have running averae on
+        **  select types .....  info in help for individual help files
 
                 just tweets   criteria   dates, text like, tweet_type, is_covid
                 concondance/words    criteria dates
                                      join tweets for dates, words for rank this is the one i worked on
 
-
-
-                have slect type show what columns
 
                 concordance 1     columns:   word, word_type, word_rank, word_count
                                   select:    dates min_rank, max_count  is_covid  tweet_type    average word rank
@@ -39,50 +137,46 @@ It contains a sort of todo list and random notes
                                   order by   rank count concordance.word
                                   having
 
-        !!  group selects to table
+                                  convert all word selects to their table ex: words_word
 
-        !!  color code selects -- what does this mean 
+        **  group selects to table
 
+        !!  color code selects -- what does this mean
+        *! few more special char to remove, look at concord list
         !! add reports that chug thru time concord how does vocabulary change
+        !! have a report that really is report on just concord join tweet with no grouping -- always join concord to tweet for dates
 
-       
+        *! slider select
         !! identify in output which slect is which
-        ? for select output put values into sql -- maybe, not clear worth the trouble 
+        xx for select output put values into sql -- maybe, not clear worth the trouble -- no if want that use sql inject
 
         ** add word type to select
-
         ** decode for is_ascii and word_type
         ** get gui name for select into header
-
         ** next work  on gui to build the database tables
-
         ** remove stuff in parse   ? paren be careful # and @ do not remove
                                    substituee " of various kinds or remove
 
         ** word type .... leading number  ?? test decode
-
         ** add decode word type
 
-        *! clean up gui select management ... better, probably never all done 
+        *! clean up gui select management ... better, probably never all done
 
-        !! add time of day to the load, or define as function... ??
+        ** add time of day to the load, or define as function... ??
 
         --------------- input data
-            
+
         note rt is a word for retweet
 
-        *! add test select after load -- need one for words ... do not select all just some a's 
-           ** have some buttons but basic tweet and concord select in dropdown do the job 
+        ** add test select after load -- need one for words ... do not select all just some a's
+           ** have some buttons but basic tweet and concord select in dropdown do the job
 
         !!  csv without sql timing... just data or data and colum headers
-            perhaps a new writer and format headless csv ... 
-            
-        ** gui 80% effective, does not crash mostly run something
+            perhaps a new writer and format headless csv ...
 
+        ** gui 90% effective, does not crash mostly run something
         ** move more stuff to gui some only avail from command line
-
-        ** display sql prior to final run of select -- is parameter option 
-
+        ** display sql prior to final run of select -- is parameter option
         ** add calculated columns
             *! add average rank, median to some queries
 
@@ -97,7 +191,6 @@ It contains a sort of todo list and random notes
         ** report types .... final counts only  words used vs number of tweets
         ** add breaking rows
 
-    
         ** add a bit of logging to reports keep track of sql -- have a config parm
         ** make a select_builder   -- still called sql_builder incorporate select_dict
 
@@ -121,16 +214,14 @@ It contains a sort of todo list and random notes
             https://findicons.com/icon/download/75612/twitter/128/png
             C:\Russ\python\tweet_concordance\help\twitter.png
 
-
-        ??  add indication of selection  in progress ... not now probably needs another thread.... 
+        ??  add indication of selection  in progress ... not now probably needs another thread....
         !!  tweets ... if no selection on word drop join to other tables ??
            or at least reverse the order... a select on all concord.words is a bit much
- 
 
         *! time operations
         ** what happed to \n on gui ... seems ok
 
-        *! put add rank into the gui
+        ** put add rank into the gui
 
         ** set search to default
 
@@ -148,15 +239,10 @@ It contains a sort of todo list and random notes
                 ** add is covid
                 ** add max rank
                 ** add min count
-
                 ** add dropdown for output format -- but perhaps change back to 2 buttons
-
                 ** add frame for Define DB -- then make work
 
-
 ----------------------------------
-
- 
 
                .\input\english-word-frequency\unigram_freq.csv
                     sourced from:
@@ -202,7 +288,7 @@ http://www.opencircuits.com/Configuration_Files_For_Python
 
 Twitter Analysis DB - OpenCircuits
 http://www.opencircuits.com/Twitter_Analysis_DB
- 
+
 --------------------- twitter analytic links -- covid models
 
 WordSmith Tools
@@ -235,7 +321,7 @@ https://github.com/covid-projections
 Add multiline editing to the Editor · Issue #2112 · spyder-ide/spyder
 https://github.com/spyder-ide/spyder/issues/2112
 
- 
+
 ----------------------------  trump data
 
 precision for covid . org
@@ -252,7 +338,6 @@ Donald Trump Complete - Search Tweets, Speeches, Policies | Factbase
 https://factba.se/search
 
 
-
 Donald Trump Deleted Tweets Twitter | Factbase
 https://factba.se/topic/deleted-tweets
 
@@ -265,10 +350,8 @@ shut down but twitter
 Every Donald Trump Tweet - dataset by datacrunch | data.world
 https://data.world/datacrunch/every-donald-trump-tweet
 
-
 Trump Tweets | US News.com
 https://www.u-s-news.com/category/donald-j-trump-tweets/
-
 
 
 this may be it !!!!!!!!!!!!!!!!!! try again may 20 seem to have to copy and paste from upper window ... slow
@@ -285,7 +368,7 @@ https://www.google.com/search?q=download%20trump%20tweets
 
 old data and code in r
 mkearney/trumptweets: Download data on all of Donald Trump's (@realDonaldTrump) tweets
-https://github.com/mkearney/trumptweets
+*>url  https://github.com/mkearney/trumptweets
 
 ------------------ Obama
 Obama White House Twitter Archive : Free Data : Free Download, Borrow and Streaming : Internet Archive
@@ -293,20 +376,16 @@ https://archive.org/details/ObamaWhiteHouseTwitterArchive
 
 ------------------ common words
 
-
 English frequency word list for download | Sketch Engine
 *>url   https://www.sketchengine.eu/english-word-list/
 
 
 *>url  https://www.wordfrequency.info/free.asp?s=y
 
-
-
----------------------- language processing 
+---------------------- language processing
 
 Natural Language Processing With spaCy in Python – Real Python
 *>url https://realpython.com/natural-language-processing-spacy-python/#what-are-nlp-and-spacy
-
 
 
 import spacy
@@ -315,14 +394,13 @@ nlp = spacy.load('en')
 doc = nlp(u"Apples and oranges are similar. Boots and hippos aren't.")
 
 for token in doc:
-    print(token, token.lemma, token.lemma_)
+    print(token, token.lemma, token.lemma_ )
 
 
 spacy   from navigator but then ng so tried
 python -m spacy download en_core_web_sm
 
 then worked with 'en_core_web_sm' in the code some simlink problem
-
 
 ====================== more possible word sources some downloaded
 
