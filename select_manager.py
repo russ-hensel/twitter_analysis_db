@@ -31,8 +31,6 @@ import sql_builder
 
 WidgetInfo               = collections.namedtuple( 'WidgetInfo', ['value', 'state', 'dd_list', ]) #
 
-
-
 # ----- ========================== Begin Application Class ================================
 class SelectManager( object ):
     """
@@ -60,7 +58,7 @@ class SelectManager( object ):
         #rint( WidgetInfo )
 
         # in the dict  enabled  valid selects ( choose from list ?? ) default selects ....
-        # ---------- sample creation of a control_dict .. override in childern
+        # ---------- sample creation of a control_dict .. override in children
         # ---------- you cannot skip any part of the tuple
         # ---------------------
         self.control_dict    =  { }
@@ -108,7 +106,7 @@ class SelectManager( object ):
     def set_up_widgets( self ):
         """
         args: zip
-        ret: mutate wigets in gui
+        ret: mutate widgets in gui
         """
         #rint( "SelectManager set_up_widgets")
         #rint( f"SelectManager self.control_dict  {self.control_dict}" )
@@ -120,7 +118,7 @@ class SelectManager( object ):
         AppGlobal.gui.set_sort_order_dict( self.sort_order_dict )
 
     # --------------------------------------------------------
-    def run_sql_builder( self, select_name, help_mode ):
+    def run_sql_builderxxxxxxxxxx( self, select_name, help_mode ):
         """
 
         args: zip
@@ -170,7 +168,7 @@ class SelectManager( object ):
     # --------------------------------------------------------
     def set_control_dict_tweets_word( self,  ):
         """
-        stand gui contol dict setting for see final line ... this is really for the whole text tweets.tweet ....
+        stand gui control dict setting for see final line ... this is really for the whole text tweets.tweet ....
         ret: zip ... all sided effects
         """
         a_wi                 = WidgetInfo( value        = "Any",
@@ -183,7 +181,7 @@ class SelectManager( object ):
     # --------------------------------------------------------
     def set_control_dict_is_covid( self,  ):
         """
-        stand gui contol dict setting for is_covid
+        stand gui control dict setting for is_covid
         args: zip
         ret: zip ... all sided effects
         """
@@ -197,7 +195,7 @@ class SelectManager( object ):
     # --------------------------------------------------------
     def set_control_dict_concord_word( self,  ):
         """
-        stand gui contol dict setting for see last line or function name
+        stand gui control dict setting for see last line or function name
         ret: zip ... all sided effects
         """
        # --------------------
@@ -210,7 +208,7 @@ class SelectManager( object ):
     # --------------------------------------------------------
     def set_control_dict_concord_word_type( self,  ):
         """
-        stand gui contol dict setting for see last line or function name
+        stand gui control dict setting for see last line or function name
         ret: zip ... all sided effects
         """
       # --------------------
@@ -224,7 +222,7 @@ class SelectManager( object ):
     # --------------------------------------------------------
     def set_control_dict_words_word( self,  ):
         """
-        stand gui contol dict setting for see final line
+        stand gui control dict setting for see final line
         ret: zip ... all sided effects
         """
         a_wi                 = WidgetInfo( value        = "Any",
@@ -236,7 +234,7 @@ class SelectManager( object ):
     # --------------------------------------------------------
     def set_control_dict_is_ascii( self,  ):
         """
-        stand gui contol dict setting for see final line
+        stand gui control dict setting for see final line
         ret: zip ... all sided effects
         """
         a_wi                 = WidgetInfo( value    = "Any",
@@ -249,7 +247,7 @@ class SelectManager( object ):
     # --------------------------------------------------------
     def set_control_dict_max_count( self,  ):
         """
-        stand gui contol dict setting for see final line
+        stand gui control dict setting for see final line
         ret: zip ... all sided effects
         """
         # --------------------
@@ -262,7 +260,7 @@ class SelectManager( object ):
     # --------------------------------------------------------
     def set_control_dict_min_rank( self,  ):
         """
-        stand gui contol dict setting for see final line
+        stand gui control dict setting for see final line
         ret: .
         """
         # --------------------
@@ -275,7 +273,7 @@ class SelectManager( object ):
     # --------------------------------------------------------
     def set_control_dict_tod_min( self,  ):
         """
-        stand gui contol dict setting for see final line
+        stand gui control dict setting for see final line
         ret: ... mutates self
         """
         a_wi                 = WidgetInfo( value        = "",
@@ -287,7 +285,7 @@ class SelectManager( object ):
     # --------------------------------------------------------
     def set_control_dict_min_group_by( self,  ):
         """
-        stand gui contol dict setting for see final line
+        stand gui control dict setting for see final line
         ret: ... mutates self
         """
         a_wi                 = WidgetInfo( value        = "",
@@ -299,7 +297,7 @@ class SelectManager( object ):
     # --------------------------------------------------------
     def set_control_dict_words_word_null( self,  ):
         """
-        stand gui contol dict setting for see final line
+        stand gui control dict setting for see final line
         ret: ... mutates self
         """
         a_wi                 = WidgetInfo( value        = "",
@@ -318,7 +316,7 @@ class SM_Select_01( SelectManager  ):
         what it says -- parent may have more doc
         """
         #rint( "init SM_Select_01")
-        #super().__init__(  )
+        #super().__init__(  )     # probably should use, but right now does nothing useful
 
         self.sort_order_dict      =  {
                                          "Date, Tweet Type":     "tweets.tweet_datetime, tweets.tweet_type",
@@ -328,26 +326,8 @@ class SM_Select_01( SelectManager  ):
         #------------------------------ for use of this see gui.configure_select_widgets()   ---
         self.control_dict    =  { }
 
-        a_wi                 = WidgetInfo( value        = "Any",
-                                          dd_list       = [ "Any", "Yes", "No" ],
-                                           state        = "readonly",
-                                )
-        self.control_dict[AppGlobal.gui.is_covid]       = a_wi
-
-        # --------------------
-        a_wi                 = WidgetInfo( value        = "Any",
-                                           dd_list      = None,   # if present configure ( else leave as is )
-                                           state        = "readonly",
-                                          )
-        self.control_dict[ AppGlobal.gui.tweet_type ]    = a_wi
-
-      # # --------------------
-      #   a_wi                 = WidgetInfo( value        = "Any",
-      #                                      dd_list      = None,   # if present configure ( else leave as is )
-      #                                      state        = "normal",
-      #                                     )
-      #   self.control_dict[ AppGlobal.gui.tweets_word_widget ] = a_wi
-
+        self.set_control_dict_is_covid()
+        self.set_control_dict_tweet_type()
         self.set_control_dict_tweets_word( )
         self.set_control_dict_tod_min( )
 
@@ -373,10 +353,60 @@ class SM_Select_01( SelectManager  ):
         builder.go( )
 
 # ----------------------------------------
-class SM_Select_02( SelectManager  ):
+class SM_Select_Msg_01( SelectManager  ):
     """
     see SelectManager
     this SM is specialized as describe in .....
+    """
+    def __init__( self,  ):
+        """
+        what it says -- parent may have more doc
+        """
+        #rint( "init SM_Select_01")
+        #super().__init__(  )
+
+        self.sort_order_dict      =  {
+                                         "Date, Tweet Type":     "tweets.tweet_datetime, tweets.tweet_type",
+                                         "Tweet Type, Date":     "tweets.tweet_type, tweets.tweet_datetime",
+                                      }
+
+        #------------------------------ for use of this see gui.configure_select_widgets()   ---
+        self.control_dict    =  { }
+
+        self.set_control_dict_is_covid()
+        self.set_control_dict_tweet_type()
+        self.set_control_dict_tweets_word( )
+        self.set_control_dict_tod_min( )
+
+    # --------------------------------------------------------
+    def run_sql_builder( self, select_name, help_mode ):
+        """
+        -- see base class for doc
+        args: zip
+        ret: zip ... all sided effects
+        """
+        #rint( "SM_Select_01  run_sql_builder")
+
+        builder                  = sql_builder.Select_Msg_01()
+        builder.help_file        = AppGlobal.parameters.help_path + "./select_msg_01.txt"
+        builder.help_mode        = help_mode
+        builder.select_name      = select_name
+
+        AppGlobal.controller.get_gui_into_builder( builder )
+
+        builder.columns_out      = [  sql_builder.ROW_COUNT_CN,
+
+                                     "tweets.tweet_type",
+                                     "tweets.tweet",
+                                     "tweets.tweet_datetime",
+                                     ]
+        builder.go( )
+
+# ----------------------------------------
+class SM_Select_02( SelectManager  ):
+    """
+    see parent SelectManager
+    this SM is specialized as describe in help file: builder.help_file
     """
     def __init__( self,  ):
         """
@@ -404,11 +434,7 @@ class SM_Select_02( SelectManager  ):
         #rint( a_wi )
         self.control_dict[AppGlobal.gui.is_covid]       = a_wi
         # --------------------
-        a_wi                 = WidgetInfo( value        = "Any",
-                                          dd_list       = None ,  # if present configure ( else leave as is )
-                                           state        = "readonly",
-                                          )
-        self.control_dict[ AppGlobal.gui.tweet_type ]   = a_wi
+        self.set_control_dict_tweet_type()
         # --------------------
         a_wi                 = WidgetInfo( value         = "Any",
                                           dd_list        = None,   # if present configure ( else leave as is )
@@ -417,18 +443,15 @@ class SM_Select_02( SelectManager  ):
         self.control_dict[ AppGlobal.gui.tweets_word_widget ] = a_wi
 
         # # --------------------
-        # a_wi                 = WidgetInfo( value         = "Any",
-        #                                    dd_list       = None,
-        #                                     state        = "readonly",
-        #                                   )
-
-
+        a_wi                 = WidgetInfo( value         = "Any",
+                                            dd_list       = None,
+                                             state        = "readonly",
+                                          )
         self.control_dict[ AppGlobal.gui.concord_word_type_widget ] = a_wi
 
         # --------------------
         self.set_control_dict_concord_word()
         self.set_control_dict_is_ascii()
-
         self.set_control_dict_min_group_by()
 
     # --------------------------------------------------------
@@ -449,7 +472,7 @@ class SM_Select_02( SelectManager  ):
         AppGlobal.controller.get_gui_into_builder( builder )
 
         # my count is dynamic to group by and count * as my_count  !! wrong should come from gui
-        # !! need gui element for this  .. still need developmen for now treat as a minimum
+        # !! need gui element for this  .. still need development for now treat as a minimum
         builder.my_count           = 0   # if using a groupby with count  !! this is a min needs rename
 
         builder.go( )
@@ -518,13 +541,6 @@ class SM_Select_03( SelectManager  ):
                                           )
         self.control_dict[ AppGlobal.gui.concord_word_type_widget ] = a_wi
 
-      # --------------------
-        # a_wi                 = WidgetInfo( value            = "Any",
-        #                                    dd_list          = None,
-        #                                     state           = "readonly",
-        #                                   )
-        # self.control_dict[ AppGlobal.gui.concord_word_widget ] = a_wi
-
         self.set_control_dict_concord_word()
         self.set_control_dict_words_word()
 
@@ -572,8 +588,8 @@ class SM_Select_03( SelectManager  ):
 
                                        "tweets.tweet_id",
                                          #"SUM( 1 ) ",
-                                        sql_builder.ROW_COUNT_CN,      # pseodo column for row count
-                                        #sql_builder.TOTAL_WORD_RANK    # pseodo column for word rank, in flux
+                                        sql_builder.ROW_COUNT_CN,      # pseudo column for row count
+                                        #sql_builder.TOTAL_WORD_RANK    # pseudo column for word rank, in flux
                                          ]
 
         builder.go( )
@@ -687,7 +703,6 @@ class SM_Select_04( SelectManager  ):
         builder.tweet_type       = AppGlobal.gui.get_tweet_type()  # should be in next line
         AppGlobal.controller.get_gui_into_builder( builder )
 
-
         builder.columns_out      = [ "tweets.tweet_datetime",
                                       "concord.word",
                                       "tweets.tweet",
@@ -722,10 +737,6 @@ class SM_Select_05( SelectManager  ):
         #----------- override parent
         self.control_dict    =  { }
         # --------------------
-        a_wi                 = WidgetInfo( value        = "Any",
-                                           dd_list      = None,   # if present configure ( else leave as is )
-                                           state        = "readonly",
-                               )
 
         a_wi                 = WidgetInfo( value        = "Any",
                                            dd_list      = None,   # if present configure ( else None leave as is )
@@ -813,7 +824,6 @@ class SM_Select_06( SelectManager  ):
         # ---- group by and other
         #  !!self.set_control_dict_word_words_is_null() needs implementation
 
-
         self.set_control_dict_min_group_by()
     # --------------------------------------------------------
     def run_sql_builder( self, select_name, help_mode ):
@@ -833,7 +843,7 @@ class SM_Select_06( SelectManager  ):
         AppGlobal.controller.get_gui_into_builder( builder )
 
         # my count is dynamic to group by and count * as my_count  !! wrong should come from gui
-        # !! need gui element for this  .. still need developmen for now treat as a minimum
+        # !! need gui element for this  .. still need development for now treat as a minimum
         builder.my_count            = 0   # if using a groupby with count  !! this is a min needs rename
 
         # builder.columns_out         = [    "concord.word",
@@ -935,14 +945,14 @@ class SM_Select_07( SelectManager  ):
                                      ]
 
         AppGlobal.controller.get_gui_into_builder( builder )   # move to here
-        msg = f">>>>>>>>>>>>>>>>>>>>>>>>>>>builder.words_word_select{builder.words_word_select}"
+        #msg = f">>>>>>>>>>>>>>>>>>>>>>>>>>>builder.words_word_select{builder.words_word_select}"
         #rint( msg )
         if  builder.words_word_select  == "":
             msg  = "There are so many words that the words like select must not be blank."
             # !! change to correct message box and put in gui
             print( msg )
             #messagebox.askokcancel( "Continue?", msg )
-            messagebox.showinfo("Cannot Run Select",msg )
+            messagebox.showinfo( "Cannot Run Select", msg )
             return
 
         builder.go( )
@@ -975,17 +985,14 @@ class SM_Select_X1( SelectManager  ):
         self.control_dict    =  { }
         # --------------------
         self.set_control_dict_is_covid()
-        # a_wi                 = WidgetInfo( value        = "Any",
-        #                                   dd_list       = None,   # if present configure ( else leave as is )
-        #                                    state        = "readonly",
-        #                                   )
-        # self.control_dict[AppGlobal.gui.is_covid]       = a_wi
+ 
         # --------------------
         a_wi                 = WidgetInfo( value        = "Any",
                                           dd_list       = None ,  # if present configure ( else leave as is )
                                            state        = "readonly",
                                           )
         self.control_dict[ AppGlobal.gui.tweet_type ]   = a_wi
+        
         # --------------------
         a_wi                 = WidgetInfo( value         = "Any",
                                           dd_list        = None,   # if present configure ( else leave as is )
@@ -998,12 +1005,8 @@ class SM_Select_X1( SelectManager  ):
                                             state        = "readonly",
                                           )
         self.control_dict[ AppGlobal.gui.concord_word_type_widget ] = a_wi
-        # # --------------------
-        # a_wi                 = WidgetInfo( value     = "Any",
-        #                                   dd_list    = None ,
-        #                                    state      = "readonly",   #[ 1,2,3 ]   # if present configure ( else leave as is )
-        #                         )
-        # self.control_dict[AppGlobal.gui.is_ascii]    = a_wi
+        # --------------------
+      
         self.set_control_dict_is_ascii()
         self.set_control_dict_concord_word()
 
@@ -1025,7 +1028,7 @@ class SM_Select_X1( SelectManager  ):
         AppGlobal.controller.get_gui_into_builder( builder )
 
         # my count is dynamic to group by and count * as my_count  !! wrong should come from gui
-        # !! need gui element for this  .. still need developmen for now treat as a minimum
+        # !! need gui element for this  .. still need development for now treat as a minimum
         builder.my_count            = 0   # if using a groupby with count  !! this is a min needs rename
 
         builder.columns_out         = [    "concord.word",
@@ -1040,8 +1043,6 @@ class SM_Select_X1( SelectManager  ):
                                       ]
 
         builder.go( )
-
-
 
 # ----------------------------------------
 class SM_Select_01_Old_for_code_ref_delete( SelectManager  ):
@@ -1145,7 +1146,6 @@ class SM_Select_01_Old_for_code_ref_delete( SelectManager  ):
         AppGlobal.controller.get_gui_into_builder( builder )
 
         builder.go( )
-
 
 # --------------------------------------
 if __name__ == '__main__':

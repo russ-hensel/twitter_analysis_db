@@ -67,7 +67,7 @@ class TweetApp( object ):
         AppGlobal.controller        = self
         AppGlobal.main_thread_id    = threading.get_ident()
         self.app_name               = "TweetApp"
-        self.version                = "Ver: Alpha 15 - 2020 06 12.1"   # most of structure for traditional
+        self.version                = "Ver: Alpha 15 - 2020 06 15.1"   # most of structure for traditional
                                                                        # select in place, more cleanup
                                                                        # build multi year db, and perhaps for others
 
@@ -617,11 +617,12 @@ class TweetApp( object ):
                                 ]   # add datetime ??
 
         self.get_gui_into_builder( builder )
-        # then override some
+        # then override some -- set into gui
         builder.tweet_type          = "tweet"       #self.gui.get_tweet_type()
-        builder.output_format       = "zap"
+        builder.output_format       = "msg"
         #builder.help_mode        = help_mode
 
+        # ?? not right
         builder.help_file        = self.parameters.help_path + "./slider_select_1.txt"
         builder.help_file        = self.parameters.help_path + "./slider_select_1.txt"
         builder.go( )

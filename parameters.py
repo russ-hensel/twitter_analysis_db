@@ -4,7 +4,6 @@
 
 for tweet analysis db
 
-
 """
 
 import logging
@@ -39,14 +38,11 @@ class Parameters( object ):
 
         """
         pass                              # if everything else is commented out
-        self.mode_build_tables_on_ram_drive()
         self.mode_2020_test()
+        #self.mode_hillary()
         #self.mode_tiny_test()
         #self.mode_db_in_code_dir()
         # --- probably obsolete, save for ref
-        #self.mode_tiny_trump()
-        #self.mode_2Ktrump()
-
         #self.mode_db_in_code_dir()
         #self.mode_big_test()
         #self.mode_add_2019()
@@ -64,31 +60,6 @@ class Parameters( object ):
         self.logging_level      = logging.DEBUG     #INFO
 
   # ------------------------
-    def mode_build_tables_on_ram_drive( self,  ):
-        """
-        for building on ram drive, one table or time period at a time
-        do not add other data to this db without a copy/rename
-        """
-        self.mode                    = "mode_build_tables_on_ram_drive"
-
-        self.show_db_def             = True    # True or False  normally false so you do not trash db by mistake
-        self.database_name           = r"R:/Temp./all_words.db"
-        self.database_name           = r"R:/Temp./2019_to_dec2019.db"
-        self.database_name           = r"R:/Temp./2018_thru_may_2020.db"
-        self.database_name           = r"R:/Temp./2017_thru_may_2020.db"
-        self.database_name           = r"R:/Temp./2016_thru_may_2020.db"
-
-
-        self.tweet_input_file_name   = r"./input/all_tweets_2019.csv"
-        self.tweet_input_file_name   = r"./input/all_tweets_2020_thru_may.csv"
-        self.tweet_input_file_name   = r"./input/all_tweets_2018.csv"
-        self.tweet_input_file_name   = r"./input/all_tweets_2017.csv"
-        self.tweet_input_file_name   = r"./input/all_tweets_2016.csv"
-
-        self.word_input_file_name    = r"./input/english-word-frequency/unigram_freq.csv"
-        self.logging_level           = logging.DEBUG     #INFO
-
-  # ------------------------
     def mode_db_in_code_dir( self,  ):
         """
         mode for first use, database in directory with code, not best for performance, but no special setup
@@ -103,9 +74,6 @@ class Parameters( object ):
                                                # normally False so you do not trash db by mistake
 
         self.tweet_input_file_name   = r"./input/all_tweets_2019.txt"   # input data for tweets
-
-
-
 
         self.who_tweets              = "djt"   # not really used yet -- perhaps later
         self.use_spacy               = True    # use the spacy processor on input words
@@ -127,7 +95,7 @@ class Parameters( object ):
 
         self.database_name           = "all_words_plus_tiny_test.db"  # starting from all words first
         self.database_name           = r"R:/Temp./2020_test.db"  # copy up fill words, rename
-
+        self.database_name           = r"R:/Temp./2016_thru_may_2020.db"
         # ------------- data load
         self.show_db_def             = True    # True or False  normally false so you do not trash db by mistake
 
@@ -143,6 +111,33 @@ class Parameters( object ):
         self.use_spacy               = True
         self.confirm_selects         = False      # if true use message box to confirm selects
         self.word_input_file_name    = r"./input/english-word-frequency/tiny_unigram_freq.csv"
+
+   # ------------------------
+    def mode_hillary( self,  ):
+        """
+        try loading the hillary data
+        """
+        self.mode                    = "mode_hillary"
+        self.database_name           = r"R:\Temp\hc_all_words.db"    #
+
+        # ------------- data load
+        self.show_db_def             = True    # True or False  show db def features in the gui
+                                               # normally False so you do not trash db by mistake
+
+        self.tweet_input_file_name   = r"./input/hclynton_2015_to_june_x.csv"
+
+        self.who_tweets              = "hrc"      # not really used yet
+        self.use_spacy               = True
+        self.confirm_selects         = False      # if true use message box to confirm selects
+
+        self.word_input_file_name    = r"./input/english-word-frequency/tiny_unigram_freq.csv"
+        self.word_input_file_name    = r"./input/english-word-frequency/unigram_freq.csv"
+
+        self.default_word_list       = []  # not implemented
+
+        self.default_word            = "joe"
+        self.combo_box_words         = [ "fake", "fraud", "outraged", "dem", "republican",  "immigration",
+                                         "sam", "joe", "warren", "barr", "more", "bad", "best", "faith", "god", "love", "hate" ]
 
    # ------------------------
     def mode_big_test( self,  ):
@@ -163,8 +158,8 @@ class Parameters( object ):
         #self.tweet_input_file_name   =  os.path.join( dir_name, base_fn  + os.extsep + ext )
         self.tweet_input_file_name   = r"./input/all_tweets_may_16_for_2020.txt"
 
-        self.who_tweets              = "djt"    # not really used yet
-        self.use_spacy               = True
+        self.who_tweets              = "djt"      # not really used yet
+        self.use_spacy               = True       # no longer an option
         self.confirm_selects         = False      # if true use message box to confirm selects
 
         self.word_input_file_name    = r"./input/english-word-frequency/tiny_unigram_freq.csv"
@@ -195,41 +190,17 @@ class Parameters( object ):
         #self.tweet_input_file_name   = r"./input/all_tweets_may_16_for_2020.txt"
         self.tweet_input_file_name   = r"./input/all_tweets_2019.txt"
 
-        self.who_tweets              = "djt"    # not really used yet
+        self.who_tweets              = "djt"      # not really used yet
         self.use_spacy               = True
         self.confirm_selects         = False      # if true use message box to confirm selects
 
         self.word_input_file_name    = r"./input/english-word-frequency/tiny_unigram_freq.csv"
         self.word_input_file_name    = r"./input/english-word-frequency/unigram_freq.csv"
 
-
         self.default_word            = "joe"
         self.combo_box_words         = [ "fake", "fraud", "outraged", "dem", "republican",  "immigration",
                                         "sam", "joe", "warren", "barr", "more", "bad", "best", "faith", "god", "love", "hate" ]
 
-    # -------
-    def mode_2Ktrump(self,  ):
-        """
-        changes not much -- may not be in default this may be ok as we may not want to run
-        """
-        self.word_input_file_name    = r".\english-word-frequency\unigram_freq.csv"
-        #self.word_input_file_name    = r".\english-word-frequency\tiny_unigram_freq.csv"
-
-        self.use_db                  = True      # if false then no output to db
-
-        self.database_name           = "tweet_2.db"
-        self.database_name           = "tweet_big_words.db"
-
-        self.use_spacy               = True
-
-        self.tweet_input_file_name   = r"tiny_in.txt"
-        self.tweet_input_file_name   = r"twoKTweets.csv"
-
-        # where does tweet output go ... direct to db? and a file
-        self.tweet_out_file_name     = r"twoKTweets_out.txt"   # out for concor.py input for util
-        self.tweet_out_file_name     = r"twoK_out.txt"   # out for concor.py input for util
-
-        print( "====================={self.database_name }============================" )
 
     # -------
     def __init__(self,    ):
@@ -368,7 +339,7 @@ class Parameters( object ):
 
         self.win_geometry           = '1500x800+20+20'     # width x height position
         self.win_geometry           = '900x600+700+230'    # width x height position  x, y  --- find code for maximize
-        self.win_geometry           = '1900x1000+2+2'    # width x height position  x, y  --- find code for maximize  good for the prof
+        self.win_geometry           = '1900x1000+2+2'      # width x height position  x, y  --- find code for maximize  good for the prof
 
         self.id_color               = "red"    # the application may have color to help identify the gui. think dead code  "blue"   "green"  and lots of other work
         self.id_height              = 20       # if there is an id pane, height of id pane, 0 for no pane
@@ -386,9 +357,9 @@ class Parameters( object ):
         self.log_gui_text_level     = logging.DEBUG
         self.pylogging_fn           = "tweet_app.py_log"      # file name for the python logging
 
-        self.logging_level          = logging.DEBUG        # .DEBUG  .INFO   logging level
+        self.logging_level          = logging.DEBUG           # .DEBUG  .INFO   logging level
 
-        self.logger_id              = "tweet"                # id in logging file
+        self.logger_id              = "tweet"                 # id in logging file
         self.who_tweets             = "djt"
 
         # ---- next 4 parms are for the select clause -- may be changed in the GUI
@@ -400,7 +371,7 @@ class Parameters( object ):
         self.select_end_hr          = AppGlobal.dd_hours[0]            # default end time for the sql select    (  index on 24 hr clock )
         self.slider_datetime_width  = datetime.timedelta( days = 9  )
 
-        self.default_word           = "dem%" #  default word for tweet selects president truth fake failing
+        self.default_word           = "dem%"     #  default word for tweet selects president truth fake failing
         self.confirm_selects        = False      # if true use message box to confirm selects
         self.show_db_def            = True       #  or False
 

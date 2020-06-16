@@ -57,6 +57,8 @@ class GUI:
         self.logger             = logging.getLogger( self.controller.logger_id + ".gui")
         self.logger.info( "in class gui_new GUI init" ) # logger not currently used by here
 
+        self.test_counter   = 0
+
         # next leftover values may not be used
         self.save_redir          = None
         self.save_sys_stdout     = sys.stdout
@@ -75,6 +77,7 @@ class GUI:
                                        "Word rank average - ( words:concord:tweets ) - 06": select_manager.SM_Select_06,
                                        "Select Words Like ( words )  07": select_manager.SM_Select_07,
                                        "Concordance with Tweet ( concord:tweets ) - X1": select_manager.SM_Select_X1,
+                                       "Message Area Tweets ( tweets ) - msg_01":        select_manager.SM_Select_Msg_01
                                        }
 
         self.select_word_type_dict  =  { "Any":           None,
@@ -366,10 +369,9 @@ class GUI:
         a_widget.set( "No Append" )
         self.output_append_widget  = a_widget
         lcol   += 1
-        # zz
 
         # ----- reset
-        a_widget = Button( a_frame , width = 10, height = 4, text = "Turn Date\nSlider Mode\nOn" )
+        a_widget = Button( a_frame , width = 10, height = 4, text = "Turn Date\nAuto Mode\nOn" )
         a_widget.config( command = self.controller.toggle_ds_mode )
         # self._set_lambda_callback( a_widget, self.set_select_this_month )
         a_widget.grid( row = lrow, column = lcol,  rowspan = 2, sticky=E + W + N + S )
@@ -1061,7 +1063,7 @@ class GUI:
     # ------------------------------------------
     def get_dt_begin_end( self ):
         """
-        what it says:   zz
+        what it says:
         get begin end times from the gui -- combine dates and hours into a datetime
         return tuple (begin, end )
         """
@@ -1112,7 +1114,7 @@ class GUI:
     # ------------------------------------------
     def get_words_is_word_null_select( self ):
         """
-        what it says:  zz
+        what it says:
         return tuple ( text, sql_text, data )  !! change to dict approach
         cut/paste text, sql_text, data   =  gui.get_is_covid()
         cut/paste    cb_text, cb_sql_text, cb_sql_value  =  self.gui.
@@ -1121,7 +1123,6 @@ class GUI:
         #  _1, _2, tf  =  self.get_logic_values_combobox( self.is_covid )
         # return  tf
         return self.get_logic_values_combobox( self.words_word_null_widget )
-
 
     # ------------------------------------------
     def get_output_append_select( self ):
@@ -1253,7 +1254,7 @@ class GUI:
         """
         self.get_words_max_count_select()
 
-# ----------- end gets by table
+# ----------- other methods inc display -end gets by table
     # ------------------------------------------
     def get_sort_order( self ):
         """
@@ -1354,9 +1355,10 @@ class GUI:
             AppGlobal.logger.log( AppGlobal.parameters.log_gui_text_level, a_string, )
              #AppGlobal.logger.info( a_string )     # not sure about this level
 
+        #rint( f"display_string >>>{a_string}<<<")
         self.rec_text.insert( END, a_string, )      # this is going wrong, why how
         try:
-             numlines = int( self.rec_text.index( 'end - 1 line' ).split('.')[0] )
+              numlines = int( self.rec_text.index( 'end - 1 line' ).split('.')[0] )
         except Exception as exception:
             self.logger.error( str( exception ) )
             print( exception )
@@ -1387,6 +1389,22 @@ class GUI:
 
         # a_select_manager   = select_manager.SM_Select_03()
         # a_select_manager.set_up_widgets()
+        msg_list    = [
+                          "\nmsg 0",
+                          "\nmsg 1",
+                          "\nmsg 2",
+
+                      ]
+
+        msg           = """20 - 2019-06-16 20:36:12  - 20:36  - tweet    - ......If Republicans ever did that to the Democrats there would be all hell to pay. It would be a scandal like no other!"""                               - 1140357430095810560
+        msg_list.append( msg )
+
+        msg    = msg_list[ self.test_counter ]
+        self.display_string( msg,  update_now = False )
+
+        self.test_counter  += 1
+        if  self.test_counter >= len( msg_list ):
+            self.test_counter = 0
 
     # ---------------------------------------
     def paste_string( self, a_string, update_now = False ):

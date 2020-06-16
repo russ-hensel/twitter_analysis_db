@@ -1,4 +1,4 @@
- 
+
 This file:  ......\twitter_analysis_db\input\readme_rsh.txt
 
 
@@ -17,15 +17,7 @@ C:\Russ\python\tweet_concordance\input\english-word-frequency
 C:\Russ\python\tweet_concordance\input\english-word-frequency
 C:\Russ\python\tweet_concordance\input\english-word-frequency\english-word-frequency.zip
 
-  
 
-  
-
------------------------------------------------------------
-
-
-
-  
 
 ----------------------------  trump data
 
@@ -45,14 +37,11 @@ Trump Twitter Archive
 (Better) - Donald Trump Tweets! | Kaggle
 *>url   https://www.kaggle.com/kingburrito666/better-donald-trump-tweets
 
-
-
 All the President’s tweets - CNN.com
 *>url   https://www.cnn.com/interactive/2017/politics/trump-tweets/
 
 Donald Trump Complete - Search Tweets, Speeches, Policies | Factbase
 *>url   https://factba.se/search
-
 
 
 Donald Trump Deleted Tweets Twitter | Factbase
@@ -98,17 +87,12 @@ English frequency word list for download | Sketch Engine
 *>url   https://www.sketchengine.eu/english-word-list/
 
 
-
-
 *>url  https://www.wordfrequency.info/free.asp?s=y
 
 
 
 
-
-
-
----------------------- scratch
+---------------------- spacy
 
 Natural Language Processing With spaCy in Python – Real Python
 *>url https://realpython.com/natural-language-processing-spacy-python/#what-are-nlp-and-spacy

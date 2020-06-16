@@ -258,7 +258,6 @@ def build_column_info():
     info_for_a_column["transform"]          = None        # not necessary for a pseodo column
     column_info[ RA_WORD_NULL ]           = info_for_a_column
 
-
     return column_info
 
 # ----------------------------------------
@@ -376,7 +375,7 @@ class PseudoColumnTotalWordRank(   ):
         self.total_word_rank          = 0
         self.builder.row_to_list      = True
         self.builder.row_functions.append( self.row_function )
-        # print( f"PseudoColumnRowCount config  --  {self.builder.row_functions}" )
+        #rint( f"PseudoColumnRowCount config  --  {self.builder.row_functions}" )
         #self.builder.footer_function.append()   !! do me
 
 # ----------------------------------------
@@ -448,9 +447,8 @@ class PseudoColumnRa_Word_Rank(   ):
         called for each row
         note: possible early return
         return  mutates a_row and self
-
         """
-        # print( "self.builder.row_count"  )  # may need processing for none
+        #rint( "self.builder.row_count"  )  # may need processing for none
         word_rank       = a_row[ self.ix_word_rank ]
         if word_rank is None:
             a_row[ self.ix_col_out  ]  = None
@@ -543,8 +541,8 @@ class PseudoColumnRa_Word_Length(   ):
 
         msg  = ( f"PseudoColumnRa_Word_Length config complete:" +
                  f"\n    ix_concord_word :{self.ix_concord_word}" +
-                 f"\n    ix_my_count:  {self.ix_my_count} " +
-                 f"\n    ix_col_out:   { self.ix_col_out} " )
+                 f"\n    ix_my_count:     {self.ix_my_count} " +
+                 f"\n    ix_col_out:      { self.ix_col_out} " )
         print( msg )
         AppGlobal.logger.debug( msg )
 
@@ -585,7 +583,6 @@ class PseudoColumnRa_Word_Length(   ):
 class PseudoColumnRa_Word_Null(   ):
     """
     supports adding of a running count/average of the concord.words that are or not words.word
-
 
     """
     def __init__( self, builder ):
@@ -649,7 +646,6 @@ class PseudoColumnRa_Word_Null(   ):
                  f"\n    ix_col_out:   { self.ix_col_out} " )
         print( msg )
         AppGlobal.logger.debug( msg )
-
 
     # ----------------------------------------------
     def row_function( self, a_row  ):
@@ -737,13 +733,13 @@ class SQLBuilder(   ):
         self.end_time           = 0
 
         self.select_msg         = ""    # a message generated during the select ... ?? may just be an idea
-
-        self.pseudo_columns     = [   PseudoColumnRowCount(         self ),       # list to check may not be present
+        
+        # list to check may not be present in any given select
+        self.pseudo_columns     = [   PseudoColumnRowCount(         self ),       
                                       PseudoColumnTotalWordRank(    self ),
                                       PseudoColumnRa_Word_Rank(     self ),
                                       PseudoColumnRa_Word_Length(   self ),
                                       PseudoColumnRa_Word_Null(     self ),
-
                                   ]
 
         self.row_functions      = []    # called for each row, used with pseudo columns
@@ -769,8 +765,7 @@ class SQLBuilder(   ):
         self.sql_data         = []    # parameters passed to sql
         self.row_count        = 0
 
-        self.row_functions    = []    # functions called on each row, producing column data
-        #self.footer_function  = []    # functions called at end of fetch, data for footer
+        self.row_functions    = []    # functions called on each row, producing column dat
         self.prior_row        = None
         self.row_to_list      = False  # convert row to a list for manipulation
 
@@ -844,6 +839,24 @@ class SQLBuilder(   ):
             AppGlobal.gui.display_info_string( msg )
         return
 
+    # ----------------------------------------------
+    def confirm_continue_0( self,   ):   #  help_mode = False
+        """
+        adding more common code to confirm_continue, experimenting with factoring
+
+        """
+
+        # next is standard this is the refactor ??
+
+        if self.help_mode or self.output_format != "msg":
+            self.display_help()
+            info_msg     =    f"sql is:\n{self.sql}\n"
+            AppGlobal.gui.display_info_string( info_msg )
+            info_msg     =    f"sql_data is:\n{self.sql_data}"
+
+        info_msg     = ""
+        self.confirm_continue( info_msg, self.check_title,   self.check_run_select, )
+
    # ----------------------------------------------
     def confirm_continue( self, info_msg,  a_title, msg, ):   #  help_mode = False
         """
@@ -863,7 +876,7 @@ class SQLBuilder(   ):
         if help_mode:
             raise app_global.UserCancel( "Mode: Help only, query not run" )
 
-        if AppGlobal.parameters.confirm_selects:
+        if AppGlobal.parameters.confirm_selects:   #  !! may still need adjust for msg format
 
             continue_flag  = messagebox.askokcancel( a_title, msg )
 
@@ -878,7 +891,7 @@ class SQLBuilder(   ):
         now does pseudo cols ....
         !! update for col transforms
         ?? would bringing references local help anything
-        ?? flag to se if any transforms used now seems to be automatic based on
+        ?? flag to see if any transforms used now seems to be automatic based on
         column names
         some mutation and file output in most cases
         """
@@ -894,15 +907,15 @@ class SQLBuilder(   ):
         file_writer         = file_writers.make_file_writer( self  )
         file_writer.write_header()
 
-        msg     = f"Select and output; connect to {self.db_name}"
-        print( msg )
+        #msg     = f"Select and output; connect to {self.db_name}"
+        #rint( msg )
         sql_con = lite.connect( self.db_name )
 
         with sql_con:
             cur           = sql_con.cursor()
             execute_args  = ( self.sql,  self.sql_data,  )
             msg           = f"select and output; execute_args {execute_args}"
-            print(  msg )
+            #rint(  msg )
             AppGlobal.logger.debug( msg )
             cur.execute( *execute_args )
 
@@ -913,7 +926,7 @@ class SQLBuilder(   ):
                     break
                 self.row_count    += 1
                 self.prior_row     = row    # save for later use, perhaps at footer ? -- save after transform
-                if self.row_to_list:        # !! efficency tweak ... probably not worth it
+                if self.row_to_list:        # !! efficiency tweak ... probably not worth it
                     #print( "row_to_list"  )
                     row  = list( row )
 
@@ -970,13 +983,14 @@ class SQLBuilder(   ):
         elif self.output_format  == "zap":
             pass
         elif self.output_format  == "msg":
-            AppGlobal.gui.do_clear_button( "dummy_event")
+            pass
+            # AppGlobal.gui.do_clear_button( "dummy_event")
 
-            with open( self.output_name, "r", encoding = "utf8", errors = 'replace' )  as a_file:
-                lines = a_file.readlines()
-                # print( lines )
-                msg  = "".join( lines )
-                AppGlobal.gui.display_info_string( msg )
+            # with open( self.output_name, "r", encoding = "utf8", errors = 'replace' )  as a_file:
+            #     lines = a_file.readlines()
+            #     # print( lines )
+            #     msg  = "".join( lines )
+            #     AppGlobal.gui.display_info_string( msg )
 
         else:
             AppGlobal.os_open_txt_file(  self.output_name )
@@ -989,7 +1003,7 @@ class SQLBuilder(   ):
         """
         AppGlobal.gui.do_clear_button( "ignored" ) # check this actually works in real time !!
         try:
-            self.this_select()   # configured for one of self.  ... with subclassing always the same
+            self.this_select()          # configured for one of self.  ... with sub-classing always the same
             self.select_and_output()    # help_mode ??
 
         except app_global.UserCancel as exception:   #
@@ -1082,7 +1096,6 @@ class SQLBuilder(   ):
         """
         return mutates self -- in particular  self.sql_where self.sql_data
         """
-        pass
         # --------- word  ... consider auto adding of wild char at both ends
         # --------- tweets.word   consider auto adding of wild char at both ends
         a_word    = self.tweets_word_select
@@ -1096,13 +1109,11 @@ class SQLBuilder(   ):
         """
         return mutates self -- in particular  self.sql_where self.sql_data
         """
-        pass
         # ----- tweet_type
         tweet_type      =   self.tweet_type
         if tweet_type is not None:
              self.add_to_where( add_where = f"\n{indent}tweets.tweet_type = ? ",
                                add_data = tweet_type  )
-
 
    # ----------------------------------------------
     def add_to_where_concord_word_like( self  ):
@@ -1113,7 +1124,6 @@ class SQLBuilder(   ):
         # --------- tweets.word   consider auto adding of wild char at both ends
         a_word    = self.concord_word_select
         if a_word != "":
-
             self.add_to_where( add_where  = f'\n{indent}concord.word  LIKE  "{a_word}"  ',     # sql inject
                                add_data   = None  )
    # ----------------------------------------------
@@ -1153,8 +1163,6 @@ class SQLBuilder(   ):
             self.add_to_where( add_where  = f'\n{indent}words.word IS NOT NULL ',
                                add_data   = None )
 
-
-
 # ----------------------------------------
 class Select_01( SQLBuilder  ):
     """
@@ -1167,7 +1175,7 @@ class Select_01( SQLBuilder  ):
         """
         what it says
         """
-        #print( "init Select_01")
+        #rint( "init Select_01")
         super().__init__(  )
 
     # ----------------------------------------------
@@ -1219,10 +1227,63 @@ class Select_01( SQLBuilder  ):
         self.confirm_continue( info_msg, self.check_title,   self.check_run_select, )
 
 # ----------------------------------------
+class Select_Msg_01( SQLBuilder  ):
+    """
+    see parent SQLBuilder
+    is this the same as Select_01 ??
+    """
+    def __init__( self,  ):
+        """
+        what it says
+        """
+        #print( "init Select_01")
+        super().__init__(  )
+
+    # ----------------------------------------------
+    def this_select( self,  ):
+        #rint( "this select TweetSelect1")
+        # ----------------------------------------------
+        msg   = f"tweet_select_1 builder vars: {self.builder_vars_as_str()}"
+        print( msg  )
+        AppGlobal.logger.debug(  msg  )
+
+        # self.columns_out      = [ "tweets.tweet_datetime", "tweets.tweet_type",  "tweets.tweet", "tweets.tweet_id"    ]
+
+        # --- not sure think sets up pseudo columns if in column list
+        for i_pc in self.pseudo_columns:
+            i_pc.config()
+        self.sql           =  "SELECT  " + ", ".join( self.columns_out  ) + " FROM tweets "
+
+        #  -------- dates
+        self.add_to_where_dates(   )
+
+        #  -------- tweet_type
+        tweet_type   = self.tweet_type
+        if tweet_type is not None:
+               self.add_to_where( add_where = f"\n{indent}tweets.tweet_type = ?   ",
+                                  add_data = tweet_type )
+
+        # --------- word  ... consider auto adding of wild char at both ends
+        # --------- tweets.word   consider auto adding of wild char at both ends
+        a_word    = self.tweets_word_select
+        if a_word != "":
+            a_word    = a_word.lower()
+            self.add_to_where( add_where  = f'\n{indent}lower( tweets.tweet )  LIKE  "%{a_word}%"',     # sql inject
+                               add_data   = None  )
+
+        self.add_to_where_is_covid()
+
+        self.sql   += self.sql_where
+
+        self.sql   +=   f"\n{indent}ORDER BY {self.gui_order_by} "
+
+        self.confirm_continue_0()
+
+# ----------------------------------------
 class Select_02( SQLBuilder  ):
 #class Select_02( SQLBuilder  ):   # !! update
     """
-    specilized decendant of SQLBuilder for a particular select see help doc
+    specialized descendant of SQLBuilder for a particular select see help doc
     """
     def __init__( self,  ):
         """
@@ -1263,12 +1324,12 @@ class Select_02( SQLBuilder  ):
         # for i_pc in self.pseudo_columns:
         #     i_pc.config()
 
-        #  --------  tweets
+        #  ---- tweets
         self.add_to_where_dates()
         self.add_to_where_tweet_type()
         self.add_to_where_word_like()
 
-        # ----  concord
+        # ---- concord
         self.add_to_where_concord_word_type()
         self.add_to_where_is_ascii()
         self.add_to_where_concord_word_like()
@@ -1306,7 +1367,7 @@ class Select_03( SQLBuilder  ):
         """
         what it says
         """
-        #print( "init Select_03")
+        #rint( "init Select_03")
         super().__init__(  )
 
     # ----------------------------------------------
@@ -1364,35 +1425,15 @@ class Select_03( SQLBuilder  ):
                self.add_to_where( add_where = f"\n{indent}tweets.tweet_type = ?   ",
                                   add_data = tweet_type )
 
-
         #  --------concord
         self.add_to_where_is_ascii()
-
-        # is_ascii   = self.is_ascii
-        # if is_ascii is not None:
-
-        #     if is_ascii:
-        #         self.add_to_where( add_where = f"\n{indent}concord.is_ascii   ",
-        #                            add_data = None )
-
-        #     else:
-        #         self.add_to_where( add_where = f"\n{indent}NOT concord.is_ascii   ",
-        #                            add_data = None )
 
         # ----- concord word_type
         self.add_to_where_concord_word_type()
         self.add_to_where_concord_word_like()
 
-        # word_type      =   self.concord_word_type_select
-        # if word_type is not None:
-        #      self.add_to_where( add_where = f"\n{indent}concord.word_type = ? ",
-        #                        add_data = word_type  )
-
-        # self.add_to_where_concord_word_like()
-
         # ---- words ?? still need more
         self.add_to_where_words_word()
-
 
         #  -------- max_count
         max_count   = self.max_count
@@ -1427,6 +1468,7 @@ class Select_03( SQLBuilder  ):
         AppGlobal.gui.display_info_string( info_msg )
 
         self.confirm_continue( info_msg, self.check_title,   self.check_run_select, )
+        
 # ----------------------------------------
 class Select_04( SQLBuilder  ):
     """
@@ -1437,7 +1479,7 @@ class Select_04( SQLBuilder  ):
         """
         what it says
         """
-        #print( "init Select_03")
+        #rint( "init Select_03")
         super().__init__(  )
 
     # ----------------------------------------------
@@ -1672,15 +1714,15 @@ class Select_05( SQLBuilder  ):
         """
         what it says
         """
-        #print( "init TweetSelect1")
+        #rint( "init TweetSelect1")
         super().__init__(  )
 
     # ----------------------------------------------
     def this_select( self,  ):
-        #print( "this select TweetSelect1")
+        #rint( "this select TweetSelect1")
         # ----------------------------------------------
         msg   = f"tweet_select_1 builder vars: {self.builder_vars_as_str()}"
-        print( msg  )
+        #rint( msg  )
         AppGlobal.logger.debug(  msg  )
 
         self.sql           = "SELECT  " +  ", ".join( self.columns_out  ) + " "
@@ -1717,7 +1759,7 @@ class Select_05( SQLBuilder  ):
 
         self.sql   +=   f"\n{indent}ORDER BY {sort_order} "
 
-        # next is standard refactor ??
+        # next is standard refactor    see confirm_...._0
         self.display_help()
         info_msg     =    f"sql is:\n{self.sql}\n"
         AppGlobal.gui.display_info_string( info_msg )
@@ -1735,7 +1777,7 @@ class Select_06( SQLBuilder  ):
         """
         what it says
         """
-        #print( "init Select_03")
+        #rint( "init Select_06")
         super().__init__(  )
 
     # ----------------------------------------------
@@ -1743,16 +1785,15 @@ class Select_06( SQLBuilder  ):
         """
         see SQLBuilder
         three way join
-        lets try to make this a word rank average ... run the avearge against the row data
+        lets try to make this a word rank average ... run the average against the row data
         select pretty much uses all gui criteria, and should be good on most sort orders !! check
         """
         # should be set in tweet_app self.select_name   = "select_name = select_06"
-        print( f"this_select {self.select_name}")
-
+        #rint( f"this_select {self.select_name}")
 
         msg    = self.builder_vars_as_str()
         AppGlobal.logger.debug( msg )
-        print( msg )   # debug
+        #rint( msg )   # debug
 
         # perhaps move back to controller   !! show why want columms_select and colums_out
         self.columns_out      = [
@@ -1881,12 +1922,12 @@ class Select_07( SQLBuilder  ):
         select pretty much uses all gui criteria, and should be good on most sort orders !! check
         """
         # should be set in tweet_app self.select_name   = "select_name = select_06"
-        print( f"this_select {self.select_name}")
+        #rint( f"this_select {self.select_name}")
 
         # debug
         msg    = self.builder_vars_as_str()
         AppGlobal.logger.debug( msg )
-        print( msg )
+        #rint( msg )
 
 
         # --- not sure think sets up pseudo columns if in column list
@@ -1952,7 +1993,7 @@ class SliderSelect1( SQLBuilder  ):
         """
         what it says
         """
-        #print( "init TweetSelect1")
+        #rint( "init SliderSelect1")
         super().__init__(  )
 
     # ----------------------------------------------
@@ -2102,6 +2143,7 @@ if __name__ == '__main__':
     # import ex_helpers       # ex_helpers.info_about_obj()
     import tweet_app
     a_app = tweet_app.TweetApp(  )
+    
 # ======================== eof ======================
 
 

@@ -1,0 +1,33 @@
+Tweets for Message Area and Slider Mode > ( select_msg_01.txt  )
+
+General:
+    Find desired tweets - Optimized for output to  Message Area ( but valid for all output formats )
+    Does not join to concord ( concordance ) or word tables, just tweets
+
+SQL:
+    Straight select from tweets table only no concord or word table info.
+    for fields use <About It> to see the SQL.
+
+Select Criteria:
+
+    Date Range - user input; whole bunch of different widgets, dropdowns and slider.
+                                       ( from tweets.tweet_datetime )
+    Is Covid -  user input; see dropdown.
+                                       ( from tweets.tweet_is_covid )
+    Word Like - like the text of the tweet.  Dropdown and text entry.
+                Word and tweet adjusted to lower case, use % as n character wild card leading or trailing.
+                                       ( from tweets.tweet )
+    Tweet Type - user input; see dropdown.
+                                       ( from tweets.tweet_type )
+
+Sort:
+    user input; see dropdown
+
+Output Format:
+    Optimized for output to the message area ( msg ) also all the usual - user input see dropdown
+
+Note:
+    To better understand the select you may want to go to <Help> and
+    read the section on the database.
+
+>-----------------------------------------------------------<

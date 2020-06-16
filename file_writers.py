@@ -20,7 +20,7 @@ BREAK_LINE      =  ":===================="    # break in "input files"
 # ----------------------------------------------
 def add_data_path(  file_name ):
     """
-    complete short path names by adding data_dir part  ... remove instance funct of same name
+    complete short path names by adding data_dir part  ... remove instance function of same name
     from another app may not be used here
     """
     ret  = ""  # why, will fail unless changed, just not well though out
@@ -41,11 +41,11 @@ def make_file_writer(  builder,  ):
     """
     Purpose:
         what it says -- make a file_writer of the correct format output_format
-    Args: builder -- amoung other things uses output_format to determine type of
+    Args: builder -- among other things uses output_format to determine type of
           writer and file name
 
     Returns: a fileWriter, mutates builder
-    Issues:  could use a thougful refactoring  --- conside dict version
+    Issues:  could use a thoughtful refactoring  --- consider dict version
     """
     output_format   = builder.output_format
 
@@ -88,12 +88,14 @@ def make_file_writer(  builder,  ):
     elif output_format == "msg":
         #fileout_name      = add_data_path( "output_select.html"  )
         builder.output_name    = AppGlobal.parameters.output_path  +  f"{os.sep}output_select.msg"
-        select_writer          = SelectMessageWriter( builder )
+        # !! why 2 was one for test resolve and fix select_writer          = SelectMessageWriter( builder )
+        print( "select_writer          = SelectMsgWriter( builder )" )
+        select_writer          = SelectMsgWriter( builder )
 
-    elif output_format == "zap":
-        #fileout_name      = add_data_path( "output_select.html"  )
-        builder.output_name    = AppGlobal.parameters.output_path  +  f"{os.sep}output_select.msg"
-        select_writer          = SelectZapWriter( builder )
+    # elif output_format == "zap":
+    #     #fileout_name      = add_data_path( "output_select.html"  )
+    #     builder.output_name    = AppGlobal.parameters.output_path  +  f"{os.sep}output_select.msg"
+    #     select_writer          = SelectZapWriter( builder )
 
     else:
         msg   =  f"invalid output_format = {output_format}"
@@ -106,15 +108,13 @@ def make_file_writer(  builder,  ):
 
     return ( select_writer )
 
-
-
 #====================================
 class SelectWriter( object ):
     """
     Purpose: base class for all writers
     """
     #----------- init -----------
-    def __init__(self, builder ):
+    def __init__( self, builder ):
         """
         what it says
         """
@@ -231,10 +231,8 @@ class SelectLogWriter( object ):
 ##        msg       = "\n".join( lines )
 #        AppGlobal.logger.log( AppGlobal.force_log_level, i_line )
 
-
-
 #====================================
-class SelectCSVWriter( object ):
+class SelectCSVWriter( SelectWriter ):
     """
     Purpose: write a tab separated file
     """
@@ -243,10 +241,7 @@ class SelectCSVWriter( object ):
         """
         what it says
         """
-        super().__init__( builder )
-        # self.builder                = builder
-        # self.file_name              = builder.output_name
-        # self.columns                = builder.columns_out
+        super().__init__( self, builder )
 
   #----------------------
     def write_header(self, ):
@@ -270,7 +265,6 @@ class SelectCSVWriter( object ):
             fmt          = i_col_info["text_format"]
             col_text     = i_col_info["column_head"]
 
-
             line_parts.append( fmt.format( x =  col_text  ) )
 
         line    = "\t".join( line_parts )
@@ -290,7 +284,6 @@ class SelectCSVWriter( object ):
         columns_out   = self.builder.columns_out
         line_parts    = []
         for  ix, i_col in enumerate( columns_out ):
-
             i_col_info   = columns_info[i_col]
             fmt          = i_col_info["curly_format"]
 
@@ -332,10 +325,6 @@ class SelectTxtWriter( SelectWriter ):
         """
         #rint( "init SM_Select_02")
         super().__init__( builder )
-
-        # self.builder                = builder
-        # self.file_name              = builder.output_name
-        # self.columns                = builder.columns_out
 
     #----------- init -----------
     def write_header(self, ):
@@ -437,7 +426,6 @@ class SelectTxtWriter( SelectWriter ):
         """
         # probably could zip columns and row_object
 
-
         line_parts   = self.format_row( row_object )    # apply formatting to exch item in row
 
         # columns_info  = self.builder.columns_info   # believe it is also a dict like a data dict
@@ -471,7 +459,6 @@ class SelectTxtWriter( SelectWriter ):
         Args:
         Return: None,  output
         """
-
         if footer_info != "":
             self.fileout.write( footer_info   + "\n" )
 
@@ -481,22 +468,17 @@ class SelectTxtWriter( SelectWriter ):
         self.fileout.close( )
 
 #====================================
-class SelectYamlWriter( object ):
+class SelectYamlWriter( SelectWriter ):
 
     """
-    yamal like output, may make more official later
+    yaml like output, may make more official later
     """
     #----------- init -----------
-    def __init__(self, builder ):
+    def __init__( self, builder ):
         """
         what is says
         """
         super().__init__( builder )
-        # self.builder               = builder
-        # #self.select_dict            = select_dict
-        # self.file_name              = builder.output_name
-        # self.columns                = builder.columns_out
-
 
     #----------- init -----------
     def write_header(self, ):
@@ -515,7 +497,6 @@ class SelectYamlWriter( object ):
         columns_out   = self.builder.columns_out
         line_parts    = []
         for  ix, i_col in enumerate( columns_out ):
-
             i_col_info   = columns_info[i_col]
             fmt          = i_col_info["text_format"]
             col_text     = i_col_info["column_head"]
@@ -566,7 +547,6 @@ class SelectYamlWriter( object ):
     def write_footer(self, footer_info,  ):
         """
         what is says
-
         Args:
         Return: mutate self, output
         """
@@ -579,10 +559,10 @@ class SelectYamlWriter( object ):
         self.fileout.close( )
 
 #====================================
-class SelectMessageWriter( object ):
+class SelectMessageWriterOld( SelectWriter ):
     """
     Message a txt file to go to the message area
-    Might want to change to write directly to it
+    Might want to change to write directly to it ... going thru txt file may be faster ??  or collect into one string 
     """
     #----------- init -----------
     def __init__(self, builder ):
@@ -619,7 +599,6 @@ class SelectMessageWriter( object ):
 
         line    = "".join( line_parts )
         #rint( line, flush = True )
-
         self.fileout.write( line   + "\n" )
 
     #----------------------
@@ -627,7 +606,6 @@ class SelectMessageWriter( object ):
         """
         what is says
         Args: Return: state change, output
-        Raises: none planned
         for now just accumulate, then render in footer
         might want to output in pages... chunks
         this needs a parse in the header to get the right columns, for now hardcode
@@ -645,10 +623,6 @@ class SelectMessageWriter( object ):
             line_parts.append( fmt.format( x = str( row_object[ix] ) ) )
 
         line    = " - ".join( line_parts )    # but odd if just one cloumn
-        #rint( "the line is", line )
-
-        #rint( line, flush = True )
-
         self.fileout.write( ">> " +  line   + "\n\n" )
 
     #---------------------
@@ -661,8 +635,9 @@ class SelectMessageWriter( object ):
         self.fileout.close( )
 #        msg       = "\n".join( lines )
 #        AppGlobal.logger.log( AppGlobal.force_log_level, i_line )
+
 #====================================
-class SelectZapWriter( object ):
+class SelectMsgWriter( SelectWriter ):
     """
     Zap right to message area
     how different from message one or other not maintained neight works right now
@@ -672,38 +647,35 @@ class SelectZapWriter( object ):
         """
         what is says
         """
-        self.builder                = builder
-        self.file_name              = builder.output_name
-        self.columns                = builder.columns_out
-        self.included_columns       = [ 2 ]   # later parse for these
+        super().__init__( builder )
 
     #----------- init -----------
     def write_header(self,  ):
         """
         what is says
         Args: Return: state change, output
-        Raises: none planned
         """
-        msg   = "write header for MessageWriter ...."
-        AppGlobal.print_debug( msg )
-
+        # msg   = "write header for SelectZapWriter ...."
+        # AppGlobal.print_debug( msg )
+        AppGlobal.gui.do_clear_button( "__dummy_event")
         #self.fileout                = open( self.file_name, "w", encoding = "utf8", errors = 'replace' )
 
-        columns_info  = self.builder.columns_info   # believe it is also a dict like a data dict
-        columns_out   = self.builder.columns_out
-        line_parts    = []
-        for  ix, i_col in enumerate( columns_out ):
+        # ----- try skipping headers
+        # columns_info  = self.builder.columns_info   # believe it is also a dict like a data dict
+        # columns_out   = self.builder.columns_out
+        # line_parts    = []
+        # for  ix, i_col in enumerate( columns_out ):
 
-            i_col_info   = columns_info[i_col]
-            fmt          = i_col_info["curly_format"]
-            col_text     = i_col_info["column_head"]
+        #     i_col_info   = columns_info[i_col]
+        #     fmt          = i_col_info["curly_format"]
+        #     col_text     = i_col_info["column_head"]
 
-            line_parts.append( fmt.format( x =  col_text  ) )
+        #     line_parts.append( fmt.format( x =  col_text  ) )
 
-        line    = "".join( line_parts )
-        #rint( line, flush = True )
+        # line    = "".join( line_parts )
+        # #rint( line, flush = True )
 
-        AppGlobal.gui.display_string( line   + "\n" )
+        # AppGlobal.gui.display_string( line   + "\n" , update_now = False )   # update_now appears to need work
 
     #----------------------
     def write_row(self, row_object ):
@@ -725,15 +697,24 @@ class SelectZapWriter( object ):
             i_col_info   = columns_info[i_col]
             fmt          = i_col_info["curly_format"]
             line_parts.append( fmt.format( x = str( row_object[ix] ) ) )
+            #rint( row_object[ix] )
 
-        line    = " - ".join( line_parts )    # but odd if just one cloumn
-        #rint( "the line is", line , flush = True)
+        line    = " - ".join( line_parts  )  # [2:4] )    # but odd if just one cloumn  -- not getting right output
+        #rint( f"the line is >>>>>{line}<<<<" , flush = True )
 
         #self.fileout.write( ">> " +  line   + "\n\n" )
-        AppGlobal.gui.display_string( ">> " +  line   + "\n\n" )
+        AppGlobal.gui.display_string( ">> " +  line   + "<<\n\n" )
+
+        # still throwing an exception, thought this should eat it
+        # try:
+        #     pass
+        #     AppGlobal.logger.log( AppGlobal.force_log_level, ">> " +  line   + "\n\n" )
+        # except Exception as exception:
+        #     # Catch the custom exception
+        #     print( exception )
 
     #---------------------
-    def write_footer(self, footer_info ):
+    def write_footerxxxx(self, footer_info ):
         """
         what is says
         Args: Return: state change, output
@@ -743,7 +724,21 @@ class SelectZapWriter( object ):
         #self.fileout.close( )
 #        msg       = "\n".join( lines )
 #        AppGlobal.logger.log( AppGlobal.force_log_level, i_line )
+    #---------------------
+    def write_footer(self, footer_info,  ):
+        """
+        what is says
 
+        Args:
+        Return: mutate self, output
+        """
+        if footer_info != "":
+            #self.fileout.write( footer_info   + "\n" )
+            AppGlobal.gui.display_string( ">> " +  footer_info   + "<<\n\n" )
+        i_line    =  ":========  footer eof  ============"
+        #self.fileout.write( i_line   + "\n" )
+        AppGlobal.gui.display_string( ">> " +  i_line   + "<<\n\n" )
+        # self.fileout.close( )
 
 #====================================
 class SelectHTMLWriter( SelectWriter ):
@@ -758,11 +753,6 @@ class SelectHTMLWriter( SelectWriter ):
         what is says
         """
         super().__init__( builder )
-
-        # self.builder                = builder
-        # self.file_name              = builder.output_name
-        # self.columns                = builder.columns_out
-
         self.current_rows           = 0
         self.max_current_table_rows = 200    # plan to output after this many !!
         self.current_table_rows     = 0
@@ -772,13 +762,11 @@ class SelectHTMLWriter( SelectWriter ):
         """
         what is says
         Args: Return: state change, output
-        Raises: none planned
         """
         #msg   = "html write header...."
         #AppGlobal.print_debug( msg )
         self.open_output_file()
         #self.fileout       = open( self.file_name, "w", encoding = "utf8", errors = 'replace' )
-
 
         columns_info  = self.builder.columns_info
         columns_out   = self.builder.columns_out
@@ -820,7 +808,6 @@ class SelectHTMLWriter( SelectWriter ):
         """
         what is says
         Args: Return: state change, output
-        Raises: none planned
         for now just accumulate, then render in footer
         might want to output in pages... chunks
         """
@@ -871,9 +858,6 @@ class SelectHTMLWriter( SelectWriter ):
         self.fileout.close( )
 #        msg       = "\n".join( lines )
 #        AppGlobal.logger.log( AppGlobal.force_log_level, i_line )
-
-
-
 
 # ==============================================
 if __name__ == '__main__':
