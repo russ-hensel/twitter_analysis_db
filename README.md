@@ -10,14 +10,18 @@ Quickly select and view tweets ( typically for a single person based on a number
 Display concordance and simple linguistic analysis for a body of tweets.
 Provide a database of tweet and concordance data for analysis using tools external to the app.
 
-This program has some supporting functionality:
+This program hassupporting functionality:
 
 Load a body of tweets into a database ( currently sqlite )
 Break the tweets down into a concordance.
 Have an accompanying db of English words ( right now sourced from Kaggle )
 Provide a variety of queries against the database for possible enlightenment.
 I will try to documented well enough so people can relatively easily extend and adapt the program. Or as alternative they can use other tools with the database like SQLiteStudio. It should be fairly easy to download and use even for those without a desire to dive into the code but, I assume some knowledge of Python, and a Python Environment to run it in. In Python 3.6 or so.
- 
+
+Status:
+
+Mostly works.  I am at the point of no longer introducing major features and just working at cleaning up what I have.  While I have a nice concordance, I am still not doing as much with it as I think it might offer.  I am shifting my efforts to other projects so this may become more static untill I again refocus on it.  That said I will continure to upgrade for the immediate future.
+
 So what are the features?
 
 Free open source
@@ -44,7 +48,7 @@ Guide to directories and files:
                                                 | -- wiki_etc -> various files documenting program, including at least some of the material from the open circuits wiki, image files
 ```
 Some individual files:
-         comming soon 
+         comming soon see the readme_rsh.txt that is in each directory ( maybe ).
 
 More documentation starting at:  http://www.opencircuits.com/Twitter_Analysis_DB#Goal
 
