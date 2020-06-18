@@ -562,7 +562,7 @@ class SelectYamlWriter( SelectWriter ):
 class SelectMessageWriterOld( SelectWriter ):
     """
     Message a txt file to go to the message area
-    Might want to change to write directly to it ... going thru txt file may be faster ??  or collect into one string 
+    Might want to change to write directly to it ... going thru txt file may be faster ??  or collect into one string
     """
     #----------- init -----------
     def __init__(self, builder ):
@@ -637,9 +637,10 @@ class SelectMessageWriterOld( SelectWriter ):
 #        AppGlobal.logger.log( AppGlobal.force_log_level, i_line )
 
 #====================================
-class SelectMsgWriter( SelectWriter ):
+class SelectMsgWriter_line_by_line( SelectWriter ):
     """
     Zap right to message area
+    seems to work fine, but slow -- write dominates time to get and display, on order of seconds
     how different from message one or other not maintained neight works right now
     """
     #----------- init -----------
@@ -732,6 +733,116 @@ class SelectMsgWriter( SelectWriter ):
         Args:
         Return: mutate self, output
         """
+        if footer_info != "":
+            #self.fileout.write( footer_info   + "\n" )
+            AppGlobal.gui.display_string( ">> " +  footer_info   + "<<\n\n" )
+        i_line    =  ":========  footer eof  ============"
+        #self.fileout.write( i_line   + "\n" )
+        AppGlobal.gui.display_string( ">> " +  i_line   + "<<\n\n" )
+        # self.fileout.close( )
+#====================================
+class SelectMsgWriter( SelectWriter ):
+    """
+    this version accumulates in memory and sends to the msg area in footer
+    how different from message one or other not maintained neight works right now
+    """
+    #----------- init -----------
+    def __init__(self, builder ):
+        """
+        what is says
+        """
+        super().__init__( builder )
+        self.output_lines     = []
+
+
+    #----------- init -----------
+    def write_header(self,  ):
+        """
+        what is says
+        Args: Return: state change, output
+        """
+        # msg   = "write header for SelectZapWriter ...."
+        # AppGlobal.print_debug( msg )
+        AppGlobal.gui.do_clear_button( "__dummy_event")
+        #self.fileout                = open( self.file_name, "w", encoding = "utf8", errors = 'replace' )
+
+        # ----- try skipping headers
+        # columns_info  = self.builder.columns_info   # believe it is also a dict like a data dict
+        # columns_out   = self.builder.columns_out
+        # line_parts    = []
+        # for  ix, i_col in enumerate( columns_out ):
+
+        #     i_col_info   = columns_info[i_col]
+        #     fmt          = i_col_info["curly_format"]
+        #     col_text     = i_col_info["column_head"]
+
+        #     line_parts.append( fmt.format( x =  col_text  ) )
+
+        # line    = "".join( line_parts )
+        # #rint( line, flush = True )
+
+        # AppGlobal.gui.display_string( line   + "\n" , update_now = False )   # update_now appears to need work
+
+    #----------------------
+    def write_row(self, row_object ):
+        """
+        what is says
+        Args: Return: state change, output
+        Raises: none planned
+        for now just accumulate, then render in footer
+        might want to output in pages... chunks
+        this needs a parse in the header to get the right columns, for now hardcode
+        """
+        # probably could zip columns and row_object
+        columns_info  = self.builder.columns_info   # believe it is also a dict like a data dict
+        columns_out   = self.builder.columns_out
+        line_parts    = []
+
+        for  ix, i_col in enumerate( columns_out ):
+
+            i_col_info   = columns_info[i_col]
+            fmt          = i_col_info["curly_format"]
+            line_parts.append( fmt.format( x = str( row_object[ix] ) ) )
+            #rint( row_object[ix] )
+
+        line    = " - ".join( line_parts  )  # [2:4] )    # but odd if just one cloumn  -- not getting right output
+        #rint( f"the line is >>>>>{line}<<<<" , flush = True )
+
+        #self.fileout.write( ">> " +  line   + "\n\n" )
+        self.output_lines.append(  line )
+        # AppGlobal.gui.display_string( ">> " +  line   + "<<\n\n" )
+
+        # still throwing an exception, thought this should eat it
+        # try:
+        #     pass
+        #     AppGlobal.logger.log( AppGlobal.force_log_level, ">> " +  line   + "\n\n" )
+        # except Exception as exception:
+        #     # Catch the custom exception
+        #     print( exception )
+
+    #---------------------
+    def write_footerxxxx(self, footer_info ):
+        """
+        what is says
+        Args: Return: state change, output
+        Raises: none planned
+        """
+        pass
+        #self.fileout.close( )
+#        msg       = "\n".join( lines )
+#        AppGlobal.logger.log( AppGlobal.force_log_level, i_line )
+    #---------------------
+    def write_footer(self, footer_info,  ):
+        """
+        what is says
+
+        Args:
+        Return: mutate self, output
+        """
+        output     = "\n".join( self.output_lines )
+        AppGlobal.gui.display_string( ">> " +  output   + "<<\n\n" )
+
+
         if footer_info != "":
             #self.fileout.write( footer_info   + "\n" )
             AppGlobal.gui.display_string( ">> " +  footer_info   + "<<\n\n" )

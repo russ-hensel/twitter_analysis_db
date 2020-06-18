@@ -46,7 +46,6 @@ class Parameters( object ):
         #self.mode_db_in_code_dir()
         #self.mode_big_test()
         #self.mode_add_2019()
-        #self.mode_db_in_code_dir()
 
         # ---- additional stuff only for testing -- in addition to another mode
         #self.mode_plus_tests()                # used only for testing
@@ -310,7 +309,7 @@ class Parameters( object ):
 
         #self.db_path            = None     # if we do not want db in the default ignore if None
 
-        # ------------- Application
+        # ------------- Application Level
         #--------------- automatic settings -----------------
         self.running_on   = RunningOn
         self.running_on.gather_data()

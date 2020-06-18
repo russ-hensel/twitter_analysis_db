@@ -67,7 +67,7 @@ class TweetApp( object ):
         AppGlobal.controller        = self
         AppGlobal.main_thread_id    = threading.get_ident()
         self.app_name               = "TweetApp"
-        self.version                = "Ver: Alpha 15 - 2020 06 15.1"   # most of structure for traditional
+        self.version                = "Ver: Alpha 15 - 2020 06 17.1"   # most of structure for traditional
                                                                        # select in place, more cleanup
                                                                        # build multi year db, and perhaps for others
 
