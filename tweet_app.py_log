@@ -499,3 +499,315 @@ footer_function from row count
 footer_function from row count
 2020-06-18 09:30:02,871 - tweet - DEBUG - Select Done, rows selected: 11 time = 0.023063182830810547
 2020-06-18 09:31:27,401 - tweet - INFO - TweetApp: all done
+2020-06-22 13:40:50,759 - tweet - DEBUG - Done config_logger
+2020-06-22 13:40:50,759 - tweet - Notice - 
+
+
+============================
+
+Running TweetApp version = Ver: Alpha 15 - 2020 06 17.1 mode = mode_2020_test
+
+2020-06-22 13:40:50,759 - tweet - Notice - 
+
+
+============================
+
+Running TweetApp version = Ver: Alpha 15 - 2020 06 17.1 mode = mode_2020_test
+
+command line arg 0 =  D:\Russ\0000\python00\python3\_projects\twitter_analysis_db\parameters.py
+current directory D:\Russ\0000\python00\python3\_projects\twitter_analysis_db
+2020-06-22 13:40:50,759 - tweet - Notice - <parameters.Parameters object at 0x00000283B767D608>
+2020-06-22 13:40:50,759 - tweet - Notice - Time now: 2020-06-22 17:40:50
+2020-06-22 13:40:51,513 - tweet.gui - INFO - in class gui_new GUI init
+2020-06-22 13:40:51,827 - tweet - Notice - process memory =     136.31 mega bytes 
+2020-06-22 13:40:55,854 - tweet - DEBUG - tweet_select_1 builder vars: builder vars for SQLBuilder( self.x ):
+     db_name:                   R:/Temp./2016_thru_may_2020.db
+     select_name:               Tweets ( tweets ) - 01
+     output_format:             html
+     columns_out:               ["'*rc*'", 'tweets.tweet_datetime', 'tweets.time_of_day', 'tweets.tweet_type', 'tweets.tweet', 'tweets.tweet_id']
+     begin_dt:                  2019-10-10 00:00:00
+     end_dt:                    2020-11-20 00:00:00
+     tweet_type:                tweet
+     max_count:                 None
+     word_type:                 None
+     tweets_word_select         
+     is_covid:                  None
+     a_word:                    
+     concord_word_select:       
+     is_ascii:                  True
+     words_word_select          
+     min_group_by_count         0
+     words_is_word_null         None
+     default_order_by:          
+     gui_order_by:              tweets.tweet_datetime, tweets.tweet_type
+     my_count:                  None
+     sql:                       
+     sql_where:                 
+     sql_having:                
+     sql_data:                  []
+     output_append:             No Append
+
+
+
+2020-06-22 13:40:55,912 - tweet - DEBUG - select and output; execute_args ("SELECT  '*rc*', tweets.tweet_datetime, tweets.time_of_day, tweets.tweet_type, tweets.tweet, tweets.tweet_id FROM tweets \n WHERE \n    tweets.tweet_datetime  >= ?  AND  \n    tweets.tweet_datetime <= ?  AND  \n    tweets.tweet_type = ?   \n    ORDER BY tweets.tweet_datetime, tweets.tweet_type ", [datetime.datetime(2019, 10, 10, 0, 0), datetime.datetime(2020, 11, 20, 0, 0), 'tweet'])
+2020-06-22 13:40:56,345 - tweet - DEBUG - select complete with footer info: Done: >
+     total number of rows = 3452
+     select and file write took 0.4439380168914795 seconds
+
+footer_function from row count
+2020-06-22 13:40:56,356 - tweet - DEBUG - Select Done, rows selected: 3452 time = 0.4439380168914795
+2020-06-22 13:41:45,773 - tweet - INFO - TweetApp: all done
+2020-06-22 13:41:56,588 - tweet - DEBUG - Done config_logger
+2020-06-22 13:41:56,588 - tweet - Notice - 
+
+
+============================
+
+Running TweetApp version = Ver: Alpha 15 - 2020 06 17.1 mode = mode_2020_test
+
+2020-06-22 13:41:56,589 - tweet - Notice - 
+
+
+============================
+
+Running TweetApp version = Ver: Alpha 15 - 2020 06 17.1 mode = mode_2020_test
+
+command line arg 0 =  D:\Russ\0000\python00\python3\_projects\twitter_analysis_db\file_writers.py
+current directory D:\Russ\0000\python00\python3\_projects\twitter_analysis_db
+2020-06-22 13:41:56,589 - tweet - Notice - <parameters.Parameters object at 0x00000283B767C688>
+2020-06-22 13:41:56,589 - tweet - Notice - Time now: 2020-06-22 17:41:56
+2020-06-22 13:41:56,689 - tweet.gui - INFO - in class gui_new GUI init
+2020-06-22 13:41:56,972 - tweet - Notice - process memory =     264.94 mega bytes 
+2020-06-22 13:42:01,753 - tweet - DEBUG - tweet_select_1 builder vars: builder vars for SQLBuilder( self.x ):
+     db_name:                   R:/Temp./2016_thru_may_2020.db
+     select_name:               Tweets ( tweets ) - 01
+     output_format:             html
+     columns_out:               ["'*rc*'", 'tweets.tweet_datetime', 'tweets.time_of_day', 'tweets.tweet_type', 'tweets.tweet', 'tweets.tweet_id']
+     begin_dt:                  2019-10-10 00:00:00
+     end_dt:                    2020-11-20 00:00:00
+     tweet_type:                tweet
+     max_count:                 None
+     word_type:                 None
+     tweets_word_select         
+     is_covid:                  None
+     a_word:                    
+     concord_word_select:       
+     is_ascii:                  True
+     words_word_select          
+     min_group_by_count         0
+     words_is_word_null         None
+     default_order_by:          
+     gui_order_by:              tweets.tweet_datetime, tweets.tweet_type
+     my_count:                  None
+     sql:                       
+     sql_where:                 
+     sql_having:                
+     sql_data:                  []
+     output_append:             No Append
+
+
+
+2020-06-22 13:45:43,885 - tweet - DEBUG - Done config_logger
+2020-06-22 13:45:43,885 - tweet - Notice - 
+
+
+============================
+
+Running TweetApp version = Ver: Alpha 15 - 2020 06 17.1 mode = mode_2020_test
+
+2020-06-22 13:45:43,885 - tweet - Notice - 
+
+
+============================
+
+Running TweetApp version = Ver: Alpha 15 - 2020 06 17.1 mode = mode_2020_test
+
+command line arg 0 =  D:\Russ\0000\python00\python3\_projects\twitter_analysis_db\file_writers.py
+current directory D:\Russ\0000\python00\python3\_projects\twitter_analysis_db
+2020-06-22 13:45:43,886 - tweet - Notice - <parameters.Parameters object at 0x000001BF2CC1B288>
+2020-06-22 13:45:43,886 - tweet - Notice - Time now: 2020-06-22 17:45:43
+2020-06-22 13:45:44,034 - tweet.gui - INFO - in class gui_new GUI init
+2020-06-22 13:45:44,453 - tweet - Notice - process memory =     261.30 mega bytes 
+2020-06-22 13:45:50,219 - tweet - DEBUG - tweet_select_1 builder vars: builder vars for SQLBuilder( self.x ):
+     db_name:                   R:/Temp./2016_thru_may_2020.db
+     select_name:               Tweets ( tweets ) - 01
+     output_format:             html
+     columns_out:               ["'*rc*'", 'tweets.tweet_datetime', 'tweets.time_of_day', 'tweets.tweet_type', 'tweets.tweet', 'tweets.tweet_id']
+     begin_dt:                  2019-10-10 00:00:00
+     end_dt:                    2020-11-20 00:00:00
+     tweet_type:                tweet
+     max_count:                 None
+     word_type:                 None
+     tweets_word_select         
+     is_covid:                  None
+     a_word:                    
+     concord_word_select:       
+     is_ascii:                  True
+     words_word_select          
+     min_group_by_count         0
+     words_is_word_null         None
+     default_order_by:          
+     gui_order_by:              tweets.tweet_datetime, tweets.tweet_type
+     my_count:                  None
+     sql:                       
+     sql_where:                 
+     sql_having:                
+     sql_data:                  []
+     output_append:             No Append
+
+
+
+2020-06-22 13:46:11,008 - tweet - INFO - TweetApp: all done
+2020-06-22 13:46:15,124 - tweet - DEBUG - Done config_logger
+2020-06-22 13:46:15,124 - tweet - Notice - 
+
+
+============================
+
+Running TweetApp version = Ver: Alpha 15 - 2020 06 17.1 mode = mode_2020_test
+
+2020-06-22 13:46:15,124 - tweet - Notice - 
+
+
+============================
+
+Running TweetApp version = Ver: Alpha 15 - 2020 06 17.1 mode = mode_2020_test
+
+command line arg 0 =  D:\Russ\0000\python00\python3\_projects\twitter_analysis_db\file_writers.py
+current directory D:\Russ\0000\python00\python3\_projects\twitter_analysis_db
+2020-06-22 13:46:15,124 - tweet - Notice - <parameters.Parameters object at 0x000001BF295D9F88>
+2020-06-22 13:46:15,124 - tweet - Notice - Time now: 2020-06-22 17:46:15
+2020-06-22 13:46:15,235 - tweet.gui - INFO - in class gui_new GUI init
+2020-06-22 13:46:15,542 - tweet - Notice - process memory =     342.76 mega bytes 
+2020-06-22 13:46:18,786 - tweet - DEBUG - tweet_select_1 builder vars: builder vars for SQLBuilder( self.x ):
+     db_name:                   R:/Temp./2016_thru_may_2020.db
+     select_name:               Tweets ( tweets ) - 01
+     output_format:             html
+     columns_out:               ["'*rc*'", 'tweets.tweet_datetime', 'tweets.time_of_day', 'tweets.tweet_type', 'tweets.tweet', 'tweets.tweet_id']
+     begin_dt:                  2019-10-10 00:00:00
+     end_dt:                    2020-11-20 00:00:00
+     tweet_type:                tweet
+     max_count:                 None
+     word_type:                 None
+     tweets_word_select         
+     is_covid:                  None
+     a_word:                    
+     concord_word_select:       
+     is_ascii:                  True
+     words_word_select          
+     min_group_by_count         0
+     words_is_word_null         None
+     default_order_by:          
+     gui_order_by:              tweets.tweet_datetime, tweets.tweet_type
+     my_count:                  None
+     sql:                       
+     sql_where:                 
+     sql_having:                
+     sql_data:                  []
+     output_append:             No Append
+
+
+
+2020-06-22 13:47:31,486 - tweet - INFO - TweetApp: all done
+2020-06-22 13:50:13,499 - tweet - DEBUG - Done config_logger
+2020-06-22 13:50:13,499 - tweet - Notice - 
+
+
+============================
+
+Running TweetApp version = Ver: Alpha 15 - 2020 06 17.1 mode = mode_2020_test
+
+2020-06-22 13:50:13,499 - tweet - Notice - 
+
+
+============================
+
+Running TweetApp version = Ver: Alpha 15 - 2020 06 17.1 mode = mode_2020_test
+
+command line arg 0 =  D:\Russ\0000\python00\python3\_projects\twitter_analysis_db\file_writers.py
+current directory D:\Russ\0000\python00\python3\_projects\twitter_analysis_db
+2020-06-22 13:50:13,499 - tweet - Notice - <parameters.Parameters object at 0x000001BF2E58F2C8>
+2020-06-22 13:50:13,499 - tweet - Notice - Time now: 2020-06-22 17:50:13
+2020-06-22 13:50:13,604 - tweet.gui - INFO - in class gui_new GUI init
+2020-06-22 13:50:13,910 - tweet - Notice - process memory =     435.44 mega bytes 
+2020-06-22 13:50:17,090 - tweet - DEBUG - tweet_select_1 builder vars: builder vars for SQLBuilder( self.x ):
+     db_name:                   R:/Temp./2016_thru_may_2020.db
+     select_name:               Tweets ( tweets ) - 01
+     output_format:             html
+     columns_out:               ["'*rc*'", 'tweets.tweet_datetime', 'tweets.time_of_day', 'tweets.tweet_type', 'tweets.tweet', 'tweets.tweet_id']
+     begin_dt:                  2019-10-10 00:00:00
+     end_dt:                    2020-11-20 00:00:00
+     tweet_type:                tweet
+     max_count:                 None
+     word_type:                 None
+     tweets_word_select         
+     is_covid:                  None
+     a_word:                    
+     concord_word_select:       
+     is_ascii:                  True
+     words_word_select          
+     min_group_by_count         0
+     words_is_word_null         None
+     default_order_by:          
+     gui_order_by:              tweets.tweet_datetime, tweets.tweet_type
+     my_count:                  None
+     sql:                       
+     sql_where:                 
+     sql_having:                
+     sql_data:                  []
+     output_append:             No Append
+
+
+
+2020-06-22 13:51:49,687 - tweet - INFO - TweetApp: all done
+2020-06-22 13:51:53,768 - tweet - DEBUG - Done config_logger
+2020-06-22 13:51:53,768 - tweet - Notice - 
+
+
+============================
+
+Running TweetApp version = Ver: Alpha 15 - 2020 06 17.1 mode = mode_2020_test
+
+2020-06-22 13:51:53,768 - tweet - Notice - 
+
+
+============================
+
+Running TweetApp version = Ver: Alpha 15 - 2020 06 17.1 mode = mode_2020_test
+
+command line arg 0 =  D:\Russ\0000\python00\python3\_projects\twitter_analysis_db\file_writers.py
+current directory D:\Russ\0000\python00\python3\_projects\twitter_analysis_db
+2020-06-22 13:51:53,768 - tweet - Notice - <parameters.Parameters object at 0x000001BF2922F548>
+2020-06-22 13:51:53,768 - tweet - Notice - Time now: 2020-06-22 17:51:53
+2020-06-22 13:51:53,869 - tweet.gui - INFO - in class gui_new GUI init
+2020-06-22 13:51:54,168 - tweet - Notice - process memory =     514.36 mega bytes 
+2020-06-22 13:51:56,013 - tweet - DEBUG - tweet_select_1 builder vars: builder vars for SQLBuilder( self.x ):
+     db_name:                   R:/Temp./2016_thru_may_2020.db
+     select_name:               Tweets ( tweets ) - 01
+     output_format:             html
+     columns_out:               ["'*rc*'", 'tweets.tweet_datetime', 'tweets.time_of_day', 'tweets.tweet_type', 'tweets.tweet', 'tweets.tweet_id']
+     begin_dt:                  2019-10-10 00:00:00
+     end_dt:                    2020-11-20 00:00:00
+     tweet_type:                tweet
+     max_count:                 None
+     word_type:                 None
+     tweets_word_select         
+     is_covid:                  None
+     a_word:                    
+     concord_word_select:       
+     is_ascii:                  True
+     words_word_select          
+     min_group_by_count         0
+     words_is_word_null         None
+     default_order_by:          
+     gui_order_by:              tweets.tweet_datetime, tweets.tweet_type
+     my_count:                  None
+     sql:                       
+     sql_where:                 
+     sql_having:                
+     sql_data:                  []
+     output_append:             No Append
+
+
+
+2020-06-22 20:43:09,704 - tweet - INFO - TweetApp: all done

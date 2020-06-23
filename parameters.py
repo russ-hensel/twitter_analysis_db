@@ -67,7 +67,6 @@ class Parameters( object ):
         self.mode                    = "db_in_code_dir"                        # mode for db in same dir as code
         self.database_name           = r"./all_words_tweets_to_all2019.db"     # location of the sqlite db, file name
                                                                                # move to ram drive for fasted response
-        self.database_name           = r"R:/Temp./all_words.db"
         # ------------- data load
         self.show_db_def             = False    # True or False  show db def features in the gui
                                                # normally False so you do not trash db by mistake
@@ -245,10 +244,7 @@ class Parameters( object ):
 
         else:
             print( f"In parameters: no special settings for computer_id {computer_id}" )
-            if self.running_on.os_is_win:
-                self.ex_editor          =  r"C:\apps\Notepad++\notepad++.exe"
-            else:
-                self.ex_editor          =  r"leafpad"    # linux raspberry pi maybe
+
 
     # -------
     def os_tweaks( self, ):
