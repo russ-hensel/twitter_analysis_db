@@ -1,10 +1,12 @@
 # twitter_analysis_db
 
 First code this is an alpha release.
-Works for me, run from a development environment, I use Spyder 
+Works for me, run from a development environment, I use Spyder.
+
+I am frequently twiddling with this app and do not have a good release process.  So it is too often released with minor but fatal bugs.  It does work.  If you have trouble getting it working I will help you, contact me. 
 
 ```
-The point:
+The point ( of the Application ):
 
 Quickly select and view tweets ( typically for a single person based on a number of criteria ).
 Display concordance and simple linguistic analysis for a body of tweets.
