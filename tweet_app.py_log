@@ -811,3 +811,847 @@ current directory D:\Russ\0000\python00\python3\_projects\twitter_analysis_db
 
 
 2020-06-22 20:43:09,704 - tweet - INFO - TweetApp: all done
+2020-06-24 18:47:14,078 - tweet - DEBUG - Done config_logger
+2020-06-24 18:47:14,078 - tweet - Notice - 
+
+
+============================
+
+Running TweetApp version = Ver: Alpha 15 - 2020 06 17.1 mode = mode_2020_test
+
+2020-06-24 18:47:14,078 - tweet - Notice - 
+
+
+============================
+
+Running TweetApp version = Ver: Alpha 15 - 2020 06 17.1 mode = mode_2020_test
+
+command line arg 0 =  D:\Russ\0000\python00\python3\_projects\twitter_analysis_db\sql_builder.py
+current directory D:\Russ\0000\python00\python3\_projects\twitter_analysis_db
+2020-06-24 18:47:14,078 - tweet - Notice - <parameters.Parameters object at 0x0000024C6AACE108>
+2020-06-24 18:47:14,078 - tweet - Notice - Time now: 2020-06-24 22:47:14
+2020-06-24 18:47:14,335 - tweet.gui - INFO - in class gui_new GUI init
+2020-06-24 18:47:14,531 - tweet - Notice - process memory =     245.07 mega bytes 
+2020-06-24 18:47:33,596 - tweet - DEBUG - tweet_select_1 builder vars: builder vars for SQLBuilder( self.x ):
+     db_name:                   R:/Temp./2016_thru_may_2020.db
+     select_name:               Tweets ( tweets ) - 01
+     output_format:             msg
+     columns_out:               ["'*rc*'", 'tweets.tweet_datetime', 'tweets.time_of_day', 'tweets.tweet_type', 'tweets.tweet', 'tweets.tweet_id']
+     begin_dt:                  2019-06-26 00:00:00
+     end_dt:                    2019-06-27 00:00:00
+     tweet_type:                tweet
+     max_count:                 None
+     word_type:                 None
+     tweets_word_select         
+     is_covid:                  None
+     a_word:                    
+     concord_word_select:       
+     is_ascii:                  True
+     words_word_select          
+     min_group_by_count         0
+     words_is_word_null         None
+     default_order_by:          
+     gui_order_by:              tweets.tweet_datetime, tweets.tweet_type
+     my_count:                  None
+     sql:                       
+     sql_where:                 
+     sql_having:                
+     sql_data:                  []
+     output_append:             No Append
+
+
+
+2020-06-24 18:47:33,711 - tweet - DEBUG - select and output; execute_args ("SELECT  '*rc*', tweets.tweet_datetime, tweets.time_of_day, tweets.tweet_type, tweets.tweet, tweets.tweet_id FROM tweets \n WHERE \n    tweets.tweet_datetime  >= ?  AND  \n    tweets.tweet_datetime <= ?  AND  \n    tweets.tweet_type = ?   \n    ORDER BY tweets.tweet_datetime, tweets.tweet_type ", [datetime.datetime(2019, 6, 26, 0, 0), datetime.datetime(2019, 6, 27, 0, 0), 'tweet'])
+2020-06-24 18:47:56,487 - tweet - DEBUG - Load parameters ..... 
+Database Name:  R:/Temp./2016_thru_may_2020.db
+Tweet Input:    ./input/all_tweets_2016.csv
+Tweet For:      djt
+Word Input:     ./input/english-word-frequency/tiny_unigram_freq.csv
+2020-06-24 18:48:16,051 - tweet - DEBUG - tweet_select_1 builder vars: builder vars for SQLBuilder( self.x ):
+     db_name:                   R:/Temp./2016_thru_may_2020.db
+     select_name:               Tweets ( tweets ) - 01
+     output_format:             msg
+     columns_out:               ["'*rc*'", 'tweets.tweet_datetime', 'tweets.time_of_day', 'tweets.tweet_type', 'tweets.tweet', 'tweets.tweet_id']
+     begin_dt:                  2019-06-26 00:00:00
+     end_dt:                    2019-06-27 00:00:00
+     tweet_type:                tweet
+     max_count:                 None
+     word_type:                 None
+     tweets_word_select         
+     is_covid:                  None
+     a_word:                    
+     concord_word_select:       
+     is_ascii:                  True
+     words_word_select          
+     min_group_by_count         0
+     words_is_word_null         None
+     default_order_by:          
+     gui_order_by:              tweets.tweet_datetime, tweets.tweet_type
+     my_count:                  None
+     sql:                       
+     sql_where:                 
+     sql_having:                
+     sql_data:                  []
+     output_append:             No Append
+
+
+
+2020-06-24 18:48:16,058 - tweet - DEBUG - select and output; execute_args ("SELECT  '*rc*', tweets.tweet_datetime, tweets.time_of_day, tweets.tweet_type, tweets.tweet, tweets.tweet_id FROM tweets \n WHERE \n    tweets.tweet_datetime  >= ?  AND  \n    tweets.tweet_datetime <= ?  AND  \n    tweets.tweet_type = ?   \n    ORDER BY tweets.tweet_datetime, tweets.tweet_type ", [datetime.datetime(2019, 6, 26, 0, 0), datetime.datetime(2019, 6, 27, 0, 0), 'tweet'])
+2020-06-24 18:48:22,972 - tweet - DEBUG - Load parameters ..... 
+Database Name:  R:/Temp./2016_thru_may_2020.db
+Tweet Input:    ./input/all_tweets_2016.csv
+Tweet For:      djt
+Word Input:     ./input/english-word-frequency/tiny_unigram_freq.csv
+2020-06-24 18:49:00,455 - tweet - INFO - TweetApp: all done
+2020-06-24 18:49:33,230 - tweet - DEBUG - Done config_logger
+2020-06-24 18:49:33,230 - tweet - Notice - 
+
+
+============================
+
+Running TweetApp version = Ver: Alpha 15 - 2020 06 17.1 mode = db_in_code_dir
+
+2020-06-24 18:49:33,230 - tweet - Notice - 
+
+
+============================
+
+Running TweetApp version = Ver: Alpha 15 - 2020 06 17.1 mode = db_in_code_dir
+
+command line arg 0 =  D:\Russ\0000\python00\python3\_projects\twitter_analysis_db\parameters.py
+current directory D:\Russ\0000\python00\python3\_projects\twitter_analysis_db
+2020-06-24 18:49:33,230 - tweet - Notice - <parameters.Parameters object at 0x0000024C6BD68EC8>
+2020-06-24 18:49:33,230 - tweet - Notice - Time now: 2020-06-24 22:49:33
+2020-06-24 18:49:33,314 - tweet.gui - INFO - in class gui_new GUI init
+2020-06-24 18:49:33,461 - tweet - Notice - process memory =     327.29 mega bytes 
+2020-06-24 18:49:35,851 - tweet - DEBUG - tweet_select_1 builder vars: builder vars for SQLBuilder( self.x ):
+     db_name:                   ./all_words_tweets_to_all2019.db
+     select_name:               Tweets ( tweets ) - 01
+     output_format:             html
+     columns_out:               ["'*rc*'", 'tweets.tweet_datetime', 'tweets.time_of_day', 'tweets.tweet_type', 'tweets.tweet', 'tweets.tweet_id']
+     begin_dt:                  2019-10-10 00:00:00
+     end_dt:                    2020-11-20 00:00:00
+     tweet_type:                tweet
+     max_count:                 None
+     word_type:                 None
+     tweets_word_select         
+     is_covid:                  None
+     a_word:                    
+     concord_word_select:       
+     is_ascii:                  True
+     words_word_select          
+     min_group_by_count         0
+     words_is_word_null         None
+     default_order_by:          
+     gui_order_by:              tweets.tweet_datetime, tweets.tweet_type
+     my_count:                  None
+     sql:                       
+     sql_where:                 
+     sql_having:                
+     sql_data:                  []
+     output_append:             No Append
+
+
+
+2020-06-24 18:51:34,620 - tweet - INFO - TweetApp: all done
+2020-06-24 18:51:37,206 - tweet - DEBUG - Done config_logger
+2020-06-24 18:51:37,206 - tweet - Notice - 
+
+
+============================
+
+Running TweetApp version = Ver: Alpha 15 - 2020 06 17.1 mode = db_in_code_dir
+
+2020-06-24 18:51:37,206 - tweet - Notice - 
+
+
+============================
+
+Running TweetApp version = Ver: Alpha 15 - 2020 06 17.1 mode = db_in_code_dir
+
+command line arg 0 =  D:\Russ\0000\python00\python3\_projects\twitter_analysis_db\file_writers.py
+current directory D:\Russ\0000\python00\python3\_projects\twitter_analysis_db
+2020-06-24 18:51:37,206 - tweet - Notice - <parameters.Parameters object at 0x0000024C0155C688>
+2020-06-24 18:51:37,206 - tweet - Notice - Time now: 2020-06-24 22:51:37
+2020-06-24 18:51:37,260 - tweet.gui - INFO - in class gui_new GUI init
+2020-06-24 18:51:37,423 - tweet - Notice - process memory =     406.67 mega bytes 
+2020-06-24 18:51:39,397 - tweet - DEBUG - tweet_select_1 builder vars: builder vars for SQLBuilder( self.x ):
+     db_name:                   ./all_words_tweets_to_all2019.db
+     select_name:               Tweets ( tweets ) - 01
+     output_format:             html
+     columns_out:               ["'*rc*'", 'tweets.tweet_datetime', 'tweets.time_of_day', 'tweets.tweet_type', 'tweets.tweet', 'tweets.tweet_id']
+     begin_dt:                  2019-10-10 00:00:00
+     end_dt:                    2020-11-20 00:00:00
+     tweet_type:                tweet
+     max_count:                 None
+     word_type:                 None
+     tweets_word_select         
+     is_covid:                  None
+     a_word:                    
+     concord_word_select:       
+     is_ascii:                  True
+     words_word_select          
+     min_group_by_count         0
+     words_is_word_null         None
+     default_order_by:          
+     gui_order_by:              tweets.tweet_datetime, tweets.tweet_type
+     my_count:                  None
+     sql:                       
+     sql_where:                 
+     sql_having:                
+     sql_data:                  []
+     output_append:             No Append
+
+
+
+2020-06-24 18:52:24,566 - tweet - INFO - TweetApp: all done
+2020-06-24 18:52:28,058 - tweet - DEBUG - Done config_logger
+2020-06-24 18:52:28,058 - tweet - Notice - 
+
+
+============================
+
+Running TweetApp version = Ver: Alpha 15 - 2020 06 17.1 mode = db_in_code_dir
+
+2020-06-24 18:52:28,058 - tweet - Notice - 
+
+
+============================
+
+Running TweetApp version = Ver: Alpha 15 - 2020 06 17.1 mode = db_in_code_dir
+
+command line arg 0 =  D:\Russ\0000\python00\python3\_projects\twitter_analysis_db\file_writers.py
+current directory D:\Russ\0000\python00\python3\_projects\twitter_analysis_db
+2020-06-24 18:52:28,058 - tweet - Notice - <parameters.Parameters object at 0x0000024C01B26448>
+2020-06-24 18:52:28,060 - tweet - Notice - Time now: 2020-06-24 22:52:28
+2020-06-24 18:52:28,110 - tweet.gui - INFO - in class gui_new GUI init
+2020-06-24 18:52:28,266 - tweet - Notice - process memory =     484.37 mega bytes 
+2020-06-24 18:52:34,309 - tweet - DEBUG - tweet_select_1 builder vars: builder vars for SQLBuilder( self.x ):
+     db_name:                   ./all_words_tweets_to_all2019.db
+     select_name:               Tweets ( tweets ) - 01
+     output_format:             html
+     columns_out:               ["'*rc*'", 'tweets.tweet_datetime', 'tweets.time_of_day', 'tweets.tweet_type', 'tweets.tweet', 'tweets.tweet_id']
+     begin_dt:                  2019-10-10 00:00:00
+     end_dt:                    2020-11-20 00:00:00
+     tweet_type:                tweet
+     max_count:                 None
+     word_type:                 None
+     tweets_word_select         
+     is_covid:                  None
+     a_word:                    
+     concord_word_select:       
+     is_ascii:                  True
+     words_word_select          
+     min_group_by_count         0
+     words_is_word_null         None
+     default_order_by:          
+     gui_order_by:              tweets.tweet_datetime, tweets.tweet_type
+     my_count:                  None
+     sql:                       
+     sql_where:                 
+     sql_having:                
+     sql_data:                  []
+     output_append:             No Append
+
+
+
+2020-06-24 18:52:34,318 - tweet - DEBUG - select and output; execute_args ("SELECT  '*rc*', tweets.tweet_datetime, tweets.time_of_day, tweets.tweet_type, tweets.tweet, tweets.tweet_id FROM tweets \n WHERE \n    tweets.tweet_datetime  >= ?  AND  \n    tweets.tweet_datetime <= ?  AND  \n    tweets.tweet_type = ?   \n    ORDER BY tweets.tweet_datetime, tweets.tweet_type ", [datetime.datetime(2019, 10, 10, 0, 0), datetime.datetime(2020, 11, 20, 0, 0), 'tweet'])
+2020-06-24 18:55:13,507 - tweet - INFO - TweetApp: all done
+2020-06-24 18:55:16,544 - tweet - DEBUG - Done config_logger
+2020-06-24 18:55:16,544 - tweet - Notice - 
+
+
+============================
+
+Running TweetApp version = Ver: Alpha 15 - 2020 06 17.1 mode = db_in_code_dir
+
+2020-06-24 18:55:16,544 - tweet - Notice - 
+
+
+============================
+
+Running TweetApp version = Ver: Alpha 15 - 2020 06 17.1 mode = db_in_code_dir
+
+command line arg 0 =  D:\Russ\0000\python00\python3\_projects\twitter_analysis_db\parameters.py
+current directory D:\Russ\0000\python00\python3\_projects\twitter_analysis_db
+2020-06-24 18:55:16,544 - tweet - Notice - <parameters.Parameters object at 0x0000024C08E72948>
+2020-06-24 18:55:16,544 - tweet - Notice - Time now: 2020-06-24 22:55:16
+2020-06-24 18:55:16,597 - tweet.gui - INFO - in class gui_new GUI init
+2020-06-24 18:55:16,755 - tweet - Notice - process memory =     564.43 mega bytes 
+2020-06-24 18:55:28,193 - tweet - DEBUG - tweet_select_1 builder vars: builder vars for SQLBuilder( self.x ):
+     db_name:                   R:\Temp\2016_thru_may_2020.db
+     select_name:               Tweets ( tweets ) - 01
+     output_format:             html
+     columns_out:               ["'*rc*'", 'tweets.tweet_datetime', 'tweets.time_of_day', 'tweets.tweet_type', 'tweets.tweet', 'tweets.tweet_id']
+     begin_dt:                  2019-10-10 00:00:00
+     end_dt:                    2020-11-20 00:00:00
+     tweet_type:                tweet
+     max_count:                 None
+     word_type:                 None
+     tweets_word_select         
+     is_covid:                  None
+     a_word:                    
+     concord_word_select:       
+     is_ascii:                  True
+     words_word_select          
+     min_group_by_count         0
+     words_is_word_null         None
+     default_order_by:          
+     gui_order_by:              tweets.tweet_datetime, tweets.tweet_type
+     my_count:                  None
+     sql:                       
+     sql_where:                 
+     sql_having:                
+     sql_data:                  []
+     output_append:             No Append
+
+
+
+2020-06-24 18:55:28,198 - tweet - DEBUG - select and output; execute_args ("SELECT  '*rc*', tweets.tweet_datetime, tweets.time_of_day, tweets.tweet_type, tweets.tweet, tweets.tweet_id FROM tweets \n WHERE \n    tweets.tweet_datetime  >= ?  AND  \n    tweets.tweet_datetime <= ?  AND  \n    tweets.tweet_type = ?   \n    ORDER BY tweets.tweet_datetime, tweets.tweet_type ", [datetime.datetime(2019, 10, 10, 0, 0), datetime.datetime(2020, 11, 20, 0, 0), 'tweet'])
+2020-06-24 18:55:48,492 - tweet - INFO - TweetApp: all done
+2020-06-24 18:55:56,893 - tweet - DEBUG - Done config_logger
+2020-06-24 18:55:56,894 - tweet - Notice - 
+
+
+============================
+
+Running TweetApp version = Ver: Alpha 15 - 2020 06 17.1 mode = db_in_code_dir
+
+2020-06-24 18:55:56,894 - tweet - Notice - 
+
+
+============================
+
+Running TweetApp version = Ver: Alpha 15 - 2020 06 17.1 mode = db_in_code_dir
+
+command line arg 0 =  D:\Russ\0000\python00\python3\_projects\twitter_analysis_db\parameters.py
+current directory D:\Russ\0000\python00\python3\_projects\twitter_analysis_db
+2020-06-24 18:55:56,894 - tweet - Notice - <parameters.Parameters object at 0x0000024C20B20048>
+2020-06-24 18:55:56,894 - tweet - Notice - Time now: 2020-06-24 22:55:56
+2020-06-24 18:55:56,944 - tweet.gui - INFO - in class gui_new GUI init
+2020-06-24 18:55:57,107 - tweet - Notice - process memory =     643.67 mega bytes 
+2020-06-24 18:55:59,422 - tweet - DEBUG - tweet_select_1 builder vars: builder vars for SQLBuilder( self.x ):
+     db_name:                   R:\Temp\2016_thru_may_2020.db
+     select_name:               Tweets ( tweets ) - 01
+     output_format:             html
+     columns_out:               ["'*rc*'", 'tweets.tweet_datetime', 'tweets.time_of_day', 'tweets.tweet_type', 'tweets.tweet', 'tweets.tweet_id']
+     begin_dt:                  2019-10-10 00:00:00
+     end_dt:                    2020-11-20 00:00:00
+     tweet_type:                tweet
+     max_count:                 None
+     word_type:                 None
+     tweets_word_select         
+     is_covid:                  None
+     a_word:                    
+     concord_word_select:       
+     is_ascii:                  True
+     words_word_select          
+     min_group_by_count         0
+     words_is_word_null         None
+     default_order_by:          
+     gui_order_by:              tweets.tweet_datetime, tweets.tweet_type
+     my_count:                  None
+     sql:                       
+     sql_where:                 
+     sql_having:                
+     sql_data:                  []
+     output_append:             No Append
+
+
+
+2020-06-24 18:55:59,428 - tweet - DEBUG - select and output; execute_args ("SELECT  '*rc*', tweets.tweet_datetime, tweets.time_of_day, tweets.tweet_type, tweets.tweet, tweets.tweet_id FROM tweets \n WHERE \n    tweets.tweet_datetime  >= ?  AND  \n    tweets.tweet_datetime <= ?  AND  \n    tweets.tweet_type = ?   \n    ORDER BY tweets.tweet_datetime, tweets.tweet_type ", [datetime.datetime(2019, 10, 10, 0, 0), datetime.datetime(2020, 11, 20, 0, 0), 'tweet'])
+2020-06-24 18:56:38,158 - tweet - INFO - TweetApp: all done
+2020-06-24 18:56:40,343 - tweet - DEBUG - Done config_logger
+2020-06-24 18:56:40,343 - tweet - Notice - 
+
+
+============================
+
+Running TweetApp version = Ver: Alpha 15 - 2020 06 17.1 mode = db_in_code_dir
+
+2020-06-24 18:56:40,343 - tweet - Notice - 
+
+
+============================
+
+Running TweetApp version = Ver: Alpha 15 - 2020 06 17.1 mode = db_in_code_dir
+
+command line arg 0 =  D:\Russ\0000\python00\python3\_projects\twitter_analysis_db\parameters.py
+current directory D:\Russ\0000\python00\python3\_projects\twitter_analysis_db
+2020-06-24 18:56:40,343 - tweet - Notice - <parameters.Parameters object at 0x0000024C2CCEF948>
+2020-06-24 18:56:40,343 - tweet - Notice - Time now: 2020-06-24 22:56:40
+2020-06-24 18:56:40,395 - tweet.gui - INFO - in class gui_new GUI init
+2020-06-24 18:56:40,548 - tweet - Notice - process memory =     722.22 mega bytes 
+2020-06-24 18:56:44,344 - tweet - DEBUG - Load parameters ..... 
+Database Name:  R:\Temp\2016_thru_may_2020.db
+Tweet Input:    ./input/all_tweets_2019.txt
+Tweet For:      djt
+Word Input:     ./input/english-word-frequency/unigram_freq.csv
+2020-06-24 18:57:34,803 - tweet - INFO - TweetApp: all done
+2020-06-24 18:57:39,400 - tweet - DEBUG - Done config_logger
+2020-06-24 18:57:39,401 - tweet - Notice - 
+
+
+============================
+
+Running TweetApp version = Ver: Alpha 15 - 2020 06 17.1 mode = db_in_code_dir
+
+2020-06-24 18:57:39,401 - tweet - Notice - 
+
+
+============================
+
+Running TweetApp version = Ver: Alpha 15 - 2020 06 17.1 mode = db_in_code_dir
+
+command line arg 0 =  D:\Russ\0000\python00\python3\_projects\twitter_analysis_db\parameters.py
+current directory D:\Russ\0000\python00\python3\_projects\twitter_analysis_db
+2020-06-24 18:57:39,401 - tweet - Notice - <parameters.Parameters object at 0x0000024C08E72688>
+2020-06-24 18:57:39,401 - tweet - Notice - Time now: 2020-06-24 22:57:39
+2020-06-24 18:57:39,455 - tweet.gui - INFO - in class gui_new GUI init
+2020-06-24 18:57:39,609 - tweet - Notice - process memory =     800.65 mega bytes 
+2020-06-24 18:57:42,973 - tweet - DEBUG - tweet_select_1 builder vars: builder vars for SQLBuilder( self.x ):
+     db_name:                   R:\Temp\2016_thru_may_2020.db
+     select_name:               Tweets ( tweets ) - 01
+     output_format:             html
+     columns_out:               ["'*rc*'", 'tweets.tweet_datetime', 'tweets.time_of_day', 'tweets.tweet_type', 'tweets.tweet', 'tweets.tweet_id']
+     begin_dt:                  2019-10-10 00:00:00
+     end_dt:                    2020-11-20 00:00:00
+     tweet_type:                tweet
+     max_count:                 None
+     word_type:                 None
+     tweets_word_select         
+     is_covid:                  None
+     a_word:                    
+     concord_word_select:       
+     is_ascii:                  True
+     words_word_select          
+     min_group_by_count         0
+     words_is_word_null         None
+     default_order_by:          
+     gui_order_by:              tweets.tweet_datetime, tweets.tweet_type
+     my_count:                  None
+     sql:                       
+     sql_where:                 
+     sql_having:                
+     sql_data:                  []
+     output_append:             No Append
+
+
+
+2020-06-24 18:57:42,981 - tweet - DEBUG - select and output; execute_args ("SELECT  '*rc*', tweets.tweet_datetime, tweets.time_of_day, tweets.tweet_type, tweets.tweet, tweets.tweet_id FROM tweets \n WHERE \n    tweets.tweet_datetime  >= ?  AND  \n    tweets.tweet_datetime <= ?  AND  \n    tweets.tweet_type = ?   \n    ORDER BY tweets.tweet_datetime, tweets.tweet_type ", [datetime.datetime(2019, 10, 10, 0, 0), datetime.datetime(2020, 11, 20, 0, 0), 'tweet'])
+2020-06-24 18:57:43,077 - tweet - DEBUG - select complete with footer info: Done: >
+     total number of rows = 3452
+     select and file write took 0.0986490249633789 seconds
+
+footer_function from row count
+2020-06-24 18:57:43,082 - tweet - DEBUG - Select Done, rows selected: 3452 time = 0.0986490249633789
+2020-06-24 18:58:06,121 - tweet - DEBUG - tweet_select_1 builder vars: builder vars for SQLBuilder( self.x ):
+     db_name:                   R:\Temp\2016_thru_may_2020.db
+     select_name:               Tweets ( tweets ) - 01
+     output_format:             msg
+     columns_out:               ["'*rc*'", 'tweets.tweet_datetime', 'tweets.time_of_day', 'tweets.tweet_type', 'tweets.tweet', 'tweets.tweet_id']
+     begin_dt:                  2019-10-10 00:00:00
+     end_dt:                    2020-11-20 00:00:00
+     tweet_type:                tweet
+     max_count:                 None
+     word_type:                 None
+     tweets_word_select         
+     is_covid:                  None
+     a_word:                    
+     concord_word_select:       
+     is_ascii:                  True
+     words_word_select          
+     min_group_by_count         0
+     words_is_word_null         None
+     default_order_by:          
+     gui_order_by:              tweets.tweet_datetime, tweets.tweet_type
+     my_count:                  None
+     sql:                       
+     sql_where:                 
+     sql_having:                
+     sql_data:                  []
+     output_append:             No Append
+
+
+
+2020-06-24 18:58:06,125 - tweet - DEBUG - select and output; execute_args ("SELECT  '*rc*', tweets.tweet_datetime, tweets.time_of_day, tweets.tweet_type, tweets.tweet, tweets.tweet_id FROM tweets \n WHERE \n    tweets.tweet_datetime  >= ?  AND  \n    tweets.tweet_datetime <= ?  AND  \n    tweets.tweet_type = ?   \n    ORDER BY tweets.tweet_datetime, tweets.tweet_type ", [datetime.datetime(2019, 10, 10, 0, 0), datetime.datetime(2020, 11, 20, 0, 0), 'tweet'])
+2020-06-24 18:58:06,242 - tweet - DEBUG - select complete with footer info: Done: >
+     total number of rows = 3452
+     select and file write took 0.040088653564453125 seconds
+
+footer_function from row count
+2020-06-24 18:58:06,254 - tweet - DEBUG - Select Done, rows selected: 3452 time = 0.040088653564453125
+2020-06-24 18:58:13,072 - tweet - DEBUG - tweet_select_1 builder vars: builder vars for SQLBuilder( self.x ):
+     db_name:                   R:\Temp\2016_thru_may_2020.db
+     select_name:               slider_select
+     output_format:             msg
+     columns_out:               ['tweets.tweet_datetime', 'tweets.tweet']
+     begin_dt:                  2017-06-28 00:00:00
+     end_dt:                    2017-06-29 00:00:00
+     tweet_type:                tweet
+     max_count:                 None
+     word_type:                 None
+     tweets_word_select         
+     is_covid:                  None
+     a_word:                    
+     concord_word_select:       
+     is_ascii:                  True
+     words_word_select          
+     min_group_by_count         0
+     words_is_word_null         None
+     default_order_by:          
+     gui_order_by:              tweets.tweet_datetime, tweets.tweet_type
+     my_count:                  None
+     sql:                       
+     sql_where:                 
+     sql_having:                
+     sql_data:                  []
+     output_append:             No Append
+
+
+
+2020-06-24 18:58:13,077 - tweet - DEBUG - select and output; execute_args ('SELECT  tweets.tweet_datetime, tweets.tweet \n     FROM tweets \n WHERE \n    tweets.tweet_datetime  >= ?  AND  \n    tweets.tweet_datetime <= ?  AND  \n    tweets.tweet_type = ?   ORDER BY tweets.tweet_datetime ', [datetime.datetime(2017, 6, 28, 0, 0), datetime.datetime(2017, 6, 29, 0, 0), 'tweet'])
+2020-06-24 18:58:13,279 - tweet - DEBUG - select complete with footer info: Done: >
+     total number of rows = 8
+     select and file write took 0.010696649551391602 seconds
+
+2020-06-24 18:58:13,279 - tweet - DEBUG - Select Done, rows selected: 8 time = 0.010696649551391602
+2020-06-24 18:58:19,890 - tweet - DEBUG - tweet_select_1 builder vars: builder vars for SQLBuilder( self.x ):
+     db_name:                   R:\Temp\2016_thru_may_2020.db
+     select_name:               slider_select
+     output_format:             msg
+     columns_out:               ['tweets.tweet_datetime', 'tweets.tweet']
+     begin_dt:                  2018-06-27 00:00:00
+     end_dt:                    2018-06-28 00:00:00
+     tweet_type:                tweet
+     max_count:                 None
+     word_type:                 None
+     tweets_word_select         
+     is_covid:                  None
+     a_word:                    
+     concord_word_select:       
+     is_ascii:                  True
+     words_word_select          
+     min_group_by_count         0
+     words_is_word_null         None
+     default_order_by:          
+     gui_order_by:              tweets.tweet_datetime, tweets.tweet_type
+     my_count:                  None
+     sql:                       
+     sql_where:                 
+     sql_having:                
+     sql_data:                  []
+     output_append:             No Append
+
+
+
+2020-06-24 18:58:19,892 - tweet - DEBUG - select and output; execute_args ('SELECT  tweets.tweet_datetime, tweets.tweet \n     FROM tweets \n WHERE \n    tweets.tweet_datetime  >= ?  AND  \n    tweets.tweet_datetime <= ?  AND  \n    tweets.tweet_type = ?   ORDER BY tweets.tweet_datetime ', [datetime.datetime(2018, 6, 27, 0, 0), datetime.datetime(2018, 6, 28, 0, 0), 'tweet'])
+2020-06-24 18:58:19,905 - tweet - DEBUG - select complete with footer info: Done: >
+     total number of rows = 16
+     select and file write took 0.009765625 seconds
+
+2020-06-24 18:58:19,906 - tweet - DEBUG - Select Done, rows selected: 16 time = 0.009765625
+2020-06-24 18:58:22,913 - tweet - DEBUG - tweet_select_1 builder vars: builder vars for SQLBuilder( self.x ):
+     db_name:                   R:\Temp\2016_thru_may_2020.db
+     select_name:               slider_select
+     output_format:             msg
+     columns_out:               ['tweets.tweet_datetime', 'tweets.tweet']
+     begin_dt:                  2019-06-26 00:00:00
+     end_dt:                    2019-06-27 00:00:00
+     tweet_type:                tweet
+     max_count:                 None
+     word_type:                 None
+     tweets_word_select         
+     is_covid:                  None
+     a_word:                    
+     concord_word_select:       
+     is_ascii:                  True
+     words_word_select          
+     min_group_by_count         0
+     words_is_word_null         None
+     default_order_by:          
+     gui_order_by:              tweets.tweet_datetime, tweets.tweet_type
+     my_count:                  None
+     sql:                       
+     sql_where:                 
+     sql_having:                
+     sql_data:                  []
+     output_append:             No Append
+
+
+
+2020-06-24 18:58:22,914 - tweet - DEBUG - select and output; execute_args ('SELECT  tweets.tweet_datetime, tweets.tweet \n     FROM tweets \n WHERE \n    tweets.tweet_datetime  >= ?  AND  \n    tweets.tweet_datetime <= ?  AND  \n    tweets.tweet_type = ?   ORDER BY tweets.tweet_datetime ', [datetime.datetime(2019, 6, 26, 0, 0), datetime.datetime(2019, 6, 27, 0, 0), 'tweet'])
+2020-06-24 18:58:22,969 - tweet - DEBUG - select complete with footer info: Done: >
+     total number of rows = 26
+     select and file write took 0.009760379791259766 seconds
+
+2020-06-24 18:58:22,979 - tweet - DEBUG - Select Done, rows selected: 26 time = 0.009760379791259766
+2020-06-24 18:58:24,785 - tweet - DEBUG - tweet_select_1 builder vars: builder vars for SQLBuilder( self.x ):
+     db_name:                   R:\Temp\2016_thru_may_2020.db
+     select_name:               slider_select
+     output_format:             msg
+     columns_out:               ['tweets.tweet_datetime', 'tweets.tweet']
+     begin_dt:                  2016-06-29 00:00:00
+     end_dt:                    2016-06-30 00:00:00
+     tweet_type:                tweet
+     max_count:                 None
+     word_type:                 None
+     tweets_word_select         
+     is_covid:                  None
+     a_word:                    
+     concord_word_select:       
+     is_ascii:                  True
+     words_word_select          
+     min_group_by_count         0
+     words_is_word_null         None
+     default_order_by:          
+     gui_order_by:              tweets.tweet_datetime, tweets.tweet_type
+     my_count:                  None
+     sql:                       
+     sql_where:                 
+     sql_having:                
+     sql_data:                  []
+     output_append:             No Append
+
+
+
+2020-06-24 18:58:24,786 - tweet - DEBUG - select and output; execute_args ('SELECT  tweets.tweet_datetime, tweets.tweet \n     FROM tweets \n WHERE \n    tweets.tweet_datetime  >= ?  AND  \n    tweets.tweet_datetime <= ?  AND  \n    tweets.tweet_type = ?   ORDER BY tweets.tweet_datetime ', [datetime.datetime(2016, 6, 29, 0, 0), datetime.datetime(2016, 6, 30, 0, 0), 'tweet'])
+2020-06-24 18:58:24,798 - tweet - DEBUG - select complete with footer info: Done: >
+     total number of rows = 9
+     select and file write took 0.010750532150268555 seconds
+
+2020-06-24 18:58:24,798 - tweet - DEBUG - Select Done, rows selected: 9 time = 0.010750532150268555
+2020-06-24 18:58:26,404 - tweet - DEBUG - tweet_select_1 builder vars: builder vars for SQLBuilder( self.x ):
+     db_name:                   R:\Temp\2016_thru_may_2020.db
+     select_name:               slider_select
+     output_format:             msg
+     columns_out:               ['tweets.tweet_datetime', 'tweets.tweet']
+     begin_dt:                  2017-06-28 00:00:00
+     end_dt:                    2017-06-29 00:00:00
+     tweet_type:                tweet
+     max_count:                 None
+     word_type:                 None
+     tweets_word_select         
+     is_covid:                  None
+     a_word:                    
+     concord_word_select:       
+     is_ascii:                  True
+     words_word_select          
+     min_group_by_count         0
+     words_is_word_null         None
+     default_order_by:          
+     gui_order_by:              tweets.tweet_datetime, tweets.tweet_type
+     my_count:                  None
+     sql:                       
+     sql_where:                 
+     sql_having:                
+     sql_data:                  []
+     output_append:             No Append
+
+
+
+2020-06-24 18:58:26,406 - tweet - DEBUG - select and output; execute_args ('SELECT  tweets.tweet_datetime, tweets.tweet \n     FROM tweets \n WHERE \n    tweets.tweet_datetime  >= ?  AND  \n    tweets.tweet_datetime <= ?  AND  \n    tweets.tweet_type = ?   ORDER BY tweets.tweet_datetime ', [datetime.datetime(2017, 6, 28, 0, 0), datetime.datetime(2017, 6, 29, 0, 0), 'tweet'])
+2020-06-24 18:58:26,417 - tweet - DEBUG - select complete with footer info: Done: >
+     total number of rows = 8
+     select and file write took 0.010686159133911133 seconds
+
+2020-06-24 18:58:26,417 - tweet - DEBUG - Select Done, rows selected: 8 time = 0.010686159133911133
+2020-06-25 11:07:53,893 - tweet - INFO - TweetApp: all done
+2020-06-25 11:08:00,510 - tweet - DEBUG - Done config_logger
+2020-06-25 11:08:00,510 - tweet - Notice - 
+
+
+============================
+
+Running TweetApp version = Ver: Alpha 15 - 2020 06 17.1 mode = db_in_code_dir
+
+2020-06-25 11:08:00,510 - tweet - Notice - 
+
+
+============================
+
+Running TweetApp version = Ver: Alpha 15 - 2020 06 17.1 mode = db_in_code_dir
+
+command line arg 0 =  D:\Russ\0000\python00\python3\_projects\twitter_analysis_db\parameters.py
+current directory D:\Russ\0000\python00\python3\_projects\twitter_analysis_db
+2020-06-25 11:08:00,510 - tweet - Notice - <parameters.Parameters object at 0x0000024C381B8688>
+2020-06-25 11:08:00,510 - tweet - Notice - Time now: 2020-06-25 15:08:00
+2020-06-25 11:08:00,766 - tweet.gui - INFO - in class gui_new GUI init
+2020-06-25 11:08:00,939 - tweet - Notice - process memory =     583.89 mega bytes 
+2020-06-25 11:08:05,557 - tweet - DEBUG - tweet_select_1 builder vars: builder vars for SQLBuilder( self.x ):
+     db_name:                   ./2016_thru_may_2020.db
+     select_name:               Tweets ( tweets ) - 01
+     output_format:             html
+     columns_out:               ["'*rc*'", 'tweets.tweet_datetime', 'tweets.time_of_day', 'tweets.tweet_type', 'tweets.tweet', 'tweets.tweet_id']
+     begin_dt:                  2019-10-10 00:00:00
+     end_dt:                    2020-11-20 00:00:00
+     tweet_type:                tweet
+     max_count:                 None
+     word_type:                 None
+     tweets_word_select         
+     is_covid:                  None
+     a_word:                    
+     concord_word_select:       
+     is_ascii:                  True
+     words_word_select          
+     min_group_by_count         0
+     words_is_word_null         None
+     default_order_by:          
+     gui_order_by:              tweets.tweet_datetime, tweets.tweet_type
+     my_count:                  None
+     sql:                       
+     sql_where:                 
+     sql_having:                
+     sql_data:                  []
+     output_append:             No Append
+
+
+
+2020-06-25 11:08:05,570 - tweet - DEBUG - select and output; execute_args ("SELECT  '*rc*', tweets.tweet_datetime, tweets.time_of_day, tweets.tweet_type, tweets.tweet, tweets.tweet_id FROM tweets \n WHERE \n    tweets.tweet_datetime  >= ?  AND  \n    tweets.tweet_datetime <= ?  AND  \n    tweets.tweet_type = ?   \n    ORDER BY tweets.tweet_datetime, tweets.tweet_type ", [datetime.datetime(2019, 10, 10, 0, 0), datetime.datetime(2020, 11, 20, 0, 0), 'tweet'])
+2020-06-25 11:08:05,670 - tweet - DEBUG - select complete with footer info: Done: >
+     total number of rows = 3452
+     select and file write took 0.10247993469238281 seconds
+
+footer_function from row count
+2020-06-25 11:08:05,674 - tweet - DEBUG - Select Done, rows selected: 3452 time = 0.10247993469238281
+2020-06-25 11:08:22,703 - tweet - DEBUG - tweet_select_1 builder vars: builder vars for SQLBuilder( self.x ):
+     db_name:                   ./2016_thru_may_2020.db
+     select_name:               slider_select
+     output_format:             msg
+     columns_out:               ['tweets.tweet_datetime', 'tweets.tweet']
+     begin_dt:                  2019-06-27 00:00:00
+     end_dt:                    2019-06-28 00:00:00
+     tweet_type:                tweet
+     max_count:                 None
+     word_type:                 None
+     tweets_word_select         
+     is_covid:                  None
+     a_word:                    
+     concord_word_select:       
+     is_ascii:                  True
+     words_word_select          
+     min_group_by_count         0
+     words_is_word_null         None
+     default_order_by:          
+     gui_order_by:              tweets.tweet_datetime, tweets.tweet_type
+     my_count:                  None
+     sql:                       
+     sql_where:                 
+     sql_having:                
+     sql_data:                  []
+     output_append:             No Append
+
+
+
+2020-06-25 11:08:22,709 - tweet - DEBUG - select and output; execute_args ('SELECT  tweets.tweet_datetime, tweets.tweet \n     FROM tweets \n WHERE \n    tweets.tweet_datetime  >= ?  AND  \n    tweets.tweet_datetime <= ?  AND  \n    tweets.tweet_type = ?   ORDER BY tweets.tweet_datetime ', [datetime.datetime(2019, 6, 27, 0, 0), datetime.datetime(2019, 6, 28, 0, 0), 'tweet'])
+2020-06-25 11:08:22,720 - tweet - DEBUG - select complete with footer info: Done: >
+     total number of rows = 11
+     select and file write took 0.010731697082519531 seconds
+
+2020-06-25 11:08:22,720 - tweet - DEBUG - Select Done, rows selected: 11 time = 0.010731697082519531
+2020-06-25 11:08:24,526 - tweet - DEBUG - tweet_select_1 builder vars: builder vars for SQLBuilder( self.x ):
+     db_name:                   ./2016_thru_may_2020.db
+     select_name:               slider_select
+     output_format:             msg
+     columns_out:               ['tweets.tweet_datetime', 'tweets.tweet']
+     begin_dt:                  2017-06-29 00:00:00
+     end_dt:                    2017-06-30 00:00:00
+     tweet_type:                tweet
+     max_count:                 None
+     word_type:                 None
+     tweets_word_select         
+     is_covid:                  None
+     a_word:                    
+     concord_word_select:       
+     is_ascii:                  True
+     words_word_select          
+     min_group_by_count         0
+     words_is_word_null         None
+     default_order_by:          
+     gui_order_by:              tweets.tweet_datetime, tweets.tweet_type
+     my_count:                  None
+     sql:                       
+     sql_where:                 
+     sql_having:                
+     sql_data:                  []
+     output_append:             No Append
+
+
+
+2020-06-25 11:08:24,527 - tweet - DEBUG - select and output; execute_args ('SELECT  tweets.tweet_datetime, tweets.tweet \n     FROM tweets \n WHERE \n    tweets.tweet_datetime  >= ?  AND  \n    tweets.tweet_datetime <= ?  AND  \n    tweets.tweet_type = ?   ORDER BY tweets.tweet_datetime ', [datetime.datetime(2017, 6, 29, 0, 0), datetime.datetime(2017, 6, 30, 0, 0), 'tweet'])
+2020-06-25 11:08:24,558 - tweet - DEBUG - select complete with footer info: Done: >
+     total number of rows = 13
+     select and file write took 0.010776996612548828 seconds
+
+2020-06-25 11:08:24,559 - tweet - DEBUG - Select Done, rows selected: 13 time = 0.010776996612548828
+2020-06-25 11:08:26,364 - tweet - DEBUG - tweet_select_1 builder vars: builder vars for SQLBuilder( self.x ):
+     db_name:                   ./2016_thru_may_2020.db
+     select_name:               slider_select
+     output_format:             msg
+     columns_out:               ['tweets.tweet_datetime', 'tweets.tweet']
+     begin_dt:                  2018-06-28 00:00:00
+     end_dt:                    2018-06-29 00:00:00
+     tweet_type:                tweet
+     max_count:                 None
+     word_type:                 None
+     tweets_word_select         
+     is_covid:                  None
+     a_word:                    
+     concord_word_select:       
+     is_ascii:                  True
+     words_word_select          
+     min_group_by_count         0
+     words_is_word_null         None
+     default_order_by:          
+     gui_order_by:              tweets.tweet_datetime, tweets.tweet_type
+     my_count:                  None
+     sql:                       
+     sql_where:                 
+     sql_having:                
+     sql_data:                  []
+     output_append:             No Append
+
+
+
+2020-06-25 11:08:26,365 - tweet - DEBUG - select and output; execute_args ('SELECT  tweets.tweet_datetime, tweets.tweet \n     FROM tweets \n WHERE \n    tweets.tweet_datetime  >= ?  AND  \n    tweets.tweet_datetime <= ?  AND  \n    tweets.tweet_type = ?   ORDER BY tweets.tweet_datetime ', [datetime.datetime(2018, 6, 28, 0, 0), datetime.datetime(2018, 6, 29, 0, 0), 'tweet'])
+2020-06-25 11:08:26,378 - tweet - DEBUG - select complete with footer info: Done: >
+     total number of rows = 14
+     select and file write took 0.009765863418579102 seconds
+
+2020-06-25 11:08:26,378 - tweet - DEBUG - Select Done, rows selected: 14 time = 0.009765863418579102
+2020-06-25 11:08:28,784 - tweet - DEBUG - tweet_select_1 builder vars: builder vars for SQLBuilder( self.x ):
+     db_name:                   ./2016_thru_may_2020.db
+     select_name:               slider_select
+     output_format:             msg
+     columns_out:               ['tweets.tweet_datetime', 'tweets.tweet']
+     begin_dt:                  2016-06-30 00:00:00
+     end_dt:                    2016-07-01 00:00:00
+     tweet_type:                tweet
+     max_count:                 None
+     word_type:                 None
+     tweets_word_select         
+     is_covid:                  None
+     a_word:                    
+     concord_word_select:       
+     is_ascii:                  True
+     words_word_select          
+     min_group_by_count         0
+     words_is_word_null         None
+     default_order_by:          
+     gui_order_by:              tweets.tweet_datetime, tweets.tweet_type
+     my_count:                  None
+     sql:                       
+     sql_where:                 
+     sql_having:                
+     sql_data:                  []
+     output_append:             No Append
+
+
+
+2020-06-25 11:08:28,856 - tweet - DEBUG - select and output; execute_args ('SELECT  tweets.tweet_datetime, tweets.tweet \n     FROM tweets \n WHERE \n    tweets.tweet_datetime  >= ?  AND  \n    tweets.tweet_datetime <= ?  AND  \n    tweets.tweet_type = ?   ORDER BY tweets.tweet_datetime ', [datetime.datetime(2016, 6, 30, 0, 0), datetime.datetime(2016, 7, 1, 0, 0), 'tweet'])
+2020-06-25 11:08:28,867 - tweet - DEBUG - select complete with footer info: Done: >
+     total number of rows = 11
+     select and file write took 0.08208847045898438 seconds
+
+2020-06-25 11:08:28,868 - tweet - DEBUG - Select Done, rows selected: 11 time = 0.08208847045898438
+2020-06-25 11:08:48,799 - tweet - INFO - TweetApp: all done

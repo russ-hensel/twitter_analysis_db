@@ -894,7 +894,7 @@ class SelectHTMLWriter( SelectWriter ):
             line_parts.append( fmt.format( x =  col_text  ) )
 
         self.line_parts    = line_parts   # for later use
-        self.html_table    = html_local.Table( header_row = line_parts )
+        self.html_table    = HTML.Table( header_row = line_parts )
 
         msg   = f"SelectHTMLWriter write_header()  columns_out  {columns_out}"
         #AppGlobal.print_debug( msg )

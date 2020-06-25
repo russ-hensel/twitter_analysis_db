@@ -38,10 +38,10 @@ class Parameters( object ):
 
         """
         pass                              # if everything else is commented out
-        self.mode_2020_test()
+        #self.mode_2020_test()
         #self.mode_hillary()
         #self.mode_tiny_test()
-        #self.mode_db_in_code_dir()
+        self.mode_db_in_code_dir()
         # --- probably obsolete, save for ref
         #self.mode_db_in_code_dir()
         #self.mode_big_test()
@@ -67,8 +67,10 @@ class Parameters( object ):
         self.mode                    = "db_in_code_dir"                        # mode for db in same dir as code
         self.database_name           = r"./all_words_tweets_to_all2019.db"     # location of the sqlite db, file name
                                                                                # move to ram drive for fasted response
+
+        self.database_name           = r"./2016_thru_may_2020.db"
         # ------------- data load
-        self.show_db_def             = False    # True or False  show db def features in the gui
+        self.show_db_def             = True   # True or False  show db def features in the gui
                                                # normally False so you do not trash db by mistake
 
         self.tweet_input_file_name   = r"./input/all_tweets_2019.txt"   # input data for tweets
